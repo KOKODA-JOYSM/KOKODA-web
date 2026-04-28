@@ -1,5 +1,9 @@
 import { Head } from '@inertiajs/react';
 import Navbar from '@/Components/navbar';
+import tailwindConfig from '../../../tailwind.config.js';
+
+const { colors } = tailwindConfig.theme.extend;
+const COLOR_BASE = colors.base;
 
 /**
  * AppLayout — layout utama aplikasi KOKODA.
@@ -25,7 +29,7 @@ export default function AppLayout({ title, children }) {
             {title && <Head title={title} />}
 
             {/* Wrapper utama: sidebar + konten */}
-            <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#FFF6EC' }}>
+            <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: COLOR_BASE }}>
 
                 {/* Navbar sudah handle hamburger, responsive, semua */}
                 <Navbar />
