@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import Navbar from '@/Components/navbar';
+import Navbar from '@/Components/Common/navbar.jsx';
 import tailwindConfig from '../../../tailwind.config.js';
 
 const { colors } = tailwindConfig.theme.extend;
