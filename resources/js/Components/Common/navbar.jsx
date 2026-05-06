@@ -51,7 +51,7 @@ export default function Navbar() {
                     pt-16 sm:pt-12 lg:pt-8
                     px-4 sm:px-5 md:px-6 lg:px-7
                     pb-6
-                    fixed lg:sticky top-0 left-0 z-[10000]
+                    fixed lg:sticky top-0 left-0 z-1
                     transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
                     lg:transform-none lg:translate-x-0
                     ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}

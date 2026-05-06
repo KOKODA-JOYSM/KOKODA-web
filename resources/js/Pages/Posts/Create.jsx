@@ -1,0 +1,397 @@
+import React, { useState } from 'react';
+import AppLayout from '@/Layouts/AppLayout';
+import { useForm } from '@inertiajs/react';
+import tailwindConfig from '../../../../tailwind.config.js';
+
+const { colors } = tailwindConfig.theme.extend;
+const COLOR_PRIMARY = colors.primary;    // '#F4C799'
+const COLOR_SECONDARY = colors.secondary; // '#C0976C'
+
+export default function Create() {
+    const [preview, setPreview] = useState(null);
+    const { data, setData, post, processing, errors } = useForm({
+        title: '',
+        description: '',
+        location: '',
+        type: 'lost', // or 'found'
+        category: '',
+        image_url: null,
+    });
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('image_url', file);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setPreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        // Create FormData for multipart/form-data
+        const formData = new FormData();
+        formData.append('title', data.title);
+        formData.append('description', data.description);
+        formData.append('location', data.location);
+        formData.append('type', data.type);
+        formData.append('category', data.category);
+        if (data.image_url) {
+            formData.append('image_url', data.image_url);
+        }
+
+        // Use Inertia post with FormData
+        post(route('posts.store'), {
+            data: formData,
+            forceFormData: true,
+            onSuccess: () => {
+                // Clear form on success
+                setData({
+                    title: '',
+                    description: '',
+                    location: '',
+                    type: 'lost',
+                    category: '',
+                    image_url: null,
+                });
+                setPreview(null);
+            },
+        });
+    };
+
+    const formFieldStyle = {
+        width: '100%',
+        padding: '12px 16px',
+        borderRadius: '8px',
+        border: `2px solid ${COLOR_PRIMARY}`,
+        fontSize: '14px',
+        fontFamily: "'Quicksand', sans-serif",
+        boxSizing: 'border-box',
+        transition: 'border-color 0.2s ease',
+    };
+
+    const errorStyle = {
+        color: '#D56666',
+        fontSize: '12px',
+        marginTop: '4px',
+    };
+
+    return (
+        <AppLayout title="Create Post - KOKODA">
+            <div style={{ padding: '32px 28px', maxWidth: '600px', margin: '0 auto' }}>
+                
+                <h1 style={{
+                    fontFamily: "'Quicksand', sans-serif",
+                    fontSize: '28px',
+                    fontWeight: '700',
+                    color: '#311A05',
+                    margin: '0 0 24px 0',
+                }}>
+                    Report a Lost or Found Item
+                </h1>
+
+                <form onSubmit={handleSubmit}>
+                    
+                    {/* Type Selection */}
+                    <div style={{ marginBottom: '24px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontFamily: "'Quicksand', sans-serif",
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#311A05',
+                            marginBottom: '10px',
+                        }}>
+                            Item Type <span style={{ color: '#D56666' }}>*</span>
+                        </label>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            {['lost', 'found'].map(type => (
+                                <label key={type} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    cursor: 'pointer',
+                                }}>
+                                    <input
+                                        type="radio"
+                                        name="type"
+                                        value={type}
+                                        checked={data.type === type}
+                                        onChange={(e) => setData('type', e.target.value)}
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                    <span style={{
+                                        fontSize: '14px',
+                                        color: '#333',
+                                    }}>
+                                        {type === 'lost' ? '❌ Lost Item' : '✅ Found Item'}
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Title */}
+                    <div style={{ marginBottom: '24px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontFamily: "'Quicksand', sans-serif",
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#311A05',
+                            marginBottom: '8px',
+                        }}>
+                            Title <span style={{ color: '#D56666' }}>*</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="E.g., Black Wallet Lost at Central Park"
+                            value={data.title}
+                            onChange={(e) => setData('title', e.target.value)}
+                            onFocus={(e) => {
+                                e.target.style.borderColor = COLOR_SECONDARY;
+                            }}
+                            onBlur={(e) => {
+                                e.target.style.borderColor = COLOR_PRIMARY;
+                            }}
+                            style={formFieldStyle}
+                        />
+                        {errors.title && <div style={errorStyle}>{errors.title}</div>}
+                    </div>
+
+                    {/* Category */}
+                    <div style={{ marginBottom: '24px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontFamily: "'Quicksand', sans-serif",
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#311A05',
+                            marginBottom: '8px',
+                        }}>
+                            Category
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="E.g., Wallet, Phone, Keys, Pet, Other"
+                            value={data.category}
+                            onChange={(e) => setData('category', e.target.value)}
+                            style={formFieldStyle}
+                            onFocus={(e) => {
+                                e.target.style.borderColor = COLOR_SECONDARY;
+                            }}
+                            onBlur={(e) => {
+                                e.target.style.borderColor = COLOR_PRIMARY;
+                            }}
+                        />
+                        {errors.category && <div style={errorStyle}>{errors.category}</div>}
+                    </div>
+
+                    {/* Location */}
+                    <div style={{ marginBottom: '24px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontFamily: "'Quicksand', sans-serif",
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#311A05',
+                            marginBottom: '8px',
+                        }}>
+                            Location <span style={{ color: '#D56666' }}>*</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Where was the item lost or found?"
+                            value={data.location}
+                            onChange={(e) => setData('location', e.target.value)}
+                            style={formFieldStyle}
+                            onFocus={(e) => {
+                                e.target.style.borderColor = COLOR_SECONDARY;
+                            }}
+                            onBlur={(e) => {
+                                e.target.style.borderColor = COLOR_PRIMARY;
+                            }}
+                        />
+                        {errors.location && <div style={errorStyle}>{errors.location}</div>}
+                    </div>
+
+                    {/* Description */}
+                    <div style={{ marginBottom: '24px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontFamily: "'Quicksand', sans-serif",
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#311A05',
+                            marginBottom: '8px',
+                        }}>
+                            Description <span style={{ color: '#D56666' }}>*</span>
+                        </label>
+                        <textarea
+                            placeholder="Describe the item in detail (color, size, unique features, etc.)"
+                            value={data.description}
+                            onChange={(e) => setData('description', e.target.value)}
+                            rows="5"
+                            style={{
+                                ...formFieldStyle,
+                                resize: 'vertical',
+                                fontFamily: "'Quicksand', sans-serif",
+                            }}
+                            onFocus={(e) => {
+                                e.target.style.borderColor = COLOR_SECONDARY;
+                            }}
+                            onBlur={(e) => {
+                                e.target.style.borderColor = COLOR_PRIMARY;
+                            }}
+                        />
+                        {errors.description && <div style={errorStyle}>{errors.description}</div>}
+                    </div>
+
+                    {/* Image Upload */}
+                    <div style={{ marginBottom: '24px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontFamily: "'Quicksand', sans-serif",
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#311A05',
+                            marginBottom: '8px',
+                        }}>
+                            Upload Image
+                        </label>
+                        <div style={{
+                            border: `2px dashed ${COLOR_PRIMARY}`,
+                            borderRadius: '8px',
+                            padding: '20px',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                        }}
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                            e.currentTarget.style.backgroundColor = '#FFF5E6';
+                        }}
+                        onDragLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                        }}>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                style={{ display: 'none' }}
+                                id="image-input"
+                            />
+                            <label htmlFor="image-input" style={{ cursor: 'pointer' }}>
+                                {preview ? (
+                                    <div>
+                                        <img
+                                            src={preview}
+                                            alt="Preview"
+                                            style={{
+                                                maxWidth: '100%',
+                                                maxHeight: '200px',
+                                                borderRadius: '8px',
+                                                marginBottom: '12px',
+                                            }}
+                                        />
+                                        <p style={{
+                                            fontSize: '12px',
+                                            color: '#666',
+                                            margin: 0,
+                                        }}>
+                                            Click to change image
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <div style={{
+                                            fontSize: '32px',
+                                            marginBottom: '8px',
+                                        }}>
+                                            📸
+                                        </div>
+                                        <p style={{
+                                            fontSize: '14px',
+                                            color: '#666',
+                                            margin: 0,
+                                        }}>
+                                            Click to upload or drag and drop
+                                        </p>
+                                    </div>
+                                )}
+                            </label>
+                        </div>
+                        {errors.image_url && <div style={errorStyle}>{errors.image_url}</div>}
+                    </div>
+
+                    {/* Buttons */}
+                    <div style={{
+                        display: 'flex',
+                        gap: '12px',
+                        marginTop: '32px',
+                    }}>
+                        <button
+                            type="button"
+                            onClick={() => window.history.back()}
+                            style={{
+                                flex: 1,
+                                padding: '12px 20px',
+                                backgroundColor: '#E8E8E8',
+                                color: '#333',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                fontFamily: "'Quicksand', sans-serif",
+                                transition: 'all 0.2s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#D0D0D0';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = '#E8E8E8';
+                            }}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            style={{
+                                flex: 1,
+                                padding: '12px 20px',
+                                backgroundColor: COLOR_PRIMARY,
+                                color: '#FFF',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                cursor: processing ? 'not-allowed' : 'pointer',
+                                fontFamily: "'Quicksand', sans-serif",
+                                opacity: processing ? 0.6 : 1,
+                                transition: 'all 0.2s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                                if (!processing) {
+                                    e.currentTarget.style.backgroundColor = COLOR_SECONDARY;
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (!processing) {
+                                    e.currentTarget.style.backgroundColor = COLOR_PRIMARY;
+                                }
+                            }}
+                        >
+                            {processing ? 'Creating...' : 'Create Post'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </AppLayout>
+    );
+}
