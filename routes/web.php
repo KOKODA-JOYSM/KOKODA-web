@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\LeaderboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -27,5 +28,8 @@ Route::middleware('auth')->group(function () {
 Route::get('/search',function(){
     return Inertia::render('search');
 })->name('search');
+
+Route::get('/leaderboard', [LeaderboardController::class, 'show'])->name('leaderboard');
+Route::get('/api/leaderboard', [LeaderboardController::class, 'index']);
 
 require __DIR__.'/auth.php';
