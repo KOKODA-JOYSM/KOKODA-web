@@ -12,7 +12,7 @@ export default function TopRankings({ users }) {
 
     return (
         <div className="mb-20">
-            <div className="flex flex-col md:flex-row items-end justify-center gap-6 md:gap-8 lg:gap-12 px-4 max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center md:items-end justify-center gap-6 md:gap-8 lg:gap-12 px-4 max-w-6xl mx-auto">
                 {/* 2nd Place - Left */}
                 {users[1] && (
                     <div className="flex flex-col items-center">
