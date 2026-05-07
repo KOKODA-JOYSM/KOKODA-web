@@ -7,8 +7,63 @@ export default function Home({ posts }) {
     const [filterType, setFilterType] = useState('all'); // 'all', 'lost', 'found'
     const [showCreateModal, setShowCreateModal] = useState(false);
 
+    // Dummy posts data for testing
+    const dummyPosts = [
+        {
+            id: 1,
+            title: 'Lost Golden Retriever',
+            description: 'Missing since Monday afternoon near Central Park. Very friendly dog, answers to Max. Please call if spotted!',
+            location: 'Central Park, New York',
+            type: 'lost',
+            category: 'Pet',
+            user: { id: 1, name: 'John Doe' },
+            created_at: '2024-05-05T10:30:00',
+            image_url: null,
+            status: 'active'
+        },
+        {
+            id: 2,
+            title: 'Found Blue Backpack',
+            description: 'Found a blue North Face backpack at the coffee shop. Contains some books and a laptop charger. DM me to claim!',
+            location: 'Coffee Shop Downtown',
+            type: 'found',
+            category: 'Bag',
+            user: { id: 2, name: 'Jane Smith' },
+            created_at: '2024-05-04T15:45:00',
+            image_url: null,
+            status: 'active'
+        },
+        {
+            id: 3,
+            title: 'Lost Silver Watch',
+            description: 'Vintage Rolex watch lost at the mall. Has sentimental value. Reward offered for safe return.',
+            location: 'Shopping Mall',
+            type: 'lost',
+            category: 'Accessory',
+            user: { id: 3, name: 'Mike Johnson' },
+            created_at: '2024-05-03T12:20:00',
+            image_url: null,
+            status: 'active'
+        },
+        {
+            id: 4,
+            title: 'Found House Keys',
+            description: 'Found a set of house keys with a blue keychain near the bus stop. Please describe the keychain to claim.',
+            location: 'Bus Stop Main Street',
+            type: 'found',
+            category: 'Key',
+            user: { id: 4, name: 'Sarah Wilson' },
+            created_at: '2024-05-02T09:15:00',
+            image_url: null,
+            status: 'active'
+        },
+    ];
+
+    // Use dummy posts if no posts from server
+    const postsData = posts && posts.data && posts.data.length > 0 ? posts : { data: dummyPosts };
+
     // Filter posts berdasarkan type
-    const filteredPosts = posts.data.filter(post => {
+    const filteredPosts = postsData.data.filter(post => {
         return filterType === 'all' || post.type === filterType;
     });
 

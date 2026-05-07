@@ -1,5 +1,5 @@
-import InputError from '@/Components/InputError';
-import TextInput from '@/Components/TextInput';
+import InputError from '@/Components/Auth/InputError';
+import TextInput from '@/Components/Auth/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function ForgotPassword({ status }) {

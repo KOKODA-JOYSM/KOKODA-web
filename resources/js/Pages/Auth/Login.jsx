@@ -1,6 +1,6 @@
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import TextInput from '@/Components/TextInput';
+import Checkbox from '@/Components/Auth/Checkbox';
+import InputError from '@/Components/Auth/InputError';
+import TextInput from '@/Components/Auth/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
