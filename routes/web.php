@@ -26,7 +26,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/search',function(){
-    return Inertia::render('search');
+    return Inertia::render('Search');
 })->name('search');
 
 Route::get('/leaderboard', [LeaderboardController::class, 'show'])->name('leaderboard');
