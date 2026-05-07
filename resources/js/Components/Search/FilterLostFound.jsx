@@ -16,7 +16,7 @@ export default function FilterLostFound({ selected, onChange }) {
                         onClick={() => onChange(isSelected ? 'all' : f.id)}
                         className={`px-8 py-2 rounded-full font-quicksand font-bold transition-all shadow-md ${
                             isSelected
-                                ? 'bg-secondary text-white'
+                                ? 'bg-highlight text-tertiary'
                                 : 'bg-base text-tertiary hover:bg-gray-100'
                         }`}
                     >
