@@ -23,7 +23,7 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen bg-primary px-4 pt-6 pb-8 font-quicksand text-tertiary sm:px-6 lg:flex lg:items-center lg:justify-center">
+        <div className="flex min-h-screen items-center justify-center bg-primary px-4 py-8 font-quicksand text-tertiary sm:px-6">
             <Head title="Register" />
 
             <div className="w-full max-w-5xl overflow-hidden rounded-2xl bg-base shadow-xl lg:grid lg:min-h-[440px] lg:grid-cols-[2fr_3fr]">
