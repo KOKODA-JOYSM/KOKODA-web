@@ -47,7 +47,7 @@ export default function Navbar() {
             {/* ── SIDEBAR ── */}
             <aside
                 className={`flex flex-col flex-shrink-0 box-border bg-primary
-                    w-64 sm:w-72 md:w-80 lg:w-72 xl:w-80 2xl:w-[340px]
+                    w-[50%] sm:w-56 md:w-72 lg:w-72 xl:w-80 2xl:w-[340px]
                     h-screen
                     pt-4 sm:pt-5 lg:pt-6
                     px-4 sm:px-5 lg:px-5
