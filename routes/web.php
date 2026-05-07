@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\PostController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,5 +32,18 @@ Route::get('/search',function(){
 
 Route::get('/leaderboard', [LeaderboardController::class, 'show'])->name('leaderboard');
 Route::get('/api/leaderboard', [LeaderboardController::class, 'index']);
+
+// Public routes for posts
+Route::get('/home', [PostController::class, 'index'])->name('home');
+Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+
+// Protected routes for posts
+Route::middleware('auth')->group(function () {
+    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+});
 
 require __DIR__.'/auth.php';
