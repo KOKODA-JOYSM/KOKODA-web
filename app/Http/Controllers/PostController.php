@@ -17,10 +17,19 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('user')
-            ->where('status', 'active')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        // Database temporarily disabled
+        // $posts = Post::with('user')
+        //     ->where('status', 'active')
+        //     ->orderBy('created_at', 'desc')
+        //     ->paginate(10);
+
+        // Return dummy data for now
+        $posts = [
+            'data' => [],
+            'current_page' => 1,
+            'per_page' => 10,
+            'total' => 0,
+        ];
 
         return Inertia::render('Home', [
             'posts' => $posts,
