@@ -114,6 +114,6 @@ class RegisteredUserController extends Controller
 
         $request->session()->forget('pending_registration');
 
-        return redirect()->route('dashboard');
+        return redirect()->route('home');
     }
 }
