@@ -73,7 +73,7 @@ export default function RegisterOtp({ expiresAt, email, status, otpPreview }) {
     };
 
     return (
-        <div className="min-h-screen bg-primary px-4 py-8 font-quicksand text-tertiary sm:px-6 lg:flex lg:items-center lg:justify-center">
+        <div className="flex min-h-screen items-center justify-center bg-primary px-4 py-8 font-quicksand text-tertiary sm:px-6">
             <Head title="OTP Verification" />
 
             <div className="w-full max-w-2xl rounded-xl bg-base px-7 py-8 shadow-lg sm:px-10">
