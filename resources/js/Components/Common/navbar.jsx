@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 
 // ─────────────────────────────────────────────
-//  NAV ITEMS CONFIG
+//  NAV ITEMS 
 // ─────────────────────────────────────────────
 const NAV_ITEMS = [
     { label: 'Home',        href: '/home',        icon: '/images/icon-home.svg'        },
