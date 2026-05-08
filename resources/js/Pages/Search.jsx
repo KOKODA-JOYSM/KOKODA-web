@@ -31,7 +31,7 @@ export default function Search() {
             const matchesType = typeFilter === 'all' || item.type === typeFilter;
             
             // Location filter
-            const matchesLocation = locationFilter === 'All Locations' || item.location === locationFilter;
+            const matchesLocation = locationFilter === 'All Locations' || item.location.toLowerCase() === locationFilter.toLowerCase();
 
             return matchesSearch && matchesType && matchesLocation;
         });
@@ -39,7 +39,7 @@ export default function Search() {
 
     return (
         <AppLayout title="Search">
-            <div className="min-h-screen bg-background pt-10 px-4 md:px-8 flex justify-center">
+            <div className="min-h-screen bg-background -mt-16 lg:mt-0 pt-20 lg:pt-10 px-4 md:px-8 flex justify-center">
                 <div className="w-full max-w-3xl">
                     {/* Search Bar */}
                     <div className="mb-6">

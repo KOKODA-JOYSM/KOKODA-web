@@ -38,7 +38,7 @@ export default function SearchResult({ items }) {
                             {item.description} <span className="font-bold cursor-pointer">....... Read More</span>
                         </p>
                         
-                        <div className={`absolute bottom-3 right-3 px-3 py-1.5 rounded-lg text-white font-bold text-sm shadow-sm ${item.type === 'lost' ? 'bg-[#D56666]' : 'bg-[#5D8CAD]'}`}>
+                        <div className={`absolute bottom-3 right-3 w-[100px] text-center px-3 py-1.5 rounded-lg text-white font-bold text-sm shadow-sm ${item.type === 'lost' ? 'bg-[#D56666]' : 'bg-[#5D8CAD]'}`}>
                             {item.type === 'lost' ? 'Lost Item' : 'Found Item'}
                         </div>
                     </div>
