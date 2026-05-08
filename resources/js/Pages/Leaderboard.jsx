@@ -25,7 +25,7 @@ export default function Leaderboard() {
 
     return (
         <AppLayout title="Leaderboard">
-            <div className="min-h-screen bg-background p-6 md:p-12">
+            <div className="min-h-screen bg-background px-6 pb-6 pt-[calc(4rem+1.5rem)] -mt-16 md:px-12 md:pb-12 md:pt-[calc(4rem+3rem)] lg:mt-0 lg:p-12">
                 {/* Title */}
                 <div className="mb-16">
                     <h1 className="font-quicksand text-3xl md:text-6xl font-bold text-secondary text-center drop-shadow-md">
