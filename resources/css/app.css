@@ -18,6 +18,7 @@
   /* Page content offset for mobile hamburger button */
   .kokoda-page-content {
       padding-top: 4rem; /* 64px — space for hamburger */
+      background-color: #FFF6EC; /* match page background so padding-top area isn't white */
   }
 
   @media (min-width: 1024px) {
