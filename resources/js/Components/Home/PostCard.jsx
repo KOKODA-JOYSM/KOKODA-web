@@ -36,7 +36,7 @@ export default function PostCard({ post }) {
                 // Normal Card Viewz
                 <div
                     onClick={() => setShowDetail(true)}
-                    className="bg-base rounded-2xl overflow-hidden shadow-md transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 md:max-w-[900px] lg:max-w-[1000px] md:mx-auto"
+                    className="bg-base rounded-2xl overflow-hidden shadow-md transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 md:max-w-[900px] lg:max-w-[1000px] mx-auto xs:min-w-[500px]"
                 >
                     {/* Header - User Info & Location (mobile/tablet: location under username; desktop: location on right) */}
                     <div className="flex flex-col md:flex-row md:justify-between md:items-center px-4 md:px-8 py-3 md:py-5 border-b border-gray-100">
@@ -92,7 +92,7 @@ export default function PostCard({ post }) {
                             </button>
 
                             {/* Item Label (compact on mobile/tablet, larger on desktop) */}
-                            <div className={`${labelColor} text-lg md:text-base sm:text-base px-3 py-1 rounded font-bold font-quicksand whitespace-nowrap inline-flex items-center justify-center shadow-lg`}>
+                            <div className={`${labelColor} text-lg text-base px-3 py-1 rounded font-bold font-quicksand whitespace-nowrap inline-flex items-center justify-center shadow-lg`}>
                                 {isFounded ? 'FOUND' : 'LOST'}
                             </div>
                         </div>
