@@ -33,31 +33,42 @@ export default function PostCard({ post }) {
     return (
         <>
             {!showComments ? (
-                // Normal Card View
+                // Normal Card Viewz
                 <div
                     onClick={() => setShowDetail(true)}
-                    className="bg-base rounded-2xl overflow-hidden shadow-md transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-0.5"
+                    className="bg-base rounded-2xl overflow-hidden shadow-md transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 md:max-w-[900px] lg:max-w-[1000px] mx-auto xs:min-w-[500px]"
                 >
-                    {/* Header - User Info & Location */}
-                    <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100">
-                        {/* Left: User Avatar & Name */}
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-highlight flex items-center justify-center text-sm font-bold flex-shrink-0">
+                    {/* Header - User Info & Location (mobile/tablet: location under username; desktop: location on right) */}
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center px-4 md:px-8 py-3 md:py-5 border-b border-gray-100">
+                        {/* Left: User Avatar, Name, and (mobile) Location */}
+                        <div className="flex items-center gap-3 w-full md:w-auto">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-highlight flex items-center justify-center text-sm font-bold flex-shrink-0">
                                 🦹
                             </div>
-                            <span className="font-quicksand text-xl font-semibold text-tertiary">
-                                @{post.user?.name || 'Unknown'}
-                            </span>
+
+                            <div className="min-w-0 w-full">
+                                <div className="flex items-center justify-between md:justify-start gap-2">
+                                    <span className="font-quicksand text-base md:text-xl font-semibold text-tertiary truncate">
+                                        @{post.user?.name || 'Unknown'}
+                                    </span>
+                                </div>
+
+                                {/* Location shown under username on mobile/tablet */}
+                                <div className="mt-1 md:hidden text-sm text-gray-text-field flex items-center gap-2 w-full">
+                                    <MapPin size={14} />
+                                    <span className="truncate">{post.location}</span>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Right: Location */}
-                        <span className="text-xl text-gray-text-field flex items-center gap-2">
-                            <MapPin /> {post.location}
-                        </span>
+                        {/* Desktop location */}
+                        <div className="hidden md:flex items-center text-lg text-gray-text-field gap-2 md:ml-4">
+                            <MapPin /> <span className="truncate">{post.location}</span>
+                        </div>
                     </div>
 
                     {/* Image Section */}
-                    <div className="relative w-full h-[500px] overflow-hidden bg-gray-100">
+                    <div className="relative w-full h-[500px] md:h-96 lg:h-[420px] overflow-hidden bg-gray-100">
                         <img
                             src={imageUrl}
                             alt={post.title}
@@ -80,9 +91,9 @@ export default function PostCard({ post }) {
                                 <MessageCircle size={32} />
                             </button>
 
-                            {/* Item Label (Right) */}
-                            <div className={`${labelColor} text-base px-3 py-1.5 rounded text-3xl font-bold font-quicksand whitespace-nowrap w-[8rem] h-[3rem] text-center content-center shadow-lg`}>
-                                {isFounded ? 'FOUND ITEM' : 'LOST ITEM'}
+                            {/* Item Label (compact on mobile/tablet, larger on desktop) */}
+                            <div className={`${labelColor} text-lg text-base px-3 py-1 rounded font-bold font-quicksand whitespace-nowrap inline-flex items-center justify-center shadow-lg`}>
+                                {isFounded ? 'FOUND' : 'LOST'}
                             </div>
                         </div>
 

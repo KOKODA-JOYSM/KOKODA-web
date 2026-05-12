@@ -27,13 +27,13 @@ export default function Navbar() {
             {/* ── HAMBURGER BUTTON (tablet & mobile only) ── */}
             <button
                 className="lg:hidden fixed top-4 left-4 sm:top-5 sm:left-5 z-[10001] bg-primary hover:bg-secondary border-none rounded-xl w-10 h-10 sm:w-11 sm:h-11 cursor-pointer flex flex-col items-center justify-center gap-1.5 p-0 transition-colors duration-200 ease-in"
-                onClick={openMenu}
-                aria-label="Open menu"
+                onClick={() => isOpen ? closeMenu() : openMenu()}
+                aria-label={isOpen ? "Close menu" : "Open menu"}
                 aria-expanded={isOpen}
             >
-                <span className="block w-5 sm:w-6 h-0.5 bg-base rounded-sm" />
-                <span className="block w-5 sm:w-6 h-0.5 bg-base rounded-sm" />
-                <span className="block w-5 sm:w-6 h-0.5 bg-base rounded-sm" />
+                <span className={`block w-5 sm:w-6 h-0.5 bg-base rounded-sm transition-all duration-300 ease-in-out ${isOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                <span className={`block w-5 sm:w-6 h-0.5 bg-base rounded-sm transition-all duration-300 ease-in-out ${isOpen ? 'opacity-0' : ''}`} />
+                <span className={`block w-5 sm:w-6 h-0.5 bg-base rounded-sm transition-all duration-300 ease-in-out ${isOpen ? '-rotate-45 -translate-y-2' : ''}`} />
             </button>
 
             {/* ── BACKDROP (closes menu when clicked) ── */}
@@ -50,7 +50,7 @@ export default function Navbar() {
                     h-screen
                     pt-4 sm:pt-5 lg:pt-6
                     px-4 sm:px-5 lg:px-5
-                    pb-4 lg:pb-5
+                    pb-4 sm:pb-4 lg:pb-16
                     fixed lg:sticky top-0 left-0 z-[10000] lg:z-10
                     transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
                     lg:transform-none lg:translate-x-0

@@ -79,10 +79,10 @@ export default function CreatePostModal({ onClose }) {
 
                     {/* Warning Alert */}
                     <div className="mb-8 p-4 px-8 bg-highlight rounded-lg border border-primary flex gap-3 items-start">
-                        <div className="text-7xl flex-shrink-0 leading-none py-8">
+                        <div className="text-4xl md:text-7xl flex-shrink-0 leading-none py-2 md:py-8">
                             ⚠️
                         </div>
-                        <p className="m-0 font-quicksand text-xl py-8 font-bold text-label-lost leading-relaxed">
+                        <p className="m-0 font-quicksand text-sm md:text-xl py-2 md:py-8 font-bold text-label-lost leading-relaxed">
                             Untuk mencegah klaim palsu, mohon tidak mendeskripsikan ciri-ciri spesifik barang secara lengkap. Simpan beberapa detail unik sebagai pertanyaan validasi kepada pihak yang mengklaim nantinya.
                         </p>
                     </div>
