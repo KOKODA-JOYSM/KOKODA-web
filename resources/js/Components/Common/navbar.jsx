@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 
 // ─────────────────────────────────────────────
@@ -6,19 +6,23 @@ import { Link, usePage } from '@inertiajs/react';
 // ─────────────────────────────────────────────
 const NAV_ITEMS = [
     { label: 'Home',        href: '/home',        icon: '/images/icon-home.svg'        },
-    { label: 'Leaderboard', href: '/leaderboard',  icon: '/images/icon-leaderboard.svg' },
-    { label: 'Search',      href: '/search',       icon: '/images/icon-search.svg'      },
-    { label: 'Chat',        href: '/chat',         icon: '/images/icon-chat.svg'        },
+    { label: 'Leaderboard', href: '/leaderboard', icon: '/images/icon-leaderboard.svg' },
+    { label: 'Search',      href: '/search',      icon: '/images/icon-search.svg'      },
+    { label: 'Chat',        href: '/chat',        icon: '/images/icon-chat.svg'        },
 ];
 
 // ─────────────────────────────────────────────
 //  COMPONENT
 // ─────────────────────────────────────────────
 export default function Navbar() {
-    const { url } = usePage();
+    // Ambil URL dan props dengan aman
+    const { url, props } = usePage();
+    const user = props?.auth?.user || null;
+
+    // Pastikan state isOpen ini ADA (ini yang bikin error tadi)
     const [isOpen, setIsOpen] = useState(false);
 
-    const isActive  = (item) => url.startsWith(item.href);
+    const isActive  = (item) => url?.startsWith(item.href);
     const openMenu  = () => setIsOpen(true);
     const closeMenu = () => setIsOpen(false);
 
@@ -69,7 +73,7 @@ export default function Navbar() {
                 {/* DIVIDER */}
                 <div className="w-full h-0.5 bg-secondary opacity-45 rounded-sm mb-4 sm:mb-5 flex-shrink-0" />
 
-                {/* NAV LINKS — flex-1 & scrollable jika konten meluap */}
+                {/* NAV LINKS */}
                 <nav className="w-full flex-1 overflow-y-auto no-scrollbar min-h-0">
                     <ul className="list-none m-0 p-0 flex flex-col gap-1 sm:gap-1.5 w-full">
                         {NAV_ITEMS.map((item) => (
@@ -81,7 +85,6 @@ export default function Navbar() {
                                     rounded-xl cursor-pointer no-underline text-[#FEFEFE] font-quicksand
                                     text-base sm:text-lg lg:text-xl font-semibold border-2 transition-all duration-200 select-none w-full box-border hover:translate-x-1 group ${isActive(item) ? 'border-secondary' : 'border-transparent'}`}
                                     aria-current={isActive(item) ? 'page' : undefined}
-                                    id={`nav-${item.label.toLowerCase()}`}
                                     onClick={closeMenu}
                                 >
                                     <img
@@ -96,16 +99,18 @@ export default function Navbar() {
                     </ul>
                 </nav>
 
-                {/* PROFILE — selalu terlihat, dipinned ke bawah sidebar */}
+                {/* PROFILE LINK (Bisa diklik & Data Dinamis) */}
                 <div className="flex-shrink-0 pt-3">
                     <Link
-                        href="#"
-                        className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-secondary no-underline border-2 border-transparent transition-colors duration-200 cursor-pointer w-full box-border hover:border-base"
+                        href="/profile"
+                        className={`flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-secondary no-underline border-2 transition-colors duration-200 cursor-pointer w-full box-border hover:border-base ${
+                            url?.startsWith('/profile') ? 'border-base' : 'border-transparent'
+                        }`}
                         id="nav-profile"
-                        aria-label="Go to profile (coming soon)"
+                        aria-label="Go to profile"
                         onClick={closeMenu}
                     >
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full shrink-0 overflow-hidden">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full shrink-0 overflow-hidden bg-background">
                             <img
                                 src="/images/icon-profile-avatar.svg"
                                 alt="Profile avatar"
@@ -113,8 +118,12 @@ export default function Navbar() {
                             />
                         </div>
                         <div className="flex flex-col gap-0.5 overflow-hidden min-w-0">
-                            <p className="text-[#FEFEFE] font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">Joysm</p>
-                            <p className="text-[#FEFEFE] font-quicksand text-xs font-normal m-0 whitespace-nowrap overflow-hidden text-ellipsis opacity-75">@ findit.joysm@gmail.com</p>
+                            <p className="text-base font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
+                                {user?.name || 'Joysm'}
+                            </p>
+                            <p className="text-base font-quicksand text-xs font-normal m-0 whitespace-nowrap overflow-hidden text-ellipsis opacity-75">
+                                @ {user?.email || 'findit.joysm@gmail.com'}
+                            </p>
                         </div>
                     </Link>
                 </div>
