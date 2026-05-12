@@ -20,13 +20,23 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// ─────────────────────────────────────────────────────────────────
+// RUTE PROFILE (SUDAH DIUPDATE)
+// ─────────────────────────────────────────────────────────────────
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    // 1. Menampilkan halaman utama profil custom kamu (Pages/Profile/Profile.jsx)
+    Route::get('/profile', function () {
+        return Inertia::render('Profile/Profile');
+    })->name('profile');
+
+    // 2. Menggeser form edit bawaan Breeze ke URL /profile/edit (Pages/Profile/Edit.jsx)
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+// ─────────────────────────────────────────────────────────────────
 
-Route::get('/search',function(){
+Route::get('/search', function () {
     return Inertia::render('Search');
 })->name('search');
 
