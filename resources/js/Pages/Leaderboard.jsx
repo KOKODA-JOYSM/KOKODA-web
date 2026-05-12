@@ -18,7 +18,7 @@ export default function Leaderboard() {
         { id: 10, name: 'Nathaniel Cole', points: 29, rank: 10 },
     ];
 
-    const mockCurrentUser = { rank: 2301, name: 'You', points: 35 };
+    const mockCurrentUser = { rank: 2301, name: 'You', points: 12 };
 
     const topThree = mockLeaderboard.slice(0, 3);
     const restRanking = mockLeaderboard.slice(3, 10);
@@ -38,7 +38,7 @@ export default function Leaderboard() {
 
                 {/* Combined Rankings Component */}
                 <div className="max-w-3xl mx-auto px-4 w-full">
-                    <div className="bg-secondary rounded-lg p-3 shadow-lg flex flex-col h-[100vh] min-h-[400px]">
+                    <div className="bg-secondary rounded-lg p-3 shadow-lg flex flex-col h-[70vh] max-h-[600px] min-h-[400px]">
                         <div className="flex-1 overflow-y-auto no-scrollbar">
                             <RankingsList users={restRanking} />
                         </div>
