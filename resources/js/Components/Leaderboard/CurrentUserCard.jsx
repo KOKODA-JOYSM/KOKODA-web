@@ -16,8 +16,8 @@ export default function CurrentUserCard({ user }) {
                     {user.rank}
                 </div>
                 <div className="w-14 h-14 rounded-full bg-base border-2 border-secondary flex items-center justify-center flex-shrink-0 shadow overflow-hidden">
-                    {user.image ? (
-                        <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                    {user.profile_picture || user.image ? (
+                        <img src={user.profile_picture || user.image} alt={user.name} className="w-full h-full object-cover" />
                     ) : (
                         <span className="text-lg font-bold text-tertiary">{getInitials(user.name)}</span>
                     )}
