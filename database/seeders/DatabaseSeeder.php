@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,33 +16,152 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        User::updateOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'admin',
+                'password' => Hash::make('admin'),
+                'profile_icon' => 'avatar-admin.png',
+                'phone_number' => '081200000000',
+                'location' => 'Jakarta',
+                'points' => 15,
+                'rating' => 5.0,
+            ]
+        );
+
         $users = [
-            ['name' => 'John Liberto', 'email' => 'john.liberto@example.com', 'points' => 45],
-            ['name' => 'Jennifer Blue', 'email' => 'jennifer.blue@example.com', 'points' => 40],
-            ['name' => 'Dominic Cole', 'email' => 'dominic.cole@example.com', 'points' => 38],
-            ['name' => 'Joe Stanford', 'email' => 'joe.stanford@example.com', 'points' => 36],
-            ['name' => 'Juhoon Cotis', 'email' => 'juhoon.cotis@example.com', 'points' => 35],
-            ['name' => 'Lucas Sterling', 'email' => 'lucas.sterling@example.com', 'points' => 35],
-            ['name' => 'Dominic Vane', 'email' => 'dominic.vane@example.com', 'points' => 33],
-            ['name' => 'Silas Thorne', 'email' => 'silas.thorne@example.com', 'points' => 32],
-            ['name' => 'Marcus Rhodes', 'email' => 'marcus.rhodes@example.com', 'points' => 31],
-            ['name' => 'Nathaniel Cole', 'email' => 'nathaniel.cole@example.com', 'points' => 29],
+            [
+                'name' => 'John Liberto',
+                'email' => 'john.liberto@example.com',
+                'profile_icon' => 'avatar-1.png',
+                'phone_number' => '081200000001',
+                'location' => 'Bogor',
+                'points' => 45,
+                'rating' => 4.7,
+            ],
+            [
+                'name' => 'Jennifer Blue',
+                'email' => 'jennifer.blue@example.com',
+                'profile_icon' => 'avatar-2.png',
+                'phone_number' => '081200000002',
+                'location' => 'Depok',
+                'points' => 40,
+                'rating' => 4.5,
+            ],
+            [
+                'name' => 'Dominic Cole',
+                'email' => 'dominic.cole@example.com',
+                'profile_icon' => 'avatar-3.png',
+                'phone_number' => '081200000003',
+                'location' => 'Bekasi',
+                'points' => 38,
+                'rating' => 4.4,
+            ],
+            [
+                'name' => 'Joe Stanford',
+                'email' => 'joe.stanford@example.com',
+                'profile_icon' => 'avatar-4.png',
+                'phone_number' => '081200000004',
+                'location' => 'Tangerang',
+                'points' => 36,
+                'rating' => 4.2,
+            ],
+            [
+                'name' => 'Juhoon Cotis',
+                'email' => 'juhoon.cotis@example.com',
+                'profile_icon' => 'avatar-5.png',
+                'phone_number' => '081200000005',
+                'location' => 'Bogor',
+                'points' => 35,
+                'rating' => 4.1,
+            ],
+            [
+                'name' => 'Lucas Sterling',
+                'email' => 'lucas.sterling@example.com',
+                'profile_icon' => 'avatar-6.png',
+                'phone_number' => '081200000006',
+                'location' => 'Bekasi',
+                'points' => 35,
+                'rating' => 4.0,
+            ],
+            [
+                'name' => 'Dominic Vane',
+                'email' => 'dominic.vane@example.com',
+                'profile_icon' => 'avatar-7.png',
+                'phone_number' => '081200000007',
+                'location' => 'Jakarta',
+                'points' => 33,
+                'rating' => 3.9,
+            ],
+            [
+                'name' => 'Silas Thorne',
+                'email' => 'silas.thorne@example.com',
+                'profile_icon' => 'avatar-8.png',
+                'phone_number' => '081200000008',
+                'location' => 'Bandung',
+                'points' => 32,
+                'rating' => 3.8,
+            ],
+            [
+                'name' => 'Marcus Rhodes',
+                'email' => 'marcus.rhodes@example.com',
+                'profile_icon' => 'avatar-9.png',
+                'phone_number' => '081200000009',
+                'location' => 'Bandung',
+                'points' => 31,
+                'rating' => 3.7,
+            ],
+            [
+                'name' => 'Nathaniel Cole',
+                'email' => 'nathaniel.cole@example.com',
+                'profile_icon' => 'avatar-10.png',
+                'phone_number' => '081200000010',
+                'location' => 'Surabaya',
+                'points' => 29,
+                'rating' => 3.6,
+            ],
+            [
+                'name' => 'Kim Bro',
+                'email' => 'kimbro.cole@example.com',
+                'profile_icon' => 'avatar-11.png',
+                'phone_number' => '081200000011',
+                'location' => 'Medan',
+                'points' => 28,
+                'rating' => 3.5,
+            ],
         ];
 
         foreach ($users as $user) {
-            User::create([
-                'name' => $user['name'],
-                'email' => $user['email'],
-                'password' => bcrypt('password'),
-                'points' => $user['points'],
-            ]);
+            User::updateOrCreate(
+                ['email' => $user['email']],
+                [
+                    'name' => $user['name'],
+                    'password' => Hash::make('password'),
+                    'profile_icon' => $user['profile_icon'],
+                    'phone_number' => $user['phone_number'],
+                    'location' => $user['location'],
+                    'points' => $user['points'],
+                    'rating' => $user['rating'],
+                ]
+            );
         }
 
-        User::create([
-            'name' => 'Joysm',
-            'email' => 'test@example.com',
-            'password' => bcrypt('password'),
-            'points' => 35,
+        User::updateOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Joysm',
+                'password' => Hash::make('password'),
+                'profile_icon' => 'avatar-12.png',
+                'phone_number' => '081200000012',
+                'location' => 'Yogyakarta',
+                'points' => 35,
+                'rating' => 4.3,
+            ]
+        );
+
+        $this->call([
+            PostSeeder::class,
+            ClaimSeeder::class,
         ]);
     }
 }
