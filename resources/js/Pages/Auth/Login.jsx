@@ -57,13 +57,14 @@ export default function Login({ status, canResetPassword }) {
                             <div>
                                 <TextInput
                                     id="email"
-                                    type="email"
+                                    type="text"
                                     name="email"
                                     value={data.email}
                                     className="block w-full rounded-lg border-secondary bg-base px-4 py-3 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                                     autoComplete="username"
+                                    inputMode="email"
                                     isFocused={true}
-                                    placeholder="Username / Email address"
+                                    placeholder="Email or username"
                                     onChange={(e) => setData('email', e.target.value)}
                                 />
                                 <InputError message={errors.email} className="mt-2 text-label-lost" />

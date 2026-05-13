@@ -101,7 +101,7 @@ export default function VerifyEmail({ status }) {
 
                 <div className="mt-6 space-y-3">
                     <Link
-                        href={route('dashboard')}
+                        href={route('home')}
                         className="block w-full rounded-lg bg-secondary px-4 py-3 text-center text-2xl font-semibold text-background transition hover:bg-tertiary"
                     >
                         Verify
