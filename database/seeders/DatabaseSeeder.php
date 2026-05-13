@@ -158,5 +158,10 @@ class DatabaseSeeder extends Seeder
                 'rating' => 4.3,
             ]
         );
+
+        $this->call([
+            PostSeeder::class,
+            ClaimSeeder::class,
+        ]);
     }
 }
