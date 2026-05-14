@@ -20,16 +20,8 @@ export default function Profile({ posts }) {
     const userAvatar = user.avatar || '/images/icon-profile-avatar.svg';
 
     // 2. Mengolah data postingan dari database
-    // Pastikan backend mengirimkan variabel 'posts' ke halaman ini.
-    // Jika format dari controller berupa paginasi (posts.data), kita ambil array-nya.
-    const dbPosts = posts?.data || posts || [];
-
-    // Filter postingan berdasarkan tab yang sedang aktif
-    // Asumsi: 
-    // - Tab 'request': menampilkan postingan tipe 'lost' atau 'found' milik user lain (atau sesuai logikamu)
-    // - Tab 'my_post': menampilkan semua postingan yang dibuat oleh user ini (user_id === user.id)
-    const requestsPosts = dbPosts.filter(post => post.type === 'found' || post.type === 'lost');
-    const myPosts = dbPosts.filter(post => post.user_id === user.id);
+    // Backend mengirim array Collection langsung (sudah difilter user_id di controller)
+    const myPosts = Array.isArray(posts) ? posts : (posts?.data || []);
 
     return (
         <AppLayout title="Profile - KOKODA">
@@ -121,7 +113,7 @@ export default function Profile({ posts }) {
                     <div className="flex flex-col gap-6">
 
                         {/* TAB 1: REQUESTS */}
-                        {activeTab === 'request' && <RequestTab posts={requestsPosts} />}
+                        {activeTab === 'request' && <RequestTab posts={[]} />}
 
                         {/* TAB 2: MY POST */}
                         {activeTab === 'my_post' && <MyPostTab posts={myPosts} />}

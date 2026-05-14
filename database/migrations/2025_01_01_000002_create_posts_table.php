@@ -14,6 +14,9 @@ return new class extends Migration
             $table->enum('type', ['lost', 'found']);
             $table->string('title');
             $table->text('description')->nullable();
+            $table->string('location')->nullable();
+            $table->string('category')->nullable();
+            $table->string('image_url')->nullable();
             $table->enum('status', ['active', 'resolved'])->default('active');
             $table->timestamps();
 

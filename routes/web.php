@@ -26,7 +26,10 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     // 1. Menampilkan halaman utama profil custom kamu (Pages/Profile/Profile.jsx)
     Route::get('/profile', function () {
-        return Inertia::render('Profile/Profile');
+        $posts = app(\App\Http\Controllers\PostController::class)->myPosts();
+        return Inertia::render('Profile/Profile', [
+            'posts' => $posts,
+        ]);
     })->name('profile');
 
     // 2. Menggeser form edit bawaan Breeze ke URL /profile/edit (Pages/Profile/Edit.jsx)
