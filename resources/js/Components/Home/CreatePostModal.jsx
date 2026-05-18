@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { useForm } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { X } from 'lucide-react';
 
 export default function CreatePostModal({ onClose }) {
     const [preview, setPreview] = useState(null);
-    const { data, setData, post, processing, errors } = useForm({
+    const [processing, setProcessing] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const [data, setDataState] = useState({
         title: '',
         description: '',
         location: '',
@@ -13,13 +16,17 @@ export default function CreatePostModal({ onClose }) {
         image_url: null,
     });
 
+    const setData = (key, value) => {
+        setDataState(prev => ({ ...prev, [key]: value }));
+    };
+
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setData('image_url', file);
             const reader = new FileReader();
-            reader.onload = (e) => {
-                setPreview(e.target.result);
+            reader.onload = (ev) => {
+                setPreview(ev.target.result);
             };
             reader.readAsDataURL(file);
         }
@@ -27,6 +34,8 @@ export default function CreatePostModal({ onClose }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setProcessing(true);
+        setErrors({});
 
         const formData = new FormData();
         formData.append('title', data.title);
@@ -34,17 +43,23 @@ export default function CreatePostModal({ onClose }) {
         formData.append('location', data.location);
         formData.append('type', data.type);
         formData.append('category', data.category);
-        if (data.image_url) {
+        if (data.image_url instanceof File) {
             formData.append('image_url', data.image_url);
         }
 
-        post(route('posts.store'), {
-            data: formData,
+        router.post(route('posts.store'), formData, {
             forceFormData: true,
             onSuccess: () => {
+                setProcessing(false);
                 onClose();
-                // Reload page to show new post
                 window.location.href = '/home';
+            },
+            onError: (errs) => {
+                setProcessing(false);
+                setErrors(errs);
+            },
+            onFinish: () => {
+                setProcessing(false);
             },
         });
     };

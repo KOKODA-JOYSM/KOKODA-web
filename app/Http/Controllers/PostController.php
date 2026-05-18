@@ -6,6 +6,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class PostController extends Controller
@@ -17,23 +18,41 @@ class PostController extends Controller
      */
     public function index()
     {
-        // Database temporarily disabled
-        // $posts = Post::with('user')
-        //     ->where('status', 'active')
-        //     ->orderBy('created_at', 'desc')
-        //     ->paginate(10);
+        $posts = Post::with('user')
+            ->where('status', 'active')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
-        // Return dummy data for now
-        $posts = [
-            'data' => [],
-            'current_page' => 1,
-            'per_page' => 10,
-            'total' => 0,
-        ];
+        // Map image_url to full public URL
+        $posts->getCollection()->transform(function ($post) {
+            if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
+                $post->image_url = asset('storage/' . $post->image_url);
+            }
+            return $post;
+        });
 
         return Inertia::render('Home', [
             'posts' => $posts,
         ]);
+    }
+
+    /**
+     * Return posts belonging to the authenticated user (for Profile / My Post tab)
+     */
+    public function myPosts()
+    {
+        $posts = Post::with('user')
+            ->where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($post) {
+                if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
+                    $post->image_url = asset('storage/' . $post->image_url);
+                }
+                return $post;
+            });
+
+        return $posts;
     }
 
     /**
@@ -50,12 +69,12 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title'       => 'required|string|max:255',
             'description' => 'required|string',
-            'location' => 'required|string|max:255',
-            'type' => 'required|in:lost,found',
-            'category' => 'nullable|string|max:100',
-            'image_url' => 'nullable|image|max:2048',
+            'location'    => 'required|string|max:255',
+            'type'        => 'required|in:lost,found',
+            'category'    => 'nullable|string|max:100',
+            'image_url'   => 'nullable|image|max:2048',
         ]);
 
         $validated['user_id'] = Auth::id();
@@ -74,8 +93,13 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        $post->load('user');
+        if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
+            $post->image_url = asset('storage/' . $post->image_url);
+        }
+
         return Inertia::render('Posts/Show', [
-            'post' => $post->load('user'),
+            'post' => $post,
         ]);
     }
 
@@ -99,16 +123,24 @@ class PostController extends Controller
         $this->authorize('update', $post);
 
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title'       => 'required|string|max:255',
             'description' => 'required|string',
-            'location' => 'required|string|max:255',
-            'type' => 'required|in:lost,found',
-            'category' => 'nullable|string|max:100',
-            'status' => 'required|in:active,resolved',
+            'location'    => 'required|string|max:255',
+            'type'        => 'required|in:lost,found',
+            'category'    => 'nullable|string|max:100',
+            'status'      => 'required|in:active,resolved',
+            'image_url'   => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('image_url')) {
+            // Delete old image if exists
+            if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
+                Storage::disk('public')->delete($post->image_url);
+            }
             $validated['image_url'] = $request->file('image_url')->store('posts', 'public');
+        } else {
+            // Keep existing image
+            unset($validated['image_url']);
         }
 
         $post->update($validated);
@@ -123,8 +155,13 @@ class PostController extends Controller
     {
         $this->authorize('delete', $post);
 
+        // Delete image from storage
+        if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
+            Storage::disk('public')->delete($post->image_url);
+        }
+
         $post->delete();
 
-        return redirect()->route('home')->with('success', 'Post deleted successfully!');
+        return redirect()->back()->with('success', 'Post deleted successfully!');
     }
 }

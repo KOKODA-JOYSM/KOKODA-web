@@ -16,7 +16,7 @@ export default function PostCard({ post }) {
     const labelColor = isFounded ? 'bg-label-found' : 'bg-label-lost';
     const labelText = isFounded ? 'FOUND' : 'LOST';
 
-    const imageUrl = '/images/default.img.webp';
+    const imageUrl = post.image_url || '/images/default.img.webp';
 
     const handleAddComment = () => {
         if (newComment.trim()) {
