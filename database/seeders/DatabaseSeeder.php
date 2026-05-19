@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,10 +17,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $adminUsername = $this->makeUniqueUsername('admin', 'admin@gmail.com');
+
         User::updateOrCreate(
             ['email' => 'admin@gmail.com'],
             [
                 'name' => 'admin',
+                'username' => $adminUsername,
                 'password' => Hash::make('admin'),
                 'profile_icon' => 'avatar-admin.png',
                 'phone_number' => '081200000000',
@@ -132,10 +136,12 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($users as $user) {
+            $username = $this->makeUniqueUsername($user['name'], $user['email']);
             User::updateOrCreate(
                 ['email' => $user['email']],
                 [
                     'name' => $user['name'],
+                    'username' => $username,
                     'password' => Hash::make('password'),
                     'profile_icon' => $user['profile_icon'],
                     'phone_number' => $user['phone_number'],
@@ -150,6 +156,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'test@example.com'],
             [
                 'name' => 'Joysm',
+                'username' => $this->makeUniqueUsername('Joysm', 'test@example.com'),
                 'password' => Hash::make('password'),
                 'profile_icon' => 'avatar-12.png',
                 'phone_number' => '081200000012',
@@ -163,5 +170,27 @@ class DatabaseSeeder extends Seeder
             PostSeeder::class,
             ClaimSeeder::class,
         ]);
+    }
+
+    private function makeUniqueUsername(string $name, string $email): string
+    {
+        $existing = User::query()->where('email', $email)->first();
+        if ($existing && !empty($existing->username)) {
+            return $existing->username;
+        }
+
+        $base = Str::slug($name);
+        if ($base === '') {
+            $base = Str::before($email, '@');
+        }
+
+        $username = $base;
+        $suffix = 1;
+        while (User::query()->where('username', $username)->exists()) {
+            $username = $base . $suffix;
+            $suffix++;
+        }
+
+        return $username;
     }
 }

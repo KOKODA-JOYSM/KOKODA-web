@@ -13,7 +13,7 @@ class ClaimSeeder extends Seeder
     {
         $admin = User::firstOrCreate(
             ['email' => 'admin@gmail.com'],
-            ['name' => 'admin', 'password' => bcrypt('admin')]
+            ['name' => 'admin', 'username' => 'admin', 'password' => bcrypt('admin')]
         );
 
         $allUsers = User::query()->where('id', '!=', $admin->id)->get();

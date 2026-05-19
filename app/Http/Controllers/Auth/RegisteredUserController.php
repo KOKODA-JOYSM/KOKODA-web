@@ -33,12 +33,16 @@ class RegisteredUserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'nullable|string|max:255',
             'email' => 'required|string|lowercase|email|max:255',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        $username = $validated['username'] ?? $validated['name'];
+
         $request->session()->put('pending_registration', [
             'name' => $validated['name'],
+            'username' => $username,
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'otp_code' => config('app.debug') ? '1111' : (string) random_int(1000, 9999),
@@ -103,8 +107,13 @@ class RegisteredUserController extends Controller
             return back()->withErrors(['otp' => 'This email is already registered.']);
         }
 
+        if (User::where('username', $pendingRegistration['username'])->exists()) {
+            return back()->withErrors(['otp' => 'This username is already taken.']);
+        }
+
         $user = User::create([
             'name' => $pendingRegistration['name'],
+            'username' => $pendingRegistration['username'],
             'email' => $pendingRegistration['email'],
             'password' => $pendingRegistration['password'],
         ]);

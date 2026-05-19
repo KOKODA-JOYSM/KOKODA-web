@@ -18,16 +18,19 @@ class PostSeeder extends Seeder
         if ($userIds->isEmpty()) {
             User::create([
                 'name' => 'User One',
+                'username' => 'user1',
                 'email' => 'user1@example.com',
                 'password' => bcrypt('password'),
             ]);
             User::create([
                 'name' => 'User Two',
+                'username' => 'user2',
                 'email' => 'user2@example.com',
                 'password' => bcrypt('password'),
             ]);
             User::create([
                 'name' => 'User Three',
+                'username' => 'user3',
                 'email' => 'user3@example.com',
                 'password' => bcrypt('password'),
             ]);

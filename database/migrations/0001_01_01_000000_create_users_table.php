@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
+            $table->rememberToken();
             $table->string('profile_icon')->nullable();
             $table->string('phone_number', 20)->nullable();
             $table->string('location')->nullable();
