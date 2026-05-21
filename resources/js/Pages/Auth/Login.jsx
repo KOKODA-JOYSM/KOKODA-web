@@ -57,7 +57,7 @@ export default function Login({ status, canResetPassword }) {
                             <div>
                                 <TextInput
                                     id="email"
-                                    type="email"
+                                    type="text"
                                     name="email"
                                     value={data.email}
                                     className="block w-full rounded-lg border-secondary bg-base px-4 py-3 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
