@@ -100,6 +100,7 @@ class PostController extends Controller
 
         return Inertia::render('Posts/Show', [
             'post' => $post,
+            'auth' => ['user' => Auth::user()],
         ]);
     }
 

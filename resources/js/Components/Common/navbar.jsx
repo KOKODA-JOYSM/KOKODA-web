@@ -30,6 +30,7 @@ export default function Navbar() {
         <>
             {/* ── HAMBURGER BUTTON (tablet & mobile only) ── */}
             <button
+                id="hamburger-btn"
                 className="lg:hidden fixed top-4 left-4 sm:top-5 sm:left-5 z-[10001] bg-primary hover:bg-secondary border-none rounded-xl w-10 h-10 sm:w-11 sm:h-11 cursor-pointer flex flex-col items-center justify-center gap-1.5 p-0 transition-colors duration-200 ease-in"
                 onClick={() => isOpen ? closeMenu() : openMenu()}
                 aria-label={isOpen ? "Close menu" : "Open menu"}
