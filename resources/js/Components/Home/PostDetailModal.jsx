@@ -1,140 +1,281 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { usePage } from '@inertiajs/react';
+import { ChevronLeft, ChevronRight, X, ExternalLink, MapPin } from 'lucide-react';
 
 export default function PostDetailModal({ post, onClose }) {
+    const { auth } = usePage().props;
+    const [currentImage, setCurrentImage] = useState(0);
+
+    // Sembunyikan hamburger navbar saat modal terbuka
+    useEffect(() => {
+        document.body.classList.add('modal-open');
+        return () => {
+            document.body.classList.remove('modal-open');
+        };
+    }, []);
+
     const isFounded = post.type === 'found';
-    const labelColor = isFounded ? 'bg-label-found' : 'bg-label-lost';
-    const labelText = isFounded ? 'Found' : 'Lost';
+    const labelColor = isFounded ? 'bg-label-found text-white' : 'bg-label-lost text-white';
+    const labelText = isFounded ? 'Found Item' : 'Lost Item';
     const buttonText = isFounded ? 'I Found This Item' : 'This is My Item';
+    const isOwnPost = auth?.user?.id === post.user_id;
 
-    const imageUrl = 'public/images/default.img.webp';
+    // Normalize images array — support single image_url or multiple
+    const images = Array.isArray(post.images) && post.images.length > 0
+        ? post.images
+        : post.image_url
+            ? [post.image_url]
+            : ['/images/default.img.webp'];
 
-    const formattedDate = new Date(post.created_at).toLocaleDateString('id-ID', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+    const formattedDate = post.created_at
+        ? new Date(post.created_at).toLocaleDateString('id-ID', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        })
+        : '—';
+
+    // Build Google Maps embed URL — no API key required
+    const mapsEmbedUrl = post.location
+        ? `https://maps.google.com/maps?q=${encodeURIComponent(post.location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`
+        : `https://maps.google.com/maps?q=Indonesia&t=&z=5&ie=UTF8&iwloc=&output=embed`;
+
+    const mapsOpenUrl = post.location
+        ? `https://www.google.com/maps/search/${encodeURIComponent(post.location)}`
+        : null;
+
+    const prevImage = (e) => {
+        e.stopPropagation();
+        setCurrentImage((i) => (i - 1 + images.length) % images.length);
+    };
+    const nextImage = (e) => {
+        e.stopPropagation();
+        setCurrentImage((i) => (i + 1) % images.length);
+    };
 
     return (
         <>
             {/* Backdrop */}
             <div
                 onClick={onClose}
-                className="fixed inset-0 bg-black bg-opacity-50 z-50 animate-fadeIn"
+                className="fixed inset-0 bg-black/60 z-50"
+                style={{ animation: 'fadeIn 0.2s ease' }}
             />
 
-            {/* Modal */}
+            {/* Modal Container */}
             <div
-                className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background rounded-lg md:rounded-2xl w-[92%] md:w-11/12 max-w-8xl md:h-[850px] z-50 shadow-2xl animate-slideUp flex flex-col md:flex-row overflow-hidden max-h-[95vh] md:max-h-none"
+                className="fixed z-50 bg-background shadow-2xl overflow-hidden"
+                style={{
+                    animation: 'slideUp 0.3s ease',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 'min(95vw, 960px)',
+                    maxHeight: '92vh',
+                    borderRadius: '1rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}
             >
-                {/* Left Section - Image with Overlay */}
-                <div className="w-full md:w-[45%] flex-shrink-0 bg-gray-100 flex flex-col relative overflow-hidden border-b md:border-b-0 md:border-r border-gray-300">
-                    {/* User Info - Top Left */}
-                    <div className="absolute top-2 md:top-4 left-2 md:left-4 flex items-center gap-1.5 md:gap-2.5 bg-white bg-opacity-95 px-2 md:px-3 py-1 md:py-2 rounded-lg z-10">
-                        <div className="w-6 md:w-8 h-6 md:h-8 rounded-full bg-highlight flex items-center justify-center text-xs md:text-sm flex-shrink-0">
-                            {/* profile */}
+                {/* Close Button — Desktop only, absolute pojok kanan atas */}
+                <button
+                    onClick={onClose}
+                    className="hidden md:flex absolute top-3 right-3 z-20 w-8 h-8 items-center justify-center rounded-full bg-white/80 hover:bg-white text-tertiary shadow transition-all"
+                    aria-label="Tutup"
+                >
+                    <X size={18} />
+                </button>
+
+                {/* Inner layout: column on mobile, side-by-side on desktop */}
+                <div className="flex flex-col md:flex-row overflow-y-auto md:overflow-hidden flex-1 min-h-0">
+
+                    {/* ── LEFT PANEL (Desktop) / TOP SECTION (Mobile) ── */}
+                    <div className="w-full md:w-[48%] flex-shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-gray-200">
+
+                        {/* User info header */}
+                        <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-100 w-full">
+                            <div className="w-8 h-8 rounded-full bg-highlight flex items-center justify-center text-sm font-bold text-tertiary flex-shrink-0">
+                                {post.user?.name?.charAt(0)?.toUpperCase() || '?'}
+                            </div>
+                            <div className="flex flex-col min-w-0 flex-1">
+                                <span className="font-quicksand font-semibold text-xs text-tertiary truncate">
+                                    {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'unknown'}`}
+                                </span>
+                            </div>
+                            <div className={`${labelColor} text-xs font-semibold font-quicksand px-2.5 py-1 rounded-full whitespace-nowrap flex-shrink-0`}>
+                                {labelText}
+                            </div>
+                            {/* Close Button — Mobile only, inline agar tidak menimpa badge */}
+                            <button
+                                onClick={onClose}
+                                className="flex md:hidden flex-shrink-0 ml-1 w-7 h-7 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-all"
+                                aria-label="Tutup"
+                            >
+                                <X size={15} />
+                            </button>
                         </div>
-                        <div className="min-w-0">
-                            <div className="font-quicksand font-semibold text-[10px] md:text-xs text-tertiary truncate">
-                                @{post.user?.name}
+
+                        {/* Image Carousel */}
+                        <div className="relative bg-gray-200 overflow-hidden mx-3 mt-3 rounded-xl" style={{ aspectRatio: '4/3', flexShrink: 0 }}>
+                            <img
+                                src={images[currentImage]}
+                                alt={post.title}
+                                className="w-full h-full object-cover"
+                            />
+                            {images.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={prevImage}
+                                        className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center shadow hover:bg-white transition"
+                                    >
+                                        <ChevronLeft size={18} />
+                                    </button>
+                                    <button
+                                        onClick={nextImage}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center shadow hover:bg-white transition"
+                                    >
+                                        <ChevronRight size={18} />
+                                    </button>
+                                    {/* Dots */}
+                                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                                        {images.map((_, i) => (
+                                            <span
+                                                key={i}
+                                                className={`w-1.5 h-1.5 rounded-full ${i === currentImage ? 'bg-white' : 'bg-white/50'}`}
+                                            />
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Google Map — Desktop only (inside left panel, fills remaining space) */}
+                        <div className="hidden md:flex flex-1 min-h-0 bg-gray-100 border-t border-gray-200 overflow-hidden relative mt-3 mb-3 mx-3 rounded-xl">
+                            <iframe
+                                title="location-map"
+                                src={mapsEmbedUrl}
+                                width="100%"
+                                height="100%"
+                                style={{ border: 0, minHeight: '160px', display: 'block' }}
+                                allowFullScreen
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            />
+                            {mapsOpenUrl && (
+                                <a
+                                    href={mapsOpenUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="absolute top-2 left-2 flex items-center gap-1.5 bg-white text-[#2D1606] text-xs font-quicksand font-bold px-3 py-1.5 rounded-lg shadow-md hover:bg-yellow-50 transition-colors border border-gray-200"
+                                >
+                                    <ExternalLink size={12} />
+                                    Buka di Maps
+                                </a>
+                            )}
+                        </div>
+
+                    </div>
+
+                    {/* ── RIGHT PANEL (Desktop) / CONTENT SECTION (Mobile) ── */}
+                    <div className="w-full md:w-[52%] flex flex-col p-5 md:p-8 overflow-y-auto">
+
+                        {/* Title */}
+                        <h2
+                            className="font-quicksand font-bold text-tertiary leading-tight mb-3 pr-6"
+                            style={{ fontSize: 'clamp(1.1rem, 2.5vw, 2rem)' }}
+                        >
+                            {post.title}
+                        </h2>
+
+                        {/* Description */}
+                        <p className="leading-relaxed mb-4 text-sm md:text-base" style={{ color: '#311A05' }}>
+                            {post.description}
+                        </p>
+
+                        {/* Meta: Category & Date */}
+                        <div className="flex flex-col gap-2.5 mb-4">
+                            {post.category && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <span className="font-quicksand font-bold text-tertiary">Kategori:</span>
+                                    <span className="font-quicksand text-gray-700">{post.category}</span>
+                                </div>
+                            )}
+                            <div className="flex items-center gap-2 text-sm">
+                                <span className="font-quicksand font-bold text-tertiary">
+                                    {isFounded ? 'Waktu Ditemukan:' : 'Tanggal Hilang:'}
+                                </span>
+                                <span className="font-quicksand text-gray-700">{formattedDate}</span>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Badge - Top Right */}
-                    <div className={`absolute top-2 md:top-4 right-2 md:right-4 ${labelColor} px-2 md:px-3.5 py-1 md:py-1.5 rounded text-[10px] md:text-xs font-semibold font-quicksand z-10 whitespace-nowrap text-base`}>
-                        {labelText} Item
-                    </div>
+                        {/* ── MOBILE ONLY: Map Section (appears after content, not sticky) ── */}
+                        <div className="md:hidden mb-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="flex items-center gap-1.5 font-quicksand font-semibold text-sm text-gray-500">
+                                    <MapPin size={14} className="text-gray-400" strokeWidth={1.75} />
+                                    {post.location || 'Lokasi'}
+                                </span>
+                                {mapsOpenUrl && (
+                                    <a
+                                        href={mapsOpenUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1 text-xs font-quicksand font-semibold text-[#2D1606] bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-lg hover:bg-yellow-100 transition-colors"
+                                    >
+                                        <ExternalLink size={11} />
+                                        Buka di Maps
+                                    </a>
+                                )}
+                            </div>
+                            <div className="rounded-xl overflow-hidden border border-gray-200" style={{ height: '200px' }}>
+                                <iframe
+                                    title="location-map-mobile"
+                                    src={mapsEmbedUrl}
+                                    width="100%"
+                                    height="200"
+                                    style={{ border: 0, display: 'block' }}
+                                    allowFullScreen
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                />
+                            </div>
+                        </div>
 
-                    {/* Image */}
-                    <img
-                        src={imageUrl}
-                        alt={post.title}
-                        className="w-full h-48 md:h-3/5 object-cover"
-                    />
+                        {/* Action Buttons */}
+                        <div className="mt-auto pt-2">
+                            {!isOwnPost && (
+                                <button
+                                    className="w-full bg-secondary text-white rounded-lg py-3 text-sm font-semibold font-quicksand transition-all duration-200 hover:opacity-85 active:scale-95 cursor-pointer"
+                                >
+                                    {buttonText}
+                                </button>
+                            )}
+                            {isOwnPost && (
+                                <div className="flex gap-2">
+                                    <a
+                                        href={`/posts/${post.id}/edit`}
+                                        className="flex-1 text-center bg-primary text-tertiary rounded-lg py-3 text-sm font-semibold font-quicksand transition-all duration-200 hover:opacity-85 cursor-pointer"
+                                    >
+                                        Edit Post
+                                    </a>
+                                </div>
+                            )}
+                        </div>
 
-                    {/* Map Section */}
-                    <div className="flex-1 bg-gray-300 flex items-center justify-center border-t border-gray-300 text-2xl md:text-5xl min-h-40 md:min-h-0">
-                        🗺️
-                    </div>
-
-                    {/* Location Text */}
-                    <div className="px-2 md:px-3 py-2 md:py-3 bg-gray-100 border-t border-gray-300 text-xs md:text-base font-quicksand text-gray-600 text-center break-words">
-                        {post.location}
                     </div>
                 </div>
-
-                {/* Right Section - Details */}
-                <div className="w-full md:w-[55%] p-3 md:p-7 flex flex-col relative overflow-y-auto">
-                    {/* Close Button */}
-                    <button
-                        onClick={onClose}
-                        className="absolute top-2 right-2 md:top-4 md:right-4 bg-none border-none text-2xl md:text-4xl cursor-pointer text-secondary hover:opacity-70 transition-opacity w-8 h-8 flex items-center justify-center flex-shrink-0"
-                    >
-                        ✕
-                    </button>
-
-                    {/* Title */}
-                    <h2 className="text-xl md:text-5xl font-bold text-tertiary font-quicksand mb-2 md:mb-10 leading-snug pr-8 p-2 md:p-8 md:pb-0 break-words">
-                        {post.title}
-                    </h2>
-
-                    {/* Description */}
-                    <p className="text-sm md:text-3xl text-gray-600 mb-2 md:mb-5 leading-relaxed px-2 md:px-8 break-words">
-                        {post.description}
-                    </p>
-
-                    {/* Category */}
-                    {post.category && (
-                        <div className="mb-2 md:mb-4 px-2 md:px-8">
-                            <div className="text-xs md:text-2xl text-gray-500 mb-1 md:mb-2 font-quicksand uppercase tracking-wider">
-                                Kategori:
-                            </div>
-                            <div className="inline-block bg-highlight text-tertiary px-2 md:px-3 py-0.5 md:py-1.5 rounded-lg md:rounded-2xl text-xs md:text-2xl font-semibold font-quicksand break-words">
-                                {post.category}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Date */}
-                    <div className="text-xs md:text-xl text-gray-600 mb-2 md:mb-6 font-quicksand p-2 md:p-4 md:px-8 break-words">
-                        <span className="font-semibold">Waktu Ditemukan:</span> {formattedDate}
-                    </div>
-
-                    {/* Spacer */}
-                    <div className="flex-1" />
-
-                    {/* Button */}
-                    <button
-                        className={`bg-secondary text-white rounded-lg px-3 md:px-5 py-2 md:py-3.5 text-xs md:text-xl font-semibold cursor-pointer font-quicksand transition-all duration-200 w-full hover:opacity-85 active:scale-95 flex-shrink-0 break-words`}
-                    >
-                        {buttonText}
-                    </button>
-                </div>
-
-                {/* CSS Animations */}
-                <style>{`
-                    @keyframes fadeIn {
-                        from { opacity: 0; }
-                        to { opacity: 1; }
-                    }
-                    @keyframes slideUp {
-                        from {
-                            opacity: 0;
-                            transform: translate(-50%, -40%);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translate(-50%, -50%);
-                        }
-                    }
-                    .animate-fadeIn {
-                        animation: fadeIn 0.2s ease;
-                    }
-                    .animate-slideUp {
-                        animation: slideUp 0.3s ease;
-                    }
-                `}</style>
             </div>
+
+            <style>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to   { opacity: 1; }
+                }
+                @keyframes slideUp {
+                    from { opacity: 0; transform: translate(-50%, -46%); }
+                    to   { opacity: 1; transform: translate(-50%, -50%); }
+                }
+            `}</style>
         </>
     );
 }

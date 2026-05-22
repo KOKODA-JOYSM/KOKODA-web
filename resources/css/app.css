@@ -27,3 +27,9 @@
       }
   }
 }
+
+/* Sembunyikan hamburger navbar saat detail post modal terbuka (mobile/tablet) */
+body.modal-open #hamburger-btn {
+    display: none !important;
+}
+

@@ -54,7 +54,7 @@ export default function Home({ posts }) {
 
                 {/* Posts Feed - Vertical Scrollable */}
                 {filteredPosts.length > 0 ? (
-                    <div className="flex flex-col gap-20 w-full px-24">
+                    <div className="flex flex-col gap-6 w-full max-w-2xl mx-auto px-2 sm:px-4">
                         {filteredPosts.map(post => (
                             <PostCard key={post.id} post={post} />
                         ))}

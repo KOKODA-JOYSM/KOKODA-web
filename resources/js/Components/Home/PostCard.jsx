@@ -12,10 +12,11 @@ export default function PostCard({ post }) {
         { id: 3, user: 'xinos-kundesu', avatar: '⭐', text: 'astanaga kok bisa hilang sih, teledor banget si orangnya, padahal penting loh ini.' },
     ]);
     const [newComment, setNewComment] = useState('');
-    const isFounded = post.type === 'found';
-    const labelColor = isFounded ? 'bg-label-found' : 'bg-label-lost';
-    const labelText = isFounded ? 'FOUND' : 'LOST';
 
+    const isFounded = post.type === 'found';
+    const labelColor = isFounded ? 'bg-label-found text-white' : 'bg-label-lost text-white';
+
+    // Always use the image_url from post object (already mapped to full URL by backend)
     const imageUrl = post.image_url || '/images/default.img.webp';
 
     const handleAddComment = () => {
@@ -24,7 +25,7 @@ export default function PostCard({ post }) {
                 id: comments.length + 1,
                 user: 'You',
                 avatar: '👤',
-                text: newComment
+                text: newComment,
             }]);
             setNewComment('');
         }
@@ -33,86 +34,80 @@ export default function PostCard({ post }) {
     return (
         <>
             {!showComments ? (
-                // Normal Card Viewz
+                /* ─── Normal Card ─── */
                 <div
                     onClick={() => setShowDetail(true)}
-                    className="bg-base rounded-2xl overflow-hidden shadow-md transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 md:max-w-[900px] lg:max-w-[1000px] mx-auto xs:min-w-[500px]"
+                    className="bg-base rounded-2xl overflow-hidden shadow-md transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 w-full max-w-2xl mx-auto"
                 >
-                    {/* Header - User Info & Location (mobile/tablet: location under username; desktop: location on right) */}
-                    <div className="flex flex-col md:flex-row md:justify-between md:items-center px-4 md:px-8 py-3 md:py-5 border-b border-gray-100">
-                        {/* Left: User Avatar, Name, and (mobile) Location */}
-                        <div className="flex items-center gap-3 w-full md:w-auto">
-                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-highlight flex items-center justify-center text-sm font-bold flex-shrink-0">
-                                🦹
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                        {/* Left: avatar + name */}
+                        <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-9 h-9 rounded-full bg-highlight flex items-center justify-center text-sm font-bold text-tertiary flex-shrink-0">
+                                {post.user?.name?.charAt(0)?.toUpperCase() || '?'}
                             </div>
-
-                            <div className="min-w-0 w-full">
-                                <div className="flex items-center justify-between md:justify-start gap-2">
-                                    <span className="font-quicksand text-base md:text-xl font-semibold text-tertiary truncate">
-                                        @{post.user?.name || 'Unknown'}
-                                    </span>
-                                </div>
-
-                                {/* Location shown under username on mobile/tablet */}
-                                <div className="mt-1 md:hidden text-sm text-gray-text-field flex items-center gap-2 w-full">
-                                    <MapPin size={14} />
-                                    <span className="truncate">{post.location}</span>
-                                </div>
-                            </div>
+                            <span className="font-quicksand text-sm font-semibold text-tertiary truncate">
+                                {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'Unknown'}`}
+                            </span>
                         </div>
 
-                        {/* Desktop location */}
-                        <div className="hidden md:flex items-center text-lg text-gray-text-field gap-2 md:ml-4">
-                            <MapPin /> <span className="truncate">{post.location}</span>
+                        {/* Right: location */}
+                        <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-text-field flex-shrink-0 max-w-[40%]">
+                            <MapPin size={12} className="flex-shrink-0" />
+                            <span className="truncate">{post.location}</span>
                         </div>
                     </div>
 
-                    {/* Image Section */}
-                    <div className="relative w-full h-[500px] md:h-96 lg:h-[420px] overflow-hidden bg-gray-100">
+                    {/* Location on mobile (below header) */}
+                    {post.location && (
+                        <div className="sm:hidden px-4 py-1.5 flex items-center gap-1.5 text-xs text-gray-text-field border-b border-gray-50">
+                            <MapPin size={11} />
+                            <span className="truncate">{post.location}</span>
+                        </div>
+                    )}
+
+                    {/* Image */}
+                    <div className="relative w-full bg-gray-100 overflow-hidden" style={{ aspectRatio: '16/9' }}>
                         <img
                             src={imageUrl}
                             alt={post.title}
                             className="w-full h-full object-cover"
+                            onError={(e) => { e.target.src = '/images/default.img.webp'; }}
                         />
                     </div>
 
-                    {/* Footer - Content & Actions */}
-                    <div className="px-4 py-6 flex flex-col gap-6">
-                        {/* Top Row: Comment Button & Label */}
-                        <div className="flex justify-between items-center px-4">
-                            {/* Comment Button */}
+                    {/* Footer */}
+                    <div className="px-4 pt-3 pb-4 flex flex-col gap-2">
+                        {/* Actions row */}
+                        <div className="flex items-center justify-between">
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setShowComments(true);
                                 }}
-                                className="p-3 bg-transparent text-gray-text-field text-sm cursor-pointer transition-all duration-200 font-quicksand hover:text-background hover:bg-primary rounded-full flex-shrink-0"
+                                className="p-2 rounded-full text-gray-text-field hover:text-background hover:bg-primary transition-all duration-200"
                             >
-                                <MessageCircle size={32} />
+                                <MessageCircle size={22} />
                             </button>
 
-                            {/* Item Label (compact on mobile/tablet, larger on desktop) */}
-                            <div className={`${labelColor} text-lg text-base px-3 py-1 rounded font-bold font-quicksand whitespace-nowrap inline-flex items-center justify-center shadow-lg`}>
+                            <div className={`${labelColor} text-xs font-bold font-quicksand px-3 py-1 rounded-full whitespace-nowrap`}>
                                 {isFounded ? 'FOUND' : 'LOST'}
                             </div>
                         </div>
 
-                        {/* Bottom: Content */}
-                        <div className='px-8 pb-4'>
-                            {/* Title */}
-                            <h3 className="font-quicksand text-2xl font-bold text-tertiary m-0 mb-1.5 leading-snug">
+                        {/* Content */}
+                        <div>
+                            <h3 className="font-quicksand text-base font-bold text-tertiary leading-snug mb-1">
                                 {post.title}
                             </h3>
-
-                            {/* Description */}
-                            <p className="text-xl text-gray-600 m-0 leading-relaxed line-clamp-2">
+                            <p className="text-sm text-tertiary leading-relaxed line-clamp-2" style={{ color: '#311A05' }}>
                                 {post.description}
                             </p>
                         </div>
                     </div>
                 </div>
             ) : (
-                // Comments View
+                /* ─── Comments View ─── */
                 <PostCommentsView
                     comments={comments}
                     newComment={newComment}

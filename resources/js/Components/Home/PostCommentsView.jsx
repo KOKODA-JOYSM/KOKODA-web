@@ -1,6 +1,5 @@
 import React from 'react';
-import { Send } from 'lucide-react';
-import { ChevronLeft } from 'lucide-react';
+import { Send, ChevronLeft } from 'lucide-react';
 
 export default function PostCommentsView({
     comments,
@@ -8,85 +7,68 @@ export default function PostCommentsView({
     setNewComment,
     onClose,
     onAddComment,
-    imageUrl
+    imageUrl,
 }) {
     const handleKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            onAddComment();
-        }
+        if (e.key === 'Enter') onAddComment();
     };
 
     return (
-        <div className="bg-base rounded-2xl overflow-hidden flex shadow-md h-[46rem]">
-            {/* Left: Image */}
-            <div className="w-1/2 bg-gray-100 overflow-hidden">
-                <img
-                    src={imageUrl}
-                    alt="Post"
-                    className="w-full h-full object-cover"
-                />
+        <div className="bg-base rounded-2xl overflow-hidden shadow-md w-full max-w-2xl mx-auto">
+            {/* Header */}
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-secondary">
+                <button
+                    onClick={onClose}
+                    className="p-1 rounded-full hover:bg-gray-100 transition"
+                >
+                    <ChevronLeft size={22} />
+                </button>
+                <h2 className="font-quicksand text-base font-bold text-tertiary flex-1 text-center">
+                    Comments
+                </h2>
+                <div className="w-8" />
             </div>
 
-            {/* Right: Comments Section */}
-            <div className="w-1/2 flex flex-col bg-base">
-                {/* Header */}
-                <div className="flex items-center justify-between border-b border-secondary" style={{ padding: '1.25rem 2rem' }}>
-                    <button
-                        onClick={onClose}
-                        className="bg-none border-none text-2xl cursor-pointer p-0 font-quicksand"
-                    >
-                        <ChevronLeft size={28}/>
-                    </button>
-                    <h2 className="font-quicksand text-2xl font-bold text-tertiary m-2 flex-1 text-center">
-                        Comments
-                    </h2>
-                    <div className="w-6" />
-                </div>
+            {/* Image (compact strip) */}
+            <div className="w-full bg-gray-100 overflow-hidden" style={{ aspectRatio: '16/9', maxHeight: '200px' }}>
+                <img src={imageUrl} alt="Post" className="w-full h-full object-cover" />
+            </div>
 
-                {/* Comments List */}
-                <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-8">
-                    {comments.map((comment) => (
-                        <div
-                            key={comment.id}
-                            className="flex gap-3"
-                        >
-                            {/* Avatar */}
-                            <div className="w-12 h-12 rounded-full bg-highlight flex items-center justify-center text-lg flex-shrink-0">
-                                {comment.avatar}
-                            </div>
-
-                            {/* Comment Content */}
-                            <div className="flex-1">
-                                <p className="font-quicksand text-sm font-semibold text-tertiary m-0 mb-1">
-                                    {comment.user}
-                                </p>
-                                <p className="font-quicksand text-sm text-gray-600 m-0 leading-relaxed">
-                                    {comment.text}
-                                </p>
-                            </div>
+            {/* Comments List */}
+            <div className="flex flex-col gap-4 p-4 max-h-72 overflow-y-auto">
+                {comments.map((comment) => (
+                    <div key={comment.id} className="flex gap-3">
+                        <div className="w-9 h-9 rounded-full bg-highlight flex items-center justify-center text-base flex-shrink-0">
+                            {comment.avatar}
                         </div>
-                    ))}
-                </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="font-quicksand text-sm font-semibold text-tertiary mb-0.5">
+                                {comment.user}
+                            </p>
+                            <p className="font-quicksand text-sm text-gray-600 leading-relaxed break-words">
+                                {comment.text}
+                            </p>
+                        </div>
+                    </div>
+                ))}
+            </div>
 
-                {/* Input Field */}
-                <div className="border-t border-gray-100 flex gap-2" style={{ padding: '1rem 1.5rem' }}>
-                    <input
-                        type="text"
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Add Comment here"
-                        className="flex-1 bg-base border-primary rounded-full text-sm font-quicksand text-tertiary outline-none"
-                        style={{ padding: '0.75rem 1rem' }}
-                    />
-                    <button
-                        onClick={onAddComment}
-                        className="bg-none border-none cursor-pointer transition-opacity duration-200 hover:opacity-70 flex items-center justify-center text-gray-text-field"
-                        style={{ padding: '0.5rem 0.75rem' }}
-                    >
-                        <Send size={28} />
-                    </button>
-                </div>
+            {/* Input */}
+            <div className="border-t border-gray-100 flex gap-2 px-4 py-3">
+                <input
+                    type="text"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Add a comment..."
+                    className="flex-1 bg-background border border-primary rounded-full text-sm font-quicksand text-tertiary outline-none px-4 py-2"
+                />
+                <button
+                    onClick={onAddComment}
+                    className="flex items-center justify-center text-gray-text-field hover:text-secondary transition-colors px-2"
+                >
+                    <Send size={22} />
+                </button>
             </div>
         </div>
     );
