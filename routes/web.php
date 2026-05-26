@@ -46,6 +46,10 @@ Route::get('/search', function () {
 Route::get('/leaderboard', [LeaderboardController::class, 'show'])->name('leaderboard');
 Route::get('/api/leaderboard', [LeaderboardController::class, 'index']);
 
+// API routes for search
+Route::get('/api/locations', [PostController::class, 'getLocations']);
+Route::get('/api/search', [PostController::class, 'search']);
+
 // Public routes for posts
 Route::get('/home', [PostController::class, 'index'])->name('home');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
