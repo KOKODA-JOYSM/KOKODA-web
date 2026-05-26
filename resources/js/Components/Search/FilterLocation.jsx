@@ -21,7 +21,7 @@ export default function FilterLocation({ selected, onChange, onLocationWithCoord
             })
             .catch(err => {
                 console.error('Failed to fetch locations:', err);
-                setGeocodeError('Failed to load locations');
+                // Tidak tampil error ke user, cukup diam
             })
             .finally(() => setLoading(false));
     }, []);
@@ -67,7 +67,6 @@ export default function FilterLocation({ selected, onChange, onLocationWithCoord
             }
 
             // Jika gagal, coba dengan kata-kata terakhir (biasanya nama kota)
-            // Contoh: "Aeon Sentul Bogor" → coba "Sentul Bogor", lalu "Bogor"
             const words = placeName.trim().split(/\s+/);
             if (words.length > 1) {
                 // Coba 2 kata terakhir
@@ -257,7 +256,7 @@ export default function FilterLocation({ selected, onChange, onLocationWithCoord
                                 )}
                             </div>
 
-                            {/* Map Container */}
+                            {/* Map Container — default ke BCA Learning Institute, Sentul */}
                             <div className="w-full h-56 md:h-64 rounded-xl overflow-hidden border border-secondary/20 relative bg-gray-100">
                                 <iframe
                                     width="100%"
@@ -266,7 +265,7 @@ export default function FilterLocation({ selected, onChange, onLocationWithCoord
                                     loading="lazy"
                                     allowFullScreen
                                     referrerPolicy="no-referrer-when-downgrade"
-                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(inputValue || 'Indonesia')}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(inputValue || 'BCA Learning Institute Sentul')}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
                                 ></iframe>
                             </div>
                         </div>
