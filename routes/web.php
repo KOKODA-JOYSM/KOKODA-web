@@ -57,6 +57,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+    // Chat routes
+    Route::get('/chat', fn() => Inertia::render('Chat/Chat'))->name('chat');
 });
 
 require __DIR__.'/auth.php';

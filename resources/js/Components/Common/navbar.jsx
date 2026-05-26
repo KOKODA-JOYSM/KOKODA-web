@@ -23,15 +23,18 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
 
     const isActive  = (item) => url?.startsWith(item.href);
+    const hideHamburgerOnChat = url?.startsWith('/chat');
     const openMenu  = () => setIsOpen(true);
     const closeMenu = () => setIsOpen(false);
+
+    const btnPositionClass = hideHamburgerOnChat ? 'sm:top-[26px] sm:left-[18px]' : 'sm:top-5 sm:left-5';
 
     return (
         <>
             {/* ── HAMBURGER BUTTON (tablet & mobile only) ── */}
             <button
                 id="hamburger-btn"
-                className="lg:hidden fixed top-4 left-4 sm:top-5 sm:left-5 z-[10001] bg-primary hover:bg-secondary border-none rounded-xl w-10 h-10 sm:w-11 sm:h-11 cursor-pointer flex flex-col items-center justify-center gap-1.5 p-0 transition-colors duration-200 ease-in"
+                className={`lg:hidden fixed top-4 left-4 ${btnPositionClass} z-[10001] bg-primary hover:bg-secondary border-none rounded-xl w-10 h-10 sm:w-11 sm:h-11 cursor-pointer flex flex-col items-center justify-center gap-1.5 p-0 transition-all duration-300 ease-in-out ${(hideHamburgerOnChat && !isOpen) ? 'opacity-0 -translate-x-full pointer-events-none' : 'opacity-100 translate-x-0 pointer-events-auto'}`}
                 onClick={() => isOpen ? closeMenu() : openMenu()}
                 aria-label={isOpen ? "Close menu" : "Open menu"}
                 aria-expanded={isOpen}

@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import Navbar from '@/Components/Common/navbar.jsx';
 import tailwindConfig from '../../../tailwind.config.js';
 
@@ -23,6 +23,9 @@ const COLOR_BASE = colors.base;
  *   }
  */
 export default function AppLayout({ title, children }) {
+    const { url } = usePage();
+    const isChat = url?.startsWith('/chat');
+
     return (
         <>
             {/* Page title di browser tab */}
@@ -36,7 +39,7 @@ export default function AppLayout({ title, children }) {
 
                 {/* Konten halaman — class kokoda-page-content sudah ada padding-top di mobile */}
                 <main
-                    className="kokoda-page-content"
+                    className={`kokoda-page-content ${isChat ? 'chat-page' : ''}`}
                     style={{ flex: 1, boxSizing: 'border-box', overflowX: 'hidden' }}
                 >
                     {children}
