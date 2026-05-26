@@ -15,6 +15,8 @@
         @viteReactRefresh
         @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
         @inertiaHead
+
+        <!-- Location autocomplete uses Nominatim (OpenStreetMap) — no API key required -->
     </head>
     <body class="font-sans antialiased">
         @inertia

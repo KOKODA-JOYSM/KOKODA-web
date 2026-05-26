@@ -36,12 +36,13 @@ export default function PostDetailModal({ post, onClose }) {
         : '—';
 
     // Build Google Maps embed URL — no API key required
-    const mapsEmbedUrl = post.location
-        ? `https://maps.google.com/maps?q=${encodeURIComponent(post.location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`
+    const locationName = typeof post.location === 'object' ? post.location?.place_name : post.location;
+    const mapsEmbedUrl = locationName
+        ? `https://maps.google.com/maps?q=${encodeURIComponent(locationName)}&t=&z=14&ie=UTF8&iwloc=&output=embed`
         : `https://maps.google.com/maps?q=Indonesia&t=&z=5&ie=UTF8&iwloc=&output=embed`;
 
-    const mapsOpenUrl = post.location
-        ? `https://www.google.com/maps/search/${encodeURIComponent(post.location)}`
+    const mapsOpenUrl = locationName
+        ? `https://www.google.com/maps/search/${encodeURIComponent(locationName)}`
         : null;
 
     const prevImage = (e) => {
@@ -179,32 +180,37 @@ export default function PostDetailModal({ post, onClose }) {
                     {/* ── RIGHT PANEL (Desktop) / CONTENT SECTION (Mobile) ── */}
                     <div className="w-full md:w-[52%] flex flex-col p-5 md:p-8 overflow-y-auto">
 
-                        {/* Title */}
-                        <h2
-                            className="font-quicksand font-bold text-tertiary leading-tight mb-3 pr-6"
-                            style={{ fontSize: 'clamp(1.1rem, 2.5vw, 2rem)' }}
-                        >
-                            {post.title}
-                        </h2>
+                        <div className="flex flex-col flex-1 border-l-[3px] border-secondary pl-5 md:pl-6 py-1 mb-6">
+                            {/* Title */}
+                            <h2
+                                className="font-quicksand font-bold text-tertiary leading-tight mb-4 pr-6"
+                                style={{ fontSize: 'clamp(1.5rem, 2.5vw, 2.25rem)' }}
+                            >
+                                {post.title}
+                            </h2>
 
-                        {/* Description */}
-                        <p className="leading-relaxed mb-4 text-sm md:text-base" style={{ color: '#311A05' }}>
-                            {post.description}
-                        </p>
+                            {/* Description */}
+                            <p
+                                className="leading-relaxed mb-8 text-sm md:text-base font-quicksand whitespace-pre-wrap"
+                                style={{ color: '#311A05' }}
+                            >
+                                {post.description}
+                            </p>
 
-                        {/* Meta: Category & Date */}
-                        <div className="flex flex-col gap-2.5 mb-4">
-                            {post.category && (
-                                <div className="flex items-center gap-2 text-sm">
-                                    <span className="font-quicksand font-bold text-tertiary">Kategori:</span>
-                                    <span className="font-quicksand text-gray-700">{post.category}</span>
+                            {/* Meta: Category & Date */}
+                            <div className="flex flex-col gap-2 mt-auto">
+                                {post.category && (
+                                    <div className="flex items-center gap-2 text-base md:text-xl text-tertiary">
+                                        <span className="font-quicksand font-medium">Kategori:</span>
+                                        <span className="font-quicksand">{post.category}</span>
+                                    </div>
+                                )}
+                                <div className="flex items-center gap-2 text-base md:text-xl text-tertiary">
+                                    <span className="font-quicksand font-medium">
+                                        {isFounded ? 'Waktu Ditemukan:' : 'Tanggal Hilang:'}
+                                    </span>
+                                    <span className="font-quicksand">{formattedDate}</span>
                                 </div>
-                            )}
-                            <div className="flex items-center gap-2 text-sm">
-                                <span className="font-quicksand font-bold text-tertiary">
-                                    {isFounded ? 'Waktu Ditemukan:' : 'Tanggal Hilang:'}
-                                </span>
-                                <span className="font-quicksand text-gray-700">{formattedDate}</span>
                             </div>
                         </div>
 
@@ -213,19 +219,8 @@ export default function PostDetailModal({ post, onClose }) {
                             <div className="flex items-center justify-between mb-2">
                                 <span className="flex items-center gap-1.5 font-quicksand font-semibold text-sm text-gray-500">
                                     <MapPin size={14} className="text-gray-400" strokeWidth={1.75} />
-                                    {post.location || 'Lokasi'}
+                                    {locationName || 'Lokasi'}
                                 </span>
-                                {mapsOpenUrl && (
-                                    <a
-                                        href={mapsOpenUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-1 text-xs font-quicksand font-semibold text-[#2D1606] bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-lg hover:bg-yellow-100 transition-colors"
-                                    >
-                                        <ExternalLink size={11} />
-                                        Buka di Maps
-                                    </a>
-                                )}
                             </div>
                             <div className="rounded-xl overflow-hidden border border-gray-200" style={{ height: '200px' }}>
                                 <iframe
@@ -242,24 +237,13 @@ export default function PostDetailModal({ post, onClose }) {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="mt-auto pt-2">
-                            {!isOwnPost && (
-                                <button
-                                    className="w-full bg-secondary text-white rounded-lg py-3 text-sm font-semibold font-quicksand transition-all duration-200 hover:opacity-85 active:scale-95 cursor-pointer"
-                                >
-                                    {buttonText}
-                                </button>
-                            )}
-                            {isOwnPost && (
-                                <div className="flex gap-2">
-                                    <a
-                                        href={`/posts/${post.id}/edit`}
-                                        className="flex-1 text-center bg-primary text-tertiary rounded-lg py-3 text-sm font-semibold font-quicksand transition-all duration-200 hover:opacity-85 cursor-pointer"
-                                    >
-                                        Edit Post
-                                    </a>
-                                </div>
-                            )}
+                        <div className="mt-auto pt-4 md:pt-2 md:pl-6 w-full flex justify-center md:justify-start">
+                            <button
+                                className="w-11/12 md:w-full max-w-lg bg-secondary text-white rounded-xl py-3 text-base md:text-lg font-semibold font-quicksand transition-all duration-200 hover:opacity-85 active:scale-95 cursor-pointer shadow-md"
+                                onClick={() => alert('Placeholder action')}
+                            >
+                                {buttonText}
+                            </button>
                         </div>
 
                     </div>

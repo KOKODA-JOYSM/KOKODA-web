@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { useForm } from '@inertiajs/react';
+import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
 import tailwindConfig from '../../../../tailwind.config.js';
 
 const { colors } = tailwindConfig.theme.extend;
@@ -9,14 +10,30 @@ const COLOR_SECONDARY = colors.secondary; // '#C0976C'
 
 export default function Edit({ post }) {
     const [preview, setPreview] = useState(post.image_url ? `/storage/${post.image_url}` : null);
+
+    // Resolve existing location data from the post's location relation
+    const existingLocationName = post.location?.place_name ?? post.location_name ?? '';
+    const existingLatitude     = post.location?.latitude   ?? post.latitude   ?? '';
+    const existingLongitude    = post.location?.longitude  ?? post.longitude  ?? '';
+
     const { data, setData, patch, processing, errors } = useForm({
         title: post.title,
         description: post.description,
-        location: post.location,
+        location_name: existingLocationName,
+        latitude: existingLatitude,
+        longitude: existingLongitude,
         type: post.type,
-        category: post.category || '',
         status: post.status,
     });
+
+    const handleLocationSelect = ({ place_name, latitude, longitude }) => {
+        setData(prev => ({
+            ...prev,
+            location_name: place_name,
+            latitude: latitude ?? '',
+            longitude: longitude ?? '',
+        }));
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -33,7 +50,6 @@ export default function Edit({ post }) {
         e.preventDefault();
         patch(route('posts.update', post.id), {
             onSuccess: () => {
-                // Redirect to post show page
                 window.location.href = `/posts/${post.id}`;
             },
         });
@@ -59,7 +75,7 @@ export default function Edit({ post }) {
     return (
         <AppLayout title={`Edit Post - KOKODA`}>
             <div style={{ padding: '32px 28px', maxWidth: '600px', margin: '0 auto' }}>
-                
+
                 <h1 style={{
                     fontFamily: "'Quicksand', sans-serif",
                     fontSize: '28px',
@@ -71,7 +87,7 @@ export default function Edit({ post }) {
                 </h1>
 
                 <form onSubmit={handleSubmit}>
-                    
+
                     {/* Type Selection */}
                     <div style={{ marginBottom: '24px' }}>
                         <label style={{
@@ -138,34 +154,7 @@ export default function Edit({ post }) {
                         {errors.title && <div style={errorStyle}>{errors.title}</div>}
                     </div>
 
-                    {/* Category */}
-                    <div style={{ marginBottom: '24px' }}>
-                        <label style={{
-                            display: 'block',
-                            fontFamily: "'Quicksand', sans-serif",
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            color: '#311A05',
-                            marginBottom: '8px',
-                        }}>
-                            Category
-                        </label>
-                        <input
-                            type="text"
-                            value={data.category}
-                            onChange={(e) => setData('category', e.target.value)}
-                            style={formFieldStyle}
-                            onFocus={(e) => {
-                                e.target.style.borderColor = COLOR_SECONDARY;
-                            }}
-                            onBlur={(e) => {
-                                e.target.style.borderColor = COLOR_PRIMARY;
-                            }}
-                        />
-                        {errors.category && <div style={errorStyle}>{errors.category}</div>}
-                    </div>
-
-                    {/* Location */}
+                    {/* Location — Google Places Autocomplete */}
                     <div style={{ marginBottom: '24px' }}>
                         <label style={{
                             display: 'block',
@@ -177,11 +166,14 @@ export default function Edit({ post }) {
                         }}>
                             Location <span style={{ color: '#D56666' }}>*</span>
                         </label>
-                        <input
-                            type="text"
-                            value={data.location}
-                            onChange={(e) => setData('location', e.target.value)}
-                            style={formFieldStyle}
+                        <GooglePlacesInput
+                            value={data.location_name}
+                            onSelect={handleLocationSelect}
+                            placeholder="Cari lokasi tempat hilang/ditemukan…"
+                            inputStyle={{
+                                ...formFieldStyle,
+                                paddingLeft: '36px',
+                            }}
                             onFocus={(e) => {
                                 e.target.style.borderColor = COLOR_SECONDARY;
                             }}
@@ -189,7 +181,10 @@ export default function Edit({ post }) {
                                 e.target.style.borderColor = COLOR_PRIMARY;
                             }}
                         />
-                        {errors.location && <div style={errorStyle}>{errors.location}</div>}
+                        {(errors.location_name || errors.latitude) && (
+                            <div style={errorStyle}>{errors.location_name || errors.latitude}</div>
+                        )}
+
                     </div>
 
                     {/* Description */}

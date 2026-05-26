@@ -32,21 +32,18 @@ export default function Home({ posts }) {
 
                 {/* Filter Buttons - LOST / FOUND */}
                 <div className="flex gap-0 mb-8 justify-center">
-                    <div className="flex bg-primary rounded-lg p-2 shadow-md gap-0">
+                    <div className="flex bg-primary rounded-lg p-1.5 shadow-md gap-1.5">
                         {['lost', 'found'].map((type, index) => (
                             <div key={type} className="flex items-center">
                                 <button
                                     onClick={() => handleFilterClick(type)}
-                                    className={`px-12 py-3 rounded-lg border-none text-base font-bold cursor-pointer font-quicksand transition-all duration-300 uppercase tracking-wide ${filterType === type
-                                        ? (type === 'lost' ? 'bg-label-lost text-base' : 'bg-label-found text-base')
-                                        : 'bg-transparent text-background hover:bg-gray-200 hover:bg-opacity-20'
+                                    className={`px-12 py-3 rounded-lg border-none font-bold cursor-pointer font-quicksand transition-all duration-300 uppercase tracking-wide text-tertiary ${filterType === type
+                                        ? 'bg-primary shadow-sm'
+                                        : 'bg-base'
                                         }`}
                                 >
                                     {type === 'lost' ? 'Lost' : 'Found'}
                                 </button>
-                                {index === 0 && (
-                                    <div className="h-8 w-px rounded-lg bg-background"></div>
-                                )}
                             </div>
                         ))}
                     </div>

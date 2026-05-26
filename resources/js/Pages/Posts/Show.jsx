@@ -48,7 +48,7 @@ export default function Show({ post, auth }) {
                                 {post.title}
                             </h1>
                             <div className="flex items-center gap-4 text-sm text-gray-600">
-                                <span>📍 {post.location}</span>
+                                <span>📍 {typeof post.location === 'object' ? post.location?.place_name : post.location}</span>
                                 <span>•</span>
                                 <span>📅 {new Date(post.created_at).toLocaleDateString()}</span>
                             </div>

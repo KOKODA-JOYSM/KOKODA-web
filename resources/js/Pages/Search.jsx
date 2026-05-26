@@ -26,14 +26,15 @@ export default function Search() {
     const filteredItems = useMemo(() => {
         return mockItems.filter(item => {
             // Text search
-            const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                                   item.description.toLowerCase().includes(searchQuery.toLowerCase());
-            
+
             // Type filter
             const matchesType = typeFilter === 'all' || item.type === typeFilter;
-            
+
             // Location filter
-            const matchesLocation = locationFilter === 'All Locations' || item.location.toLowerCase() === locationFilter.toLowerCase();
+            const itemLocationName = typeof item.location === 'object' ? item.location?.place_name : item.location;
+            const matchesLocation = locationFilter === 'All Locations' || (itemLocationName && itemLocationName.toLowerCase() === locationFilter.toLowerCase());
 
             return matchesSearch && matchesType && matchesLocation;
         });
@@ -47,7 +48,7 @@ export default function Search() {
                     <div className="mb-6">
                         <SearchBar value={searchQuery} onChange={setSearchQuery} />
                     </div>
-                    
+
                     {/* Filters Section */}
                     <div className="flex flex-wrap items-center gap-4 mb-2">
                         <FilterLostFound selected={typeFilter} onChange={setTypeFilter} />

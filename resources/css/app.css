@@ -53,3 +53,22 @@ body.modal-open #hamburger-btn {
     display: none !important;
 }
 
+/* Fix: @tailwindcss/forms resets text color on inputs — pastikan teks selalu terlihat */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+    color: #311A05 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #A0856A !important;
+    opacity: 1;
+}
+
