@@ -73,7 +73,6 @@ class PostController extends Controller
             'description' => 'required|string',
             'location'    => 'required|string|max:255',
             'type'        => 'required|in:lost,found',
-            'category'    => 'nullable|string|max:100',
             'image_url'   => 'nullable|image|max:2048',
         ]);
 
@@ -128,7 +127,6 @@ class PostController extends Controller
             'description' => 'required|string',
             'location'    => 'required|string|max:255',
             'type'        => 'required|in:lost,found',
-            'category'    => 'nullable|string|max:100',
             'status'      => 'required|in:active,resolved',
             'image_url'   => 'nullable|image|max:2048',
         ]);

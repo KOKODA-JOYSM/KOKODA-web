@@ -167,6 +167,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->call([
+            LocationSeeder::class,
             PostSeeder::class,
             ClaimSeeder::class,
         ]);
