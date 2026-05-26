@@ -54,7 +54,7 @@ export default function PostCard({ post }) {
                         {/* Right: location */}
                         <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-text-field flex-shrink-0 max-w-[40%]">
                             <MapPin size={12} className="flex-shrink-0" />
-                            <span className="truncate">{post.location}</span>
+                            <span className="truncate">{typeof post.location === 'object' ? post.location?.place_name : post.location}</span>
                         </div>
                     </div>
 
@@ -62,7 +62,7 @@ export default function PostCard({ post }) {
                     {post.location && (
                         <div className="sm:hidden px-4 py-1.5 flex items-center gap-1.5 text-xs text-gray-text-field border-b border-gray-50">
                             <MapPin size={11} />
-                            <span className="truncate">{post.location}</span>
+                            <span className="truncate">{typeof post.location === 'object' ? post.location.place_name : post.location}</span>
                         </div>
                     )}
 

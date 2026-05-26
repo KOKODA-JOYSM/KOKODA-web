@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Location;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -18,7 +19,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('user')
+        $posts = Post::with(['user', 'location'])
             ->where('status', 'active')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -41,7 +42,7 @@ class PostController extends Controller
      */
     public function myPosts()
     {
-        $posts = Post::with('user')
+        $posts = Post::with(['user', 'location'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get()
@@ -69,20 +70,36 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'required|string',
-            'location'    => 'required|string|max:255',
-            'type'        => 'required|in:lost,found',
-            'image_url'   => 'nullable|image|max:2048',
+            'title'         => 'required|string|max:255',
+            'description'   => 'required|string',
+            'location_name' => 'required|string|max:255',
+            'latitude'      => 'required|numeric|between:-90,90',
+            'longitude'     => 'required|numeric|between:-180,180',
+            'type'          => 'required|in:lost,found',
+            'image_url'     => 'nullable|image|max:2048',
         ]);
 
-        $validated['user_id'] = Auth::id();
+        // Create Location record
+        $location = Location::create([
+            'user_id'    => Auth::id(),
+            'place_name' => $validated['location_name'],
+            'latitude'   => $validated['latitude'],
+            'longitude'  => $validated['longitude'],
+        ]);
+
+        $postData = [
+            'user_id'     => Auth::id(),
+            'location_id' => $location->id,
+            'title'       => $validated['title'],
+            'description' => $validated['description'],
+            'type'        => $validated['type'],
+        ];
 
         if ($request->hasFile('image_url')) {
-            $validated['image_url'] = $request->file('image_url')->store('posts', 'public');
+            $postData['image_url'] = $request->file('image_url')->store('posts', 'public');
         }
 
-        Post::create($validated);
+        Post::create($postData);
 
         return redirect()->route('home')->with('success', 'Post created successfully!');
     }
@@ -92,7 +109,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        $post->load('user');
+        $post->load(['user', 'location']);
         if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
             $post->image_url = asset('storage/' . $post->image_url);
         }
@@ -110,6 +127,8 @@ class PostController extends Controller
     {
         $this->authorize('update', $post);
 
+        $post->load('location');
+
         return Inertia::render('Posts/Edit', [
             'post' => $post,
         ]);
@@ -123,26 +142,49 @@ class PostController extends Controller
         $this->authorize('update', $post);
 
         $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'required|string',
-            'location'    => 'required|string|max:255',
-            'type'        => 'required|in:lost,found',
-            'status'      => 'required|in:active,resolved',
-            'image_url'   => 'nullable|image|max:2048',
+            'title'         => 'required|string|max:255',
+            'description'   => 'required|string',
+            'location_name' => 'required|string|max:255',
+            'latitude'      => 'required|numeric|between:-90,90',
+            'longitude'     => 'required|numeric|between:-180,180',
+            'type'          => 'required|in:lost,found',
+            'status'        => 'required|in:active,resolved',
+            'image_url'     => 'nullable|image|max:2048',
         ]);
+
+        // Update or create location
+        if ($post->location_id) {
+            $post->location->update([
+                'place_name' => $validated['location_name'],
+                'latitude'   => $validated['latitude'],
+                'longitude'  => $validated['longitude'],
+            ]);
+        } else {
+            $location = Location::create([
+                'user_id'    => Auth::id(),
+                'place_name' => $validated['location_name'],
+                'latitude'   => $validated['latitude'],
+                'longitude'  => $validated['longitude'],
+            ]);
+            $post->location_id = $location->id;
+        }
+
+        $postData = [
+            'title'       => $validated['title'],
+            'description' => $validated['description'],
+            'type'        => $validated['type'],
+            'status'      => $validated['status'],
+        ];
 
         if ($request->hasFile('image_url')) {
             // Delete old image if exists
             if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
                 Storage::disk('public')->delete($post->image_url);
             }
-            $validated['image_url'] = $request->file('image_url')->store('posts', 'public');
-        } else {
-            // Keep existing image
-            unset($validated['image_url']);
+            $postData['image_url'] = $request->file('image_url')->store('posts', 'public');
         }
 
-        $post->update($validated);
+        $post->update($postData);
 
         return redirect()->route('home')->with('success', 'Post updated successfully!');
     }
@@ -157,6 +199,11 @@ class PostController extends Controller
         // Delete image from storage
         if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
             Storage::disk('public')->delete($post->image_url);
+        }
+
+        // Delete associated location
+        if ($post->location_id && $post->location) {
+            $post->location->delete();
         }
 
         $post->delete();

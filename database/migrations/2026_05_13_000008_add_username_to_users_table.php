@@ -9,7 +9,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('username')->unique()->after('name');
+            if (!Schema::hasColumn('users', 'username')) {
+                $table->string('username')->after('name');
+            }
+        });
+
+        DB::statement('UPDATE users SET username = CONCAT("user", id) WHERE username = "" OR username IS NULL');
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->unique('username');
         });
     }
 

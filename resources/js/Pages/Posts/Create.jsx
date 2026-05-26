@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { useForm } from '@inertiajs/react';
+import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
 import tailwindConfig from '../../../../tailwind.config.js';
 
 const { colors } = tailwindConfig.theme.extend;
@@ -12,11 +13,21 @@ export default function Create() {
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
-        location: '',
+        location_name: '',
+        latitude: '',
+        longitude: '',
         type: 'lost', // or 'found'
-        category: '',
         image_url: null,
     });
+
+    const handleLocationSelect = ({ place_name, latitude, longitude }) => {
+        setData(prev => ({
+            ...prev,
+            location_name: place_name,
+            latitude: latitude ?? '',
+            longitude: longitude ?? '',
+        }));
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -32,14 +43,15 @@ export default function Create() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         // Create FormData for multipart/form-data
         const formData = new FormData();
         formData.append('title', data.title);
         formData.append('description', data.description);
-        formData.append('location', data.location);
+        formData.append('location_name', data.location_name);
+        formData.append('latitude', data.latitude);
+        formData.append('longitude', data.longitude);
         formData.append('type', data.type);
-        formData.append('category', data.category);
         if (data.image_url) {
             formData.append('image_url', data.image_url);
         }
@@ -53,9 +65,10 @@ export default function Create() {
                 setData({
                     title: '',
                     description: '',
-                    location: '',
+                    location_name: '',
+                    latitude: '',
+                    longitude: '',
                     type: 'lost',
-                    category: '',
                     image_url: null,
                 });
                 setPreview(null);
@@ -72,6 +85,8 @@ export default function Create() {
         fontFamily: "'Quicksand', sans-serif",
         boxSizing: 'border-box',
         transition: 'border-color 0.2s ease',
+        color: '#311A05',
+        backgroundColor: '#FFFFFF',
     };
 
     const errorStyle = {
@@ -83,7 +98,7 @@ export default function Create() {
     return (
         <AppLayout title="Create Post - KOKODA">
             <div style={{ padding: '32px 28px', maxWidth: '600px', margin: '0 auto' }}>
-                
+
                 <h1 style={{
                     fontFamily: "'Quicksand', sans-serif",
                     fontSize: '28px',
@@ -95,7 +110,7 @@ export default function Create() {
                 </h1>
 
                 <form onSubmit={handleSubmit}>
-                    
+
                     {/* Type Selection */}
                     <div style={{ marginBottom: '24px' }}>
                         <label style={{
@@ -163,35 +178,7 @@ export default function Create() {
                         {errors.title && <div style={errorStyle}>{errors.title}</div>}
                     </div>
 
-                    {/* Category */}
-                    <div style={{ marginBottom: '24px' }}>
-                        <label style={{
-                            display: 'block',
-                            fontFamily: "'Quicksand', sans-serif",
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            color: '#311A05',
-                            marginBottom: '8px',
-                        }}>
-                            Category
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="E.g., Wallet, Phone, Keys, Pet, Other"
-                            value={data.category}
-                            onChange={(e) => setData('category', e.target.value)}
-                            style={formFieldStyle}
-                            onFocus={(e) => {
-                                e.target.style.borderColor = COLOR_SECONDARY;
-                            }}
-                            onBlur={(e) => {
-                                e.target.style.borderColor = COLOR_PRIMARY;
-                            }}
-                        />
-                        {errors.category && <div style={errorStyle}>{errors.category}</div>}
-                    </div>
-
-                    {/* Location */}
+                    {/* Location — Google Places Autocomplete */}
                     <div style={{ marginBottom: '24px' }}>
                         <label style={{
                             display: 'block',
@@ -203,12 +190,14 @@ export default function Create() {
                         }}>
                             Location <span style={{ color: '#D56666' }}>*</span>
                         </label>
-                        <input
-                            type="text"
-                            placeholder="Where was the item lost or found?"
-                            value={data.location}
-                            onChange={(e) => setData('location', e.target.value)}
-                            style={formFieldStyle}
+                        <GooglePlacesInput
+                            value={data.location_name}
+                            onSelect={handleLocationSelect}
+                            placeholder="Cari lokasi tempat hilang/ditemukan…"
+                            inputStyle={{
+                                ...formFieldStyle,
+                                paddingLeft: '36px',
+                            }}
                             onFocus={(e) => {
                                 e.target.style.borderColor = COLOR_SECONDARY;
                             }}
@@ -216,7 +205,10 @@ export default function Create() {
                                 e.target.style.borderColor = COLOR_PRIMARY;
                             }}
                         />
-                        {errors.location && <div style={errorStyle}>{errors.location}</div>}
+                        {(errors.location_name || errors.latitude) && (
+                            <div style={errorStyle}>{errors.location_name || errors.latitude}</div>
+                        )}
+
                     </div>
 
                     {/* Description */}
