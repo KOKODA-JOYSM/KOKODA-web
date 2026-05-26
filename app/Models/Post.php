@@ -9,12 +9,11 @@ class Post extends Model
 {
     protected $fillable = [
         'user_id',
+        'location_id',
         'title',
         'description',
         'image_url',
-        'location',
         'type', // 'lost' atau 'found'
-        'category',
         'status', // 'active', 'resolved'
     ];
 
@@ -29,5 +28,10 @@ class Post extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
     }
 }

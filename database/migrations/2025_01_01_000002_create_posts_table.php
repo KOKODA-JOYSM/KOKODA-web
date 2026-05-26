@@ -11,11 +11,10 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('location_id')->unique();
             $table->enum('type', ['lost', 'found']);
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('location')->nullable();
-            $table->string('category')->nullable();
             $table->string('image_url')->nullable();
             $table->enum('status', ['active', 'resolved'])->default('active');
             $table->timestamps();
@@ -23,6 +22,7 @@ return new class extends Migration
             // Indexes untuk infinite scroll & filter
             $table->index(['type', 'status']);
             $table->index('user_id');
+            $table->index('location_id');
         });
     }
 
