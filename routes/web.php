@@ -29,12 +29,14 @@ Route::middleware('auth')->group(function () {
         $posts = app(\App\Http\Controllers\PostController::class)->myPosts();
         return Inertia::render('Profile/Profile', [
             'posts' => $posts,
+            'status' => session('status'),
         ]);
     })->name('profile');
 
     // 2. Menggeser form edit bawaan Breeze ke URL /profile/edit (Pages/Profile/Edit.jsx)
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    // POST digunakan agar PHP bisa parse multipart/form-data (file upload) dengan benar
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 // ─────────────────────────────────────────────────────────────────

@@ -116,7 +116,11 @@ export default function Navbar() {
                     >
                         <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full shrink-0 overflow-hidden bg-background">
                             <img
-                                src="/images/icon-profile-avatar.svg"
+                                src={
+                                    user?.profile_icon
+                                        ? '/' + user.profile_icon
+                                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=F4C799&color=311A05`
+                                }
                                 alt="Profile avatar"
                                 className="w-full h-full object-cover"
                             />

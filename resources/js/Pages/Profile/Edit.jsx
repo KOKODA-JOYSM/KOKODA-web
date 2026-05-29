@@ -2,13 +2,13 @@ import React from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
-export default function Edit({ mustVerifyEmail, status }) {
+export default function Edit({ mustVerifyEmail }) {
     // Mengambil data user yang sedang login dari props bawaan Inertia
     const user = usePage().props.auth.user;
     const [previewUrl, setPreviewUrl] = React.useState(null);
 
     // Menggunakan useForm dari Inertia untuk menangani input & submit data
-    const { data, setData, patch, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         name: user.name || '',
         email: user.email || '',
         location: user.location || '',
@@ -18,7 +18,7 @@ export default function Edit({ mustVerifyEmail, status }) {
     // Fungsi untuk mengirim pembaruan data ke backend saat tombol Save ditekan
     const submit = (e) => {
         e.preventDefault();
-        patch(route('profile.update'), {
+        post(route('profile.update'), {
             forceFormData: true,
         });
     };
@@ -43,7 +43,7 @@ export default function Edit({ mustVerifyEmail, status }) {
             return previewUrl;
         }
         if (user.profile_icon) {
-            return '/storage/' + user.profile_icon;
+            return '/' + user.profile_icon;
         }
         return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=F4C799&color=311A05';
     };
@@ -57,6 +57,18 @@ export default function Edit({ mustVerifyEmail, status }) {
 
                 {/* Batasi lebar konten maksimal agar proporsional dan rapi */}
                 <form onSubmit={submit} className="w-full max-w-4xl flex flex-col gap-6">
+
+                    {/* Error Alert */}
+                    {Object.keys(errors).length > 0 && (
+                        <div className="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg text-sm">
+                            <p className="font-semibold">Please check your input:</p>
+                            <ul className="mt-2">
+                                {Object.entries(errors).map(([field, message]) => (
+                                    <li key={field}>• {message}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     {/* ── CARD 1: HEADER & GANTI FOTO ── */}
                     <div className="bg-secondary rounded-[28px] p-8 sm:p-10 flex flex-col sm:flex-row justify-between items-center gap-6 shadow-md">
@@ -152,13 +164,6 @@ export default function Edit({ mustVerifyEmail, status }) {
                             />
                             {errors.location && <span className="text-red-300 text-xs">{errors.location}</span>}
                         </div>
-
-                        {/* Notifikasi Status Berhasil (Opsional bawaan Breeze) */}
-                        {status === 'profile-updated' && (
-                            <div className="text-sm font-medium text-green-200">
-                                Profile updated successfully.
-                            </div>
-                        )}
                     </div>
 
 
