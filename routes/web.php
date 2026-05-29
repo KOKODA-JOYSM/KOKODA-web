@@ -17,8 +17,8 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    return redirect()->route('home');
+})->name('dashboard');
 
 // ─────────────────────────────────────────────────────────────────
 // RUTE PROFILE (SUDAH DIUPDATE)
@@ -26,7 +26,10 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     // 1. Menampilkan halaman utama profil custom kamu (Pages/Profile/Profile.jsx)
     Route::get('/profile', function () {
-        return Inertia::render('Profile/Profile');
+        $posts = app(\App\Http\Controllers\PostController::class)->myPosts();
+        return Inertia::render('Profile/Profile', [
+            'posts' => $posts,
+        ]);
     })->name('profile');
 
     // 2. Menggeser form edit bawaan Breeze ke URL /profile/edit (Pages/Profile/Edit.jsx)
@@ -43,6 +46,10 @@ Route::get('/search', function () {
 Route::get('/leaderboard', [LeaderboardController::class, 'show'])->name('leaderboard');
 Route::get('/api/leaderboard', [LeaderboardController::class, 'index']);
 
+// API routes for search
+Route::get('/api/locations', [PostController::class, 'getLocations']);
+Route::get('/api/search', [PostController::class, 'search']);
+
 // Public routes for posts
 Route::get('/home', [PostController::class, 'index'])->name('home');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
@@ -54,6 +61,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+    // Chat routes
+    Route::get('/chat', fn() => Inertia::render('Chat/Chat'))->name('chat');
 });
 
 require __DIR__.'/auth.php';

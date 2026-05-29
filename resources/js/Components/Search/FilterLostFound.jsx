@@ -14,10 +14,10 @@ export default function FilterLostFound({ selected, onChange }) {
                     <button
                         key={f.id}
                         onClick={() => onChange(isSelected ? 'all' : f.id)}
-                        className={`px-8 py-2 rounded-full font-quicksand font-bold transition-all shadow-md ${
+                        className={`px-8 py-2 rounded-full font-quicksand font-bold transition-all shadow-md border-2 ${
                             isSelected
-                                ? 'bg-highlight text-tertiary'
-                                : 'bg-base text-tertiary hover:bg-gray-100'
+                                ? 'bg-highlight text-tertiary border-secondary'
+                                : 'bg-white text-tertiary border-primary hover:bg-primary/30'
                         }`}
                     >
                         {f.label}

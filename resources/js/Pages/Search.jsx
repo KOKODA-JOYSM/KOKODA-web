@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import SearchBar from '@/Components/Search/SearchBar';
 import FilterLostFound from '@/Components/Search/FilterLostFound';
@@ -11,33 +11,52 @@ export default function Search() {
     const [typeFilter, setTypeFilter] = useState('all');
     const [locationFilter, setLocationFilter] = useState('All Locations');
     const [selectedPost, setSelectedPost] = useState(null);
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [locationCoords, setLocationCoords] = useState(null);
 
-    // Mock data for initial UI implementation
-    const mockItems = [
-        { id: 1, type: 'lost', title: 'Ayam Jerry', description: 'Lorem ipsum dolor sit amet consectetur. Accumsan turpis porttitor velit amet vitae pulvinar pretium amet.', location: 'Boyolali', created_at: '2023-10-24T10:00:00', user: { name: 'JerryOwner' }, category: 'Pet', image: null },
-        { id: 2, type: 'found', title: 'Ayam Jerry', description: 'Lorem ipsum dolor sit amet consectetur. Accumsan turpis porttitor velit amet vitae pulvinar pretium amet.', location: 'Boyolali', created_at: '2023-10-25T10:00:00', user: { name: 'Finder123' }, category: 'Pet', image: null },
-        { id: 3, type: 'lost', title: 'Mas Steven', description: 'Lorem ipsum dolor sit amet consectetur.', location: 'Jogja', created_at: '2023-10-22T10:00:00', user: { name: 'StevenFriend' }, category: 'Person', image: null },
-        { id: 4, type: 'found', title: 'Silver Casio Watch', description: 'Found a digital watch near the entrance.', location: 'Jakarta', created_at: '2023-10-26T10:00:00', user: { name: 'SecurityGuard' }, category: 'Accessories', image: null },
-        { id: 5, type: 'lost', title: 'MacBook Charger', description: 'Forgot my USB-C charger in a cafe.', location: 'Bandung', created_at: '2023-10-21T10:00:00', user: { name: 'CafeWorker' }, category: 'Electronics', image: null },
-        { id: 6, type: 'found', title: 'Car Keys', description: 'Honda car keys found on the ground.', location: 'Surabaya', created_at: '2023-10-27T10:00:00', user: { name: 'GoodSamaritan' }, category: 'Keys', image: null },
-    ];
+    // Fetch posts from database
+    useEffect(() => {
+        const fetchPosts = async () => {
+            setLoading(true);
+            try {
+                const params = new URLSearchParams();
+                if (searchQuery) params.append('q', searchQuery);
+                if (typeFilter !== 'all') params.append('type', typeFilter);
+                if (locationFilter !== 'All Locations') params.append('location', locationFilter);
+                
+                // Add coordinates for radius search (if available)
+                if (locationCoords) {
+                    params.append('latitude', locationCoords.lat);
+                    params.append('longitude', locationCoords.lng);
+                    params.append('radius', 5); // 5km
+                    console.log('📍 Searching with radius:', locationCoords);
+                } else if (locationFilter !== 'All Locations') {
+                    // Fallback: search by location name without radius
+                    console.log('🏘️ Searching by location name:', locationFilter);
+                }
 
-    // Filter logic
-    const filteredItems = useMemo(() => {
-        return mockItems.filter(item => {
-            // Text search
-            const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                  item.description.toLowerCase().includes(searchQuery.toLowerCase());
-            
-            // Type filter
-            const matchesType = typeFilter === 'all' || item.type === typeFilter;
-            
-            // Location filter
-            const matchesLocation = locationFilter === 'All Locations' || item.location.toLowerCase() === locationFilter.toLowerCase();
+                console.log('🔍 Search params:', params.toString());
+                const response = await fetch(`/api/search?${params}`);
+                const data = await response.json();
+                console.log('📦 Results:', data);
+                setPosts(data.data || []);
+            } catch (err) {
+                console.error('Failed to fetch posts:', err);
+                setPosts([]);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-            return matchesSearch && matchesType && matchesLocation;
-        });
-    }, [searchQuery, typeFilter, locationFilter, mockItems]);
+        fetchPosts();
+    }, [searchQuery, typeFilter, locationFilter, locationCoords]);
+
+    const handleLocationWithCoords = (locationName, coords) => {
+        console.log('📌 Location selected:', locationName, 'Coords:', coords);
+        setLocationCoords(coords); // Can be null (fallback to name search)
+        setLocationFilter(locationName);
+    };
 
     return (
         <AppLayout title="Search">
@@ -47,20 +66,24 @@ export default function Search() {
                     <div className="mb-6">
                         <SearchBar value={searchQuery} onChange={setSearchQuery} />
                     </div>
-                    
+
                     {/* Filters Section */}
                     <div className="flex flex-wrap items-center gap-4 mb-2">
                         <FilterLostFound selected={typeFilter} onChange={setTypeFilter} />
-                        <FilterLocation selected={locationFilter} onChange={setLocationFilter} />
+                        <FilterLocation 
+                            selected={locationFilter} 
+                            onChange={setLocationFilter}
+                            onLocationWithCoords={handleLocationWithCoords}
+                        />
                     </div>
 
                     <div className="mb-6 text-gray-text-field font-quicksand font-semibold ml-2 text-sm">
-                        {filteredItems.length} result - {locationFilter === 'All Locations' ? 'Jogja' : locationFilter}
+                        {loading ? 'Loading...' : `${posts.length} result${locationCoords ? ' within 5km radius' : ''}`}
                     </div>
 
                     {/* Results Section */}
                     <div>
-                        <SearchResult items={filteredItems} onItemClick={setSelectedPost} />
+                        <SearchResult items={posts} onItemClick={setSelectedPost} />
                     </div>
                 </div>
             </div>

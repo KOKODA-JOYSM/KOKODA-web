@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Location;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -13,88 +14,89 @@ class PostSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get or create users
-        $user1 = User::firstOrCreate(
-            ['email' => 'user1@example.com'],
-            ['name' => 'dorayusuke_', 'password' => bcrypt('password')]
-        );
+        $userIds = User::query()->pluck('id');
 
-        $user2 = User::firstOrCreate(
-            ['email' => 'user2@example.com'],
-            ['name' => 'kome_mlay', 'password' => bcrypt('password')]
-        );
+        if ($userIds->isEmpty()) {
+            User::create([
+                'name' => 'User One',
+                'username' => 'user1',
+                'email' => 'user1@example.com',
+                'password' => bcrypt('password'),
+            ]);
+            User::create([
+                'name' => 'User Two',
+                'username' => 'user2',
+                'email' => 'user2@example.com',
+                'password' => bcrypt('password'),
+            ]);
+            User::create([
+                'name' => 'User Three',
+                'username' => 'user3',
+                'email' => 'user3@example.com',
+                'password' => bcrypt('password'),
+            ]);
 
-        $user3 = User::firstOrCreate(
-            ['email' => 'user3@example.com'],
-            ['name' => 'penermundo_sepatu', 'password' => bcrypt('password')]
-        );
+            $userIds = User::query()->pluck('id');
+        }
 
-        // Sample lost and found posts
-        $posts = [
+        $locations = Location::query()->orderBy('id')->get();
+        if ($locations->isEmpty()) {
+            return;
+        }
+
+        $postTemplates = [
             [
-                'user_id' => $user1->id,
-                'title' => 'Menemukan Dompet Skena',
-                'description' => 'Halo ges, aku nemuin nih wallet berwarna hitam dengan brand terkenal, aku menemukan barang ini di area lokasi tertentu, untuk memastikan keamanan barang ini aku akan memberikan barang ini kepada yang benar-benar empunya saja.',
-                'location' => 'Sentul, Bogor',
-                'type' => 'found',
-                'category' => 'Wallet',
-                'status' => 'active',
-                'image_url' => null,
-            ],
-            [
-                'user_id' => $user2->id,
-                'title' => 'DICARI!!! Kucing Kampung Coklot Bercak Hitam',
-                'description' => 'Halo ges, aku nemuin nih wallet berwarna hitam dengan brand terkenal, aku menemukan barang ini di area lokasi tertentu, untuk memastikan keamanan barang ini aku akan memberikan barang ini kepada yang benar-benar empunya saja.',
-                'location' => 'Bengkalis, Riau',
+                'title' => 'Lost black wallet',
+                'description' => 'Lost a black wallet with several cards. Please contact me if found.',
                 'type' => 'lost',
-                'category' => 'Pet',
                 'status' => 'active',
-                'image_url' => null,
             ],
             [
-                'user_id' => $user3->id,
-                'title' => 'Menemukan Sepatu Penambok Tinggi Badan',
-                'description' => 'Halo ges, aku nemuin nih wallet berwarna hitam dengan brand terkenal, aku menemukan barang ini di area lokasi tertentu, untuk memastikan keamanan barang ini aku akan memberikan barang ini kepada yang benar-benar empunya saja.',
-                'location' => 'Butam, Kepri',
+                'title' => 'Found keys with red keychain',
+                'description' => 'Found a set of keys with a red keychain in the area.',
                 'type' => 'found',
-                'category' => 'Shoes',
                 'status' => 'active',
-                'image_url' => null,
             ],
             [
-                'user_id' => $user1->id,
-                'title' => 'HILANG!!! Ponsel iPhone 14 Pro',
-                'description' => 'Ponsel saya hilang di area mall sentul. Warna space gray dengan casing transparan. Sangat berharga bagi saya. Siapa pun yang menemukan mohon menghubungi saya segera.',
-                'location' => 'Sentul, Bogor',
+                'title' => 'Lost white earbuds',
+                'description' => 'Left white earbuds around the location. Please contact me if found.',
                 'type' => 'lost',
-                'category' => 'Phone',
                 'status' => 'active',
-                'image_url' => null,
             ],
             [
-                'user_id' => $user2->id,
-                'title' => 'Ditemukan Kunci Rumah dengan Gantungan Unik',
-                'description' => 'Menemukan satu set kunci dengan gantungan berbentuk boneka di dekat halte bus. Kunci terlihat baru dan penting untuk pemiliknya. Hubungi saya jika ini milik Anda.',
-                'location' => 'Riau, Indonesia',
+                'title' => 'Found blue backpack',
+                'description' => 'Blue backpack with notebooks found nearby.',
                 'type' => 'found',
-                'category' => 'Keys',
                 'status' => 'active',
-                'image_url' => null,
             ],
             [
-                'user_id' => $user3->id,
-                'title' => 'HILANG!!! Jam Tangan Fossil Cokelat',
-                'description' => 'Jam tangan Fossil dengan tali kulit cokelat hilang kemarin sore di pusat perbelanjaan. Jam ini sangat bermakna karena hadiah dari orang tua. Reward menanti untuk yang menemukan dan mengembalikan!',
-                'location' => 'Kepri, Indonesia',
+                'title' => 'Lost silver watch',
+                'description' => 'Silver watch lost around the area.',
                 'type' => 'lost',
-                'category' => 'Accessories',
                 'status' => 'active',
-                'image_url' => null,
+            ],
+            [
+                'title' => 'Found student ID card',
+                'description' => 'Found a student ID card on the ground.',
+                'type' => 'found',
+                'status' => 'active',
             ],
         ];
 
-        foreach ($posts as $post) {
-            Post::create($post);
+        foreach ($locations as $index => $location) {
+            $template = $postTemplates[$index % count($postTemplates)];
+            $title = $template['title'] . ' near ' . $location->place_name;
+
+            Post::updateOrCreate(
+                ['location_id' => $location->id],
+                [
+                    'user_id' => $location->user_id,
+                    'title' => $title,
+                    'description' => $template['description'],
+                    'type' => $template['type'],
+                    'status' => $template['status'],
+                ]
+            );
         }
     }
 }
