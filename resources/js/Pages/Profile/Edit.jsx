@@ -8,7 +8,7 @@ export default function Edit({ mustVerifyEmail }) {
     const [previewUrl, setPreviewUrl] = React.useState(null);
 
     // Menggunakan useForm dari Inertia untuk menangani input & submit data
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, patch, processing, errors } = useForm({
         name: user.name || '',
         email: user.email || '',
         location: user.location || '',
@@ -18,7 +18,7 @@ export default function Edit({ mustVerifyEmail }) {
     // Fungsi untuk mengirim pembaruan data ke backend saat tombol Save ditekan
     const submit = (e) => {
         e.preventDefault();
-        post(route('profile.update'), {
+        patch(route('profile.update'), {
             forceFormData: true,
         });
     };
