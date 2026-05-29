@@ -18,6 +18,8 @@ class RegistrationTest extends TestCase
 
     public function test_new_users_can_register(): void
     {
+        config(['app.debug' => true]);
+
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
@@ -25,7 +27,13 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
+        $response->assertRedirect(route('register.otp'));
+
+        $verifyResponse = $this->post('/register/otp/verify', [
+            'otp' => '1111',
+        ]);
+
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $verifyResponse->assertRedirect(route('home'));
     }
 }

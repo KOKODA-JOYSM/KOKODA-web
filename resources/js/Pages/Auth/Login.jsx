@@ -1,6 +1,6 @@
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import TextInput from '@/Components/TextInput';
+import Checkbox from '@/Components/Auth/Checkbox';
+import InputError from '@/Components/Auth/InputError';
+import TextInput from '@/Components/Auth/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -23,13 +23,13 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <div className="min-h-screen bg-primary px-4 py-8 font-quicksand text-tertiary sm:px-6 lg:flex lg:items-center lg:justify-center">
+        <div className="flex min-h-screen items-center justify-center bg-primary px-4 py-8 font-quicksand text-tertiary sm:px-6">
             <Head title="Log in" />
 
             <div className="w-full max-w-5xl overflow-hidden rounded-2xl bg-base shadow-xl lg:grid lg:min-h-[440px] lg:grid-cols-[2fr_3fr]">
                 <div className="relative hidden lg:block">
                     <img
-                        src="/images/lost-and-found-box.png"
+                        src="/images/lost-and-found-image.png"
                         alt="Lost and found box"
                         className="h-full w-full object-cover object-[center_72%]"
                     />
@@ -40,7 +40,7 @@ export default function Login({ status, canResetPassword }) {
                     <div className="w-full max-w-md">
                         <div className="mb-8 flex flex-col items-center text-center">
                             <div className="mb-3 flex items-center gap-2 text-tertiary">
-                                <img src="/images/KOKODA-logo-removed-background.png" alt="KOKODA logo" className="h-14 w-auto" />
+                                    <img src="/images/logo-kokoda-black.svg" alt="KOKODA logo" className="h-14 w-auto" />
                             </div>
                             <h1 className="text-[2.87rem] font-bold leading-tight text-secondary" style={{ textShadow: '3.2px 3.2px 0.8px rgba(0, 0, 0, 0.5)' }}>
                                 Welcome Back!
@@ -57,10 +57,10 @@ export default function Login({ status, canResetPassword }) {
                             <div>
                                 <TextInput
                                     id="email"
-                                    type="email"
+                                    type="text"
                                     name="email"
                                     value={data.email}
-                                    className="block w-full rounded-lg border-secondary bg-base px-4 py-3 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary focus:ring-tertiary"
+                                    className="block w-full rounded-lg border-secondary bg-base px-4 py-3 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                                     autoComplete="username"
                                     isFocused={true}
                                     placeholder="Username / Email address"
@@ -76,7 +76,7 @@ export default function Login({ status, canResetPassword }) {
                                         type={showPassword ? 'text' : 'password'}
                                         name="password"
                                         value={data.password}
-                                        className="block w-full rounded-lg border-secondary bg-base px-4 py-3 pr-12 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary focus:ring-tertiary"
+                                        className="block w-full rounded-lg border-secondary bg-base px-4 py-3 pr-12 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                                         autoComplete="current-password"
                                         placeholder="Password"
                                         onChange={(e) => setData('password', e.target.value)}
@@ -126,7 +126,7 @@ export default function Login({ status, canResetPassword }) {
                             </button>
                         </form>
 
-                        <div className="my-6 h-px w-full bg-secondary/50" />
+                        <div className="my-3 h-px w-full bg-secondary/50" />
 
                         <button
                             type="button"

@@ -1,5 +1,74 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Roboto:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+      display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+  }
+
+  /* Page content offset for mobile hamburger button */
+  .kokoda-page-content {
+      padding-top: 4rem; /* 64px — space for hamburger */
+      background-color: #FFF6EC; /* match page background so padding-top area isn't white */
+  }
+
+  @media (min-width: 1024px) {
+      .kokoda-page-content {
+          padding-top: 0;
+      }
+  }
+
+  /* Additional top padding for Chat page on tablet to avoid header being cut off
+     Only applies when AppLayout adds the `chat-page` class — other pages unaffected */
+  .kokoda-page-content.chat-page {
+      padding-top: 4rem; /* baseline */
+  }
+
+  @media (min-width: 0px) and (max-width: 1023px) {
+      .kokoda-page-content.chat-page {
+          padding-top: 0; /* Remove padding entirely on tablet, per user request */
+          margin-bottom: 0;
+          padding-bottom: 0;
+      }
+  }
+
+  @media (min-width: 1024px) {
+      .kokoda-page-content.chat-page {
+          padding-top: 0; /* desktop unchanged */
+      }
+  }
+}
+
+/* Sembunyikan hamburger navbar saat detail post modal terbuka (mobile/tablet) */
+body.modal-open #hamburger-btn {
+    display: none !important;
+}
+
+/* Fix: @tailwindcss/forms resets text color on inputs — pastikan teks selalu terlihat */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+    color: #311A05 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #A0856A !important;
+    opacity: 1;
+}
+

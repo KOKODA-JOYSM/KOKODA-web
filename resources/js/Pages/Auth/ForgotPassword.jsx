@@ -1,8 +1,6 @@
-import InputError from '@/Components/InputError';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import InputError from '@/Components/Auth/InputError';
+import TextInput from '@/Components/Auth/TextInput';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function ForgotPassword({ status }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -16,40 +14,74 @@ export default function ForgotPassword({ status }) {
     };
 
     return (
-        <GuestLayout>
+        <div className="min-h-screen bg-primary px-4 pt-6 pb-8 font-quicksand text-tertiary sm:px-6 lg:flex lg:items-center lg:justify-center">
             <Head title="Forgot Password" />
 
-            <div className="mb-4 text-sm text-gray-600">
-                Forgot your password? No problem. Just let us know your email
-                address and we will email you a password reset link that will
-                allow you to choose a new one.
+            <div className="w-full max-w-5xl overflow-hidden rounded-2xl bg-base shadow-xl lg:grid lg:min-h-[440px] lg:grid-cols-[2fr_3fr]">
+                <div className="relative hidden lg:block">
+                    <img
+                        src="/images/lost-and-found-image.png"
+                        alt="Lost and found box"
+                        className="h-full w-full object-cover object-[center_72%]"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-tertiary/55 via-transparent to-transparent" />
+                </div>
+
+                <div className="flex items-center justify-center bg-base px-6 py-10 sm:px-10">
+                    <div className="w-full max-w-md">
+                        <div className="mb-9 flex flex-col items-center text-center">
+                            <div className="mb-4 flex items-center gap-2 text-tertiary">
+                                    <img src="/images/LogoKokoda.svg" alt="KOKODA logo" className="h-14 w-auto" />
+                            </div>
+                            <h1 className="text-[2.87rem] font-bold leading-tight text-secondary" style={{ textShadow: '3.2px 3.2px 0.8px rgba(0, 0, 0, 0.5)' }}>
+                                Forgot Password
+                            </h1>
+                            <p className="mt-2 text-center text-base text-secondary/90">
+                                Enter your email and we will send a reset link to help you create a new password.
+                            </p>
+                        </div>
+
+                        {status && (
+                            <div className="mb-4 rounded-lg border border-online-color/30 bg-online-color/10 px-3 py-2 text-sm font-semibold text-online-color">
+                                {status}
+                            </div>
+                        )}
+
+                        <form onSubmit={submit} className="space-y-4">
+                            <div>
+                                <TextInput
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value={data.email}
+                                    className="block w-full rounded-lg border-secondary bg-base px-4 py-3 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
+                                    isFocused={true}
+                                    autoComplete="username"
+                                    placeholder="Email address"
+                                    onChange={(e) => setData('email', e.target.value)}
+                                />
+
+                                <InputError message={errors.email} className="mt-2 text-label-lost" />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="mt-3 w-full rounded-lg bg-secondary px-4 py-3 text-base font-bold uppercase tracking-wide text-background transition hover:bg-tertiary hover:text-background disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                {processing ? 'Sending...' : 'Email Password Reset Link'}
+                            </button>
+                        </form>
+
+                        <p className="mt-7 text-center text-base text-tertiary">
+                            Back to{' '}
+                            <Link href={route('login')} className="font-semibold text-secondary underline underline-offset-2 hover:text-tertiary">
+                                Log in
+                            </Link>
+                        </p>
+                    </div>
+                </div>
             </div>
-
-            {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
-
-            <form onSubmit={submit}>
-                <TextInput
-                    id="email"
-                    type="email"
-                    name="email"
-                    value={data.email}
-                    className="mt-1 block w-full"
-                    isFocused={true}
-                    onChange={(e) => setData('email', e.target.value)}
-                />
-
-                <InputError message={errors.email} className="mt-2" />
-
-                <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Email Password Reset Link
-                    </PrimaryButton>
-                </div>
-            </form>
-        </GuestLayout>
+        </div>
     );
 }
