@@ -89,7 +89,7 @@ export default function CreatePostModal({ onClose }) {
                 className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-base rounded-2xl w-11/12 max-w-5xl max-h-[90vh] overflow-y-auto z-50 shadow-2xl animate-slideUp px-6 md:px-12"
             >
                 {/* Header */}
-                <div className="flex justify-between items-center py-10 md:py-14 border-b border-secondary sticky top-0 bg-base mb-4">
+                <div className="flex justify-between items-center py-10 md:py-14 border-b border-secondary sticky top-0 bg-base mb-4 z-10">
                     <h2 className="absolute left-1/2 transform -translate-x-1/2 font-quicksand text-2xl md:text-3xl font-bold text-tertiary m-0">
                         Create Post
                     </h2>
@@ -126,7 +126,7 @@ export default function CreatePostModal({ onClose }) {
                                     onClick={() => setData('type', type)}
                                     className={`px-8 md:px-12 py-3 rounded-lg border-none font-bold cursor-pointer font-quicksand transition-all duration-300 uppercase tracking-wide text-tertiary ${
                                         data.type === type
-                                            ? 'bg-primary shadow-sm'
+                                            ? 'bg-highlight shadow-sm'
                                             : 'bg-base'
                                         }`}
                                     type="button"

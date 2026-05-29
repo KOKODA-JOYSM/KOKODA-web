@@ -38,7 +38,7 @@ export default function Home({ posts }) {
                                 <button
                                     onClick={() => handleFilterClick(type)}
                                     className={`px-12 py-3 rounded-lg border-none font-bold cursor-pointer font-quicksand transition-all duration-300 uppercase tracking-wide text-tertiary ${filterType === type
-                                        ? 'bg-primary shadow-sm'
+                                        ? 'bg-highlight shadow-sm'
                                         : 'bg-base'
                                         }`}
                                 >
