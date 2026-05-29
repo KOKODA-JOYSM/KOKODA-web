@@ -6,7 +6,7 @@ import RequestTab from './RequestTab';
 import MyPostTab from './MyPostTab';
 import HistoryTab from './HistoryTab';
 
-export default function Profile({ posts }) {
+export default function Profile({ posts, status }) {
     // 1. Ambil data user yang sedang login langsung dari backend (database)
     const { auth } = usePage().props;
     const user = auth.user;
@@ -17,7 +17,9 @@ export default function Profile({ posts }) {
     // Fallback data pelengkap (karena kolom ini biasanya belum ada di tabel users bawaan Breeze)
     const userLocation = user.location || 'Tangerang';
     const userRating = user.rating || '4,7/5';
-    const userAvatar = user.avatar || '/images/icon-profile-avatar.svg';
+    const userAvatar = user.profile_icon
+        ? ('/' + user.profile_icon)
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=F4C799&color=311A05`;
 
     // 2. Mengolah data postingan dari database
     // Backend mengirim array Collection langsung (sudah difilter user_id di controller)
@@ -27,6 +29,13 @@ export default function Profile({ posts }) {
         <AppLayout title="Profile - KOKODA">
             {/* Kontainer Utama */}
             <div className="px-6 py-8 bg-background min-h-screen w-full font-quicksand flex flex-col items-center">
+
+                {/* Notifikasi sukses setelah update profil */}
+                {status === 'profile-updated' && (
+                    <div className="w-full max-w-4xl mb-4 px-4 py-3 bg-green-500/20 border border-green-500 text-green-300 rounded-xl text-sm font-medium">
+                        Profile updated successfully.
+                    </div>
+                )}
 
                 {/* Batasi lebar konten maksimal */}
                 <div className="w-full max-w-4xl flex flex-col gap-8">
@@ -41,7 +50,6 @@ export default function Profile({ posts }) {
                                     src={userAvatar}
                                     alt={user.name}
                                     className="w-full h-full object-cover"
-                                    onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=F4C799&color=311A05` }}
                                 />
                             </div>
 

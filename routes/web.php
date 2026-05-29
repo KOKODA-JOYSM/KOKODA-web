@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
         $posts = app(\App\Http\Controllers\PostController::class)->myPosts();
         return Inertia::render('Profile/Profile', [
             'posts' => $posts,
+            'status' => session('status'),
         ]);
     })->name('profile');
 
