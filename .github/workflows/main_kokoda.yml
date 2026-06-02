@@ -27,11 +27,18 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-dev --optimize-autoloader
 
-      - name: Copy nginx config
-        run: cp default /home/site/wwwroot/default || true
-
       - name: Generate app key
         run: php artisan key:generate
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build frontend assets
+        run: |
+          npm install
+          npm run build
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
