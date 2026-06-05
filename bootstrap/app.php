@@ -16,6 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        // Azure App Service mengakhiri TLS di load balancer dan meneruskan
+        // X-Forwarded-Proto/-For. Tanpa trust proxies, Laravel mengira request
+        // adalah http sehingga redirect & form action auth memakai skema yang
+        // salah (mixed-content / redirect gagal) di belakang proxy Azure.
+        $middleware->trustProxies(at: '*');
+
         $middleware->redirectUsersTo('/home');
 
         //

@@ -8,12 +8,12 @@ use Tests\TestCase;
 class ExampleTest extends TestCase
 {
     /**
-     * A basic test example.
+     * Root ("/") diarahkan ke home feed.
      */
-    public function test_the_application_returns_a_successful_response(): void
+    public function test_the_root_redirects_to_home(): void
     {
         $response = $this->get('/');
 
-        $response->assertStatus(200);
+        $response->assertRedirect(route('home'));
     }
 }

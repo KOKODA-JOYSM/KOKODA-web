@@ -3,17 +3,12 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PostController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Empty endpoint ("/") langsung diarahkan ke home feed.
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return redirect()->route('home');
 });
 
 Route::get('/dashboard', function () {
@@ -68,3 +63,8 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Endpoint yang tidak dikenal / kosong diarahkan kembali ke home.
+Route::fallback(function () {
+    return redirect()->route('home');
+});
