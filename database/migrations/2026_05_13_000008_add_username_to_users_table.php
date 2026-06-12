@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -14,7 +15,13 @@ return new class extends Migration
             }
         });
 
-        DB::statement('UPDATE users SET username = CONCAT("user", id) WHERE username = "" OR username IS NULL');
+        // CONCAT() tidak ada di SQLite (dipakai test suite & CI); SQLite memakai
+        // operator ||, sedangkan MySQL (Azure) memakai CONCAT().
+        $username = DB::getDriverName() === 'sqlite'
+            ? "'user' || id"
+            : "CONCAT('user', id)";
+
+        DB::statement("UPDATE users SET username = {$username} WHERE username = '' OR username IS NULL");
 
         Schema::table('users', function (Blueprint $table) {
             $table->unique('username');
