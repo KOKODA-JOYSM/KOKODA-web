@@ -1,7 +1,7 @@
 # Deploy KOKODA ke Azure App Service
 
-Catatan konfigurasi yang **wajib** ada di Azure agar authentication berfungsi
-dan tersimpan ke database Azure.
+Catatan konfigurasi yang **wajib** ada di Azure agar authentication dan fitur
+post (CRUD + upload gambar) berfungsi dan tersimpan ke database Azure.
 
 ## 1. Startup Command
 
@@ -11,9 +11,22 @@ Azure Portal → App Service → **Configuration → General settings → Startu
 /home/site/wwwroot/startup.sh
 ```
 
-Script [`startup.sh`](startup.sh) menerapkan konfigurasi Nginx dan menjalankan
-`php artisan migrate --force` di setiap start, sehingga skema tabel selalu ada di
-database Azure.
+Script [`startup.sh`](startup.sh) berjalan di setiap deploy/restart dan:
+
+1. Menerapkan konfigurasi Nginx custom ([`default`](default)), termasuk
+   `client_max_body_size 10M` agar upload gambar post tidak ditolak 413.
+2. Menaikkan limit upload PHP (`upload_max_filesize`) via `.user.ini`.
+3. Mengarahkan folder upload (`storage/app/public` dan
+   `public/images/profile-icons`) ke `/home/storage/...` yang **persistent**,
+   karena zip deploy menghapus seluruh `/home/site/wwwroot` setiap deploy.
+4. Menjalankan `php artisan storage:link --force` supaya URL gambar post
+   (`/storage/posts/...`) bisa diakses publik.
+5. Menjalankan `php artisan migrate --force` sehingga skema tabel (users,
+   posts, locations, dll) selalu ada di database Azure.
+6. Menjalankan `config:cache` + `view:cache` untuk performa production.
+
+Tidak ada Application Setting tambahan yang diperlukan untuk fitur post —
+semuanya ditangani `startup.sh`.
 
 ## 2. Application Settings (Environment Variables)
 
@@ -27,6 +40,7 @@ ephemeral (hilang saat restart), **bukan** ke MySQL Azure.
 |---|---|---|
 | `APP_ENV` | `production` | Matikan mode debug/OTP statis |
 | `APP_DEBUG` | `false` | |
+| `APP_KEY` | `base64:...` (generate sekali: `php artisan key:generate --show`) | Artifact GitHub Actions tidak menyertakan `.env`, jadi key harus dari sini. Key yang stabil juga menjaga session tidak ter-invalidate tiap deploy |
 | `APP_URL` | `https://<nama-app>.azurewebsites.net` | URL publik (HTTPS) |
 | `DB_CONNECTION` | `mysql` | **Override sqlite default** |
 | `DB_HOST` | `<server>.mysql.database.azure.com` | Azure Database for MySQL |
@@ -45,3 +59,12 @@ Setelah mengisi DB di atas, jalankan ulang deploy / restart App Service supaya
 
 - Registrasi user baru → cek tabel `users` di Azure MySQL bertambah.
 - Login/relogin tetap berhasil setelah App Service di-restart (data persisten).
+
+### Fitur Post
+
+- Buat post baru dengan gambar (≤2 MB) → post muncul di `/home` dan gambarnya
+  tampil (URL `https://<app>/storage/posts/...` tidak 404).
+- Edit post: ganti gambar → gambar lama terhapus, gambar baru tampil.
+- Restart App Service **dan** lakukan deploy ulang → gambar post lama tetap
+  tampil (file persisten di `/home/storage/app/public`).
+- Search (`/search`) dengan filter lokasi → hasil tetap menampilkan gambar.

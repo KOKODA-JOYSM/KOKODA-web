@@ -6,6 +6,11 @@ server {
     server_name _;
     port_in_redirect off;
 
+    # Izinkan upload gambar post/profil hingga 10 MB.
+    # Default nginx hanya 1 MB sehingga upload gambar >1 MB ditolak 413
+    # sebelum sampai ke validasi Laravel (max:2048 KB).
+    client_max_body_size 10M;
+
     location / {
         try_files $uri $uri/ /index.php?$query_string;
     }
