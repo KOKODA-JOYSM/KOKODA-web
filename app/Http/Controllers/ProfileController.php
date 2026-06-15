@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +16,38 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    /**
+     * Display a public profile for any user.
+     */
+    public function show(User $user): Response|RedirectResponse
+    {
+        // If viewing own profile, redirect to the authenticated profile page
+        if (Auth::check() && Auth::id() === $user->id) {
+            return redirect()->route('profile');
+        }
+
+        // Load the user's active posts
+        $posts = Post::with(['user', 'location'])
+            ->where('user_id', $user->id)
+            ->where('status', 'active')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return Inertia::render('Profile/Show', [
+            'profileUser' => [
+                'id'              => $user->id,
+                'name'            => $user->name,
+                'username'        => $user->username,
+                'email'           => $user->email,
+                'location'        => $user->location,
+                'rating'          => $user->rating,
+                'points'          => $user->points ?? 0,
+                'profile_icon'    => $user->profile_icon,
+            ],
+            'posts' => $posts,
+        ]);
+    }
+
     /**
      * Display the user's profile form.
      */
@@ -93,3 +127,4 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 }
+
