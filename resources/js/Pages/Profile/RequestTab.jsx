@@ -4,7 +4,7 @@ export default function RequestTab({ posts }) {
     if (posts.length === 0) {
         return (
             <div className="text-center py-12 bg-secondary/10 rounded-2xl text-tertiary font-semibold">
-                Kamu belum membuat request apapun.
+                You haven't made any requests yet.
             </div>
         );
     }
@@ -32,7 +32,7 @@ export default function RequestTab({ posts }) {
                                     <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
                                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                                     </svg>
-                                    <span>{(typeof item.location === 'object' ? item.location?.place_name : item.location) || 'Lokasi tidak diketahui'}</span>
+                                    <span>{(typeof item.location === 'object' ? item.location?.place_name : item.location) || 'Unknown location'}</span>
                                 </div>
 
                                 <p className="text-sm text-tertiary/80 line-clamp-2 mb-2 font-medium">

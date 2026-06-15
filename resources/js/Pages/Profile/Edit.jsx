@@ -136,7 +136,7 @@ export default function Edit({ mustVerifyEmail }) {
                                     <span>{user.email}</span>
                                 </div>
                                 {previewUrl && (
-                                    <p className="text-xs opacity-70 mt-2">Foto baru dipilih — klik Save Change untuk menyimpan</p>
+                                    <p className="text-xs opacity-70 mt-2">New photo selected — click Save Change to save</p>
                                 )}
                             </div>
                         </div>

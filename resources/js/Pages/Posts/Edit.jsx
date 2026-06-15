@@ -9,7 +9,7 @@ const COLOR_PRIMARY = colors.primary;    // '#F4C799'
 const COLOR_SECONDARY = colors.secondary; // '#C0976C'
 
 export default function Edit({ post }) {
-    const [preview, setPreview] = useState(post.image_url ? `/storage/${post.image_url}` : null);
+    const [preview, setPreview] = useState(post.image_url || null);
 
     // Resolve existing location data from the post's location relation
     const existingLocationName = post.location?.place_name ?? post.location_name ?? '';

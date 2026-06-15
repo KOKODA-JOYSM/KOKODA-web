@@ -24,13 +24,7 @@ class PostController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // Map image_url to full public URL
-        $posts->getCollection()->transform(function ($post) {
-            if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
-                $post->image_url = asset('storage/' . $post->image_url);
-            }
-            return $post;
-        });
+        // image_url is resolved to a full public URL by the Post model accessor.
 
         return Inertia::render('Home', [
             'posts' => $posts,
@@ -45,13 +39,9 @@ class PostController extends Controller
         $posts = Post::with(['user', 'location'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($post) {
-                if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
-                    $post->image_url = asset('storage/' . $post->image_url);
-                }
-                return $post;
-            });
+            ->get();
+
+        // image_url is resolved to a full public URL by the Post model accessor.
 
         return $posts;
     }
@@ -110,9 +100,7 @@ class PostController extends Controller
     public function show(Post $post)
     {
         $post->load(['user', 'location']);
-        if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
-            $post->image_url = asset('storage/' . $post->image_url);
-        }
+        // image_url is resolved to a full public URL by the Post model accessor.
 
         return Inertia::render('Posts/Show', [
             'post' => $post,
@@ -177,9 +165,10 @@ class PostController extends Controller
         ];
 
         if ($request->hasFile('image_url')) {
-            // Delete old image if exists
-            if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
-                Storage::disk('public')->delete($post->image_url);
+            // Delete old image if exists (use raw stored path, not the accessor URL)
+            $oldImage = $post->getRawOriginal('image_url');
+            if ($oldImage && !str_starts_with($oldImage, 'http')) {
+                Storage::disk('public')->delete($oldImage);
             }
             $postData['image_url'] = $request->file('image_url')->store('posts', 'public');
         }
@@ -196,9 +185,10 @@ class PostController extends Controller
     {
         $this->authorize('delete', $post);
 
-        // Delete image from storage
-        if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
-            Storage::disk('public')->delete($post->image_url);
+        // Delete image from storage (use raw stored path, not the accessor URL)
+        $oldImage = $post->getRawOriginal('image_url');
+        if ($oldImage && !str_starts_with($oldImage, 'http')) {
+            Storage::disk('public')->delete($oldImage);
         }
 
         // Delete associated location
@@ -321,16 +311,9 @@ class PostController extends Controller
             })->values();
         }
 
-        // Map image_url to full public URL and format response
-        $posts = $posts->map(function ($post) {
-            if ($post->image_url && !str_starts_with($post->image_url, 'http')) {
-                $post->image_url = asset('storage/' . $post->image_url);
-            }
-            return $post;
-        });
-
+        // image_url is resolved to a full public URL by the Post model accessor.
         return response()->json([
-            'data' => $posts,
+            'data' => $posts->values(),
             'total' => count($posts)
         ]);
     }
