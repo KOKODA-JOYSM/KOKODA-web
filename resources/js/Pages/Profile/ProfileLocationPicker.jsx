@@ -69,9 +69,9 @@ export default function ProfileLocationPicker({ selected, onChange }) {
                 }
             }
 
-            setGeocodeError(`Lokasi "${placeName}" tidak ditemukan di peta, namun tetap disimpan.`);
+            setGeocodeError(`Location "${placeName}" was not found on the map, but it will still be saved.`);
         } catch {
-            setGeocodeError('Gagal memuat peta. Lokasi tetap akan disimpan.');
+            setGeocodeError('Failed to load the map. Your location will still be saved.');
         }
         return null;
     };
@@ -119,7 +119,7 @@ export default function ProfileLocationPicker({ selected, onChange }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <span className={selected ? 'text-tertiary' : 'text-gray-400'}>
-                    {selected || 'Pilih lokasi Anda...'}
+                    {selected || 'Choose your location...'}
                 </span>
             </button>
 
@@ -129,7 +129,7 @@ export default function ProfileLocationPicker({ selected, onChange }) {
                     <div className="bg-base w-full max-w-md rounded-2xl shadow-xl flex flex-col overflow-hidden">
                         {/* Header */}
                         <div className="flex justify-between items-center p-5 border-b-2 border-gray-200/50 bg-background">
-                            <h2 className="text-2xl font-quicksand font-bold text-tertiary">Pilih Lokasi</h2>
+                            <h2 className="text-2xl font-quicksand font-bold text-tertiary">Choose Location</h2>
                             <button
                                 type="button"
                                 onClick={() => setIsOpen(false)}
@@ -144,7 +144,7 @@ export default function ProfileLocationPicker({ selected, onChange }) {
                         {/* Body */}
                         <div className="p-5 flex flex-col gap-4">
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-quicksand text-gray-text-field font-bold tracking-wide">Cari Lokasi</label>
+                                <label className="text-xs font-quicksand text-gray-text-field font-bold tracking-wide">Search Location</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-tertiary">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,7 +162,7 @@ export default function ProfileLocationPicker({ selected, onChange }) {
                                                 handleSave();
                                             }
                                         }}
-                                        placeholder="Contoh: Tangerang, Jakarta, Bandung"
+                                        placeholder="e.g. Tangerang, Jakarta, Bandung"
                                         className="w-full bg-white text-tertiary rounded-md py-2.5 pl-9 pr-3 font-quicksand text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all placeholder:text-gray-text-field border border-secondary/20"
                                         autoFocus
                                     />
@@ -185,7 +185,7 @@ export default function ProfileLocationPicker({ selected, onChange }) {
                                 )}
 
                                 {loading && (
-                                    <div className="text-xs text-gray-text-field font-quicksand mt-1">Memuat...</div>
+                                    <div className="text-xs text-gray-text-field font-quicksand mt-1">Loading...</div>
                                 )}
 
                                 {geocodeError && (
@@ -217,7 +217,7 @@ export default function ProfileLocationPicker({ selected, onChange }) {
                                 className="w-full bg-tertiary text-base rounded-xl py-3 font-quicksand font-bold text-base hover:opacity-90 transition-opacity shadow-md disabled:opacity-50"
                                 disabled={loading}
                             >
-                                {loading ? 'Menyimpan...' : 'Simpan Lokasi'}
+                                {loading ? 'Saving...' : 'Save Location'}
                             </button>
                         </div>
                     </div>

@@ -28,7 +28,7 @@ export default function PostDetailModal({ post, onClose }) {
             : ['/images/default.img.webp'];
 
     const formattedDate = post.created_at
-        ? new Date(post.created_at).toLocaleDateString('id-ID', {
+        ? new Date(post.created_at).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -110,7 +110,7 @@ export default function PostDetailModal({ post, onClose }) {
                             <button
                                 onClick={onClose}
                                 className="flex md:hidden flex-shrink-0 ml-1 w-7 h-7 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-all"
-                                aria-label="Tutup"
+                                aria-label="Close"
                             >
                                 <X size={15} />
                             </button>
@@ -170,7 +170,7 @@ export default function PostDetailModal({ post, onClose }) {
                                     className="absolute top-2 left-2 flex items-center gap-1.5 bg-white text-[#2D1606] text-xs font-quicksand font-bold px-3 py-1.5 rounded-lg shadow-md hover:bg-yellow-50 transition-colors border border-gray-200"
                                 >
                                     <ExternalLink size={12} />
-                                    Buka di Maps
+                                    Open in Maps
                                 </a>
                             )}
                         </div>
@@ -201,13 +201,13 @@ export default function PostDetailModal({ post, onClose }) {
                             <div className="flex flex-col gap-2 mt-auto">
                                 {post.category && (
                                     <div className="flex items-center gap-2 text-base md:text-xl text-tertiary">
-                                        <span className="font-quicksand font-medium">Kategori:</span>
+                                        <span className="font-quicksand font-medium">Category:</span>
                                         <span className="font-quicksand">{post.category}</span>
                                     </div>
                                 )}
                                 <div className="flex items-center gap-2 text-base md:text-xl text-tertiary">
                                     <span className="font-quicksand font-medium">
-                                        {isFounded ? 'Waktu Ditemukan:' : 'Tanggal Hilang:'}
+                                        {isFounded ? 'Found On:' : 'Date Lost:'}
                                     </span>
                                     <span className="font-quicksand">{formattedDate}</span>
                                 </div>
@@ -219,7 +219,7 @@ export default function PostDetailModal({ post, onClose }) {
                             <div className="flex items-center justify-between mb-2">
                                 <span className="flex items-center gap-1.5 font-quicksand font-semibold text-sm text-gray-500">
                                     <MapPin size={14} className="text-gray-400" strokeWidth={1.75} />
-                                    {locationName || 'Lokasi'}
+                                    {locationName || 'Location'}
                                 </span>
                             </div>
                             <div className="rounded-xl overflow-hidden border border-gray-200" style={{ height: '200px' }}>

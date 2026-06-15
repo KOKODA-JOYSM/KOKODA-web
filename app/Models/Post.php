@@ -34,4 +34,25 @@ class Post extends Model
     {
         return $this->belongsTo(Location::class);
     }
+
+    /**
+     * Always expose image_url as a full, publicly reachable URL.
+     *
+     * Single source of truth for image URLs across home, search, profile,
+     * and the detail view. Works both locally and on Azure as long as
+     * APP_URL is correct and `php artisan storage:link` has been run.
+     * Storage operations (delete) must use getRawOriginal('image_url').
+     */
+    public function getImageUrlAttribute($value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+
+        if (str_starts_with($value, 'http')) {
+            return $value;
+        }
+
+        return asset('storage/' . $value);
+    }
 }
