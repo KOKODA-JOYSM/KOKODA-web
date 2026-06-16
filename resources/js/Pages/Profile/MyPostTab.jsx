@@ -37,7 +37,7 @@ export default function MyPostTab({ posts }) {
             {/* Header dengan count dan tombol buat post */}
             <div className="flex items-center justify-between">
                 <p className="text-sm text-tertiary/70 font-medium">
-                    {posts.length} postingan ditemukan
+                    {posts.length} posts found
                 </p>
                 <Link
                     href="/posts/create"
@@ -46,7 +46,7 @@ export default function MyPostTab({ posts }) {
                     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                     </svg>
-                    Post Baru
+                    New Post
                 </Link>
             </div>
 
@@ -133,7 +133,7 @@ export default function MyPostTab({ posts }) {
                                         onClick={() => handleDelete(item)}
                                         className="bg-label-lost/80 hover:bg-label-lost text-base text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all duration-200 cursor-pointer"
                                     >
-                                        Hapus
+                                        Delete
                                     </button>
                                 </div>
                             </div>

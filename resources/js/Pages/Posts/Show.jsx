@@ -1,6 +1,7 @@
 import React from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
+import PostActionButtons from '@/Components/Posts/PostActionButtons';
 
 export default function Show({ post, auth }) {
     const isFounded = post.type === 'found';
@@ -97,8 +98,9 @@ export default function Show({ post, auth }) {
                             </span>
                         </div>
 
-                        {/* Actions - only show if user owns the post */}
-                        {isOwnPost && (
+                        {/* Actions */}
+                        {isOwnPost ? (
+                            /* Owner: Edit & Delete */
                             <div className="flex gap-3 pt-6 border-t border-gray-300">
                                 <button
                                     onClick={() => window.location.href = `/posts/${post.id}/edit`}
@@ -109,13 +111,18 @@ export default function Show({ post, auth }) {
                                 <button
                                     onClick={() => {
                                         if (confirm('Are you sure you want to delete this post?')) {
-                                            // TODO: implement delete
+                                            router.delete(`/posts/${post.id}`);
                                         }
                                     }}
                                     className="flex-1 px-5 py-3 bg-label-lost text-white text-sm font-semibold rounded-lg font-quicksand transition-all duration-200 hover:opacity-80 cursor-pointer"
                                 >
                                     Delete Post
                                 </button>
+                            </div>
+                        ) : (
+                            /* Non-owner: Request & Chat */
+                            <div className="pt-6 border-t border-gray-300">
+                                <PostActionButtons post={post} variant="default" />
                             </div>
                         )}
                     </div>

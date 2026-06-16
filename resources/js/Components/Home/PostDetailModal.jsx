@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, X, ExternalLink, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, ExternalLink, MapPin, Pencil, Trash2 } from 'lucide-react';
+import PostActionButtons from '@/Components/Posts/PostActionButtons';
 
 export default function PostDetailModal({ post, onClose }) {
     const { auth } = usePage().props;
     const [currentImage, setCurrentImage] = useState(0);
 
-    // Sembunyikan hamburger navbar saat modal terbuka
+    // Hide hamburger navbar when modal is open
     useEffect(() => {
         document.body.classList.add('modal-open');
         return () => {
@@ -28,7 +29,7 @@ export default function PostDetailModal({ post, onClose }) {
             : ['/images/default.img.webp'];
 
     const formattedDate = post.created_at
-        ? new Date(post.created_at).toLocaleDateString('id-ID', {
+        ? new Date(post.created_at).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -78,11 +79,11 @@ export default function PostDetailModal({ post, onClose }) {
                     flexDirection: 'column',
                 }}
             >
-                {/* Close Button — Desktop only, absolute pojok kanan atas */}
+                {/* Close Button — Desktop only, absolute top-right corner */}
                 <button
                     onClick={onClose}
                     className="hidden md:flex absolute top-3 right-3 z-20 w-8 h-8 items-center justify-center rounded-full bg-white/80 hover:bg-white text-tertiary shadow transition-all"
-                    aria-label="Tutup"
+                    aria-label="Close"
                 >
                     <X size={18} />
                 </button>
@@ -106,11 +107,11 @@ export default function PostDetailModal({ post, onClose }) {
                             <div className={`${labelColor} text-xs font-semibold font-quicksand px-2.5 py-1 rounded-full whitespace-nowrap flex-shrink-0`}>
                                 {labelText}
                             </div>
-                            {/* Close Button — Mobile only, inline agar tidak menimpa badge */}
+                            {/* Close Button — Mobile only, inline so it doesn't overlap badge */}
                             <button
                                 onClick={onClose}
                                 className="flex md:hidden flex-shrink-0 ml-1 w-7 h-7 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-all"
-                                aria-label="Tutup"
+                                aria-label="Close"
                             >
                                 <X size={15} />
                             </button>
@@ -170,7 +171,7 @@ export default function PostDetailModal({ post, onClose }) {
                                     className="absolute top-2 left-2 flex items-center gap-1.5 bg-white text-[#2D1606] text-xs font-quicksand font-bold px-3 py-1.5 rounded-lg shadow-md hover:bg-yellow-50 transition-colors border border-gray-200"
                                 >
                                     <ExternalLink size={12} />
-                                    Buka di Maps
+                                    Open in Maps
                                 </a>
                             )}
                         </div>
@@ -201,13 +202,13 @@ export default function PostDetailModal({ post, onClose }) {
                             <div className="flex flex-col gap-2 mt-auto">
                                 {post.category && (
                                     <div className="flex items-center gap-2 text-base md:text-xl text-tertiary">
-                                        <span className="font-quicksand font-medium">Kategori:</span>
+                                        <span className="font-quicksand font-medium">Category:</span>
                                         <span className="font-quicksand">{post.category}</span>
                                     </div>
                                 )}
                                 <div className="flex items-center gap-2 text-base md:text-xl text-tertiary">
                                     <span className="font-quicksand font-medium">
-                                        {isFounded ? 'Waktu Ditemukan:' : 'Tanggal Hilang:'}
+                                        {isFounded ? 'Date Found:' : 'Date Lost:'}
                                     </span>
                                     <span className="font-quicksand">{formattedDate}</span>
                                 </div>
@@ -219,7 +220,7 @@ export default function PostDetailModal({ post, onClose }) {
                             <div className="flex items-center justify-between mb-2">
                                 <span className="flex items-center gap-1.5 font-quicksand font-semibold text-sm text-gray-500">
                                     <MapPin size={14} className="text-gray-400" strokeWidth={1.75} />
-                                    {locationName || 'Lokasi'}
+                                    {locationName || 'Location'}
                                 </span>
                             </div>
                             <div className="rounded-xl overflow-hidden border border-gray-200" style={{ height: '200px' }}>
@@ -237,13 +238,37 @@ export default function PostDetailModal({ post, onClose }) {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="mt-auto pt-4 md:pt-2 md:pl-6 w-full flex justify-center md:justify-start">
-                            <button
-                                className="w-11/12 md:w-full max-w-lg bg-secondary text-white rounded-xl py-3 text-base md:text-lg font-semibold font-quicksand transition-all duration-200 hover:opacity-85 active:scale-95 cursor-pointer shadow-md"
-                                onClick={() => alert('Placeholder action')}
-                            >
-                                {buttonText}
-                            </button>
+                        <div className="mt-auto pt-4 md:pt-2 md:pl-6 w-full">
+                            {isOwnPost ? (
+                                /* Owner: Edit & Delete */
+                                <div className="flex gap-3 w-11/12 md:w-full max-w-lg mx-auto md:mx-0">
+                                    <button
+                                        onClick={() => window.location.href = `/posts/${post.id}/edit`}
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-secondary text-white rounded-xl text-sm font-semibold font-quicksand transition-all duration-200 hover:opacity-90 active:scale-[0.97] cursor-pointer shadow-md"
+                                    >
+                                        <Pencil size={16} />
+                                        Edit Post
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (confirm('Are you sure you want to delete this post?')) {
+                                                window.axios.delete(`/posts/${post.id}`).then(() => {
+                                                    window.location.href = '/home';
+                                                });
+                                            }
+                                        }}
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-label-lost text-label-lost rounded-xl text-sm font-semibold font-quicksand transition-all duration-200 hover:bg-label-lost hover:text-white active:scale-[0.97] cursor-pointer"
+                                    >
+                                        <Trash2 size={16} />
+                                        Delete
+                                    </button>
+                                </div>
+                            ) : (
+                                /* Non-owner: Request & Chat */
+                                <div className="w-11/12 md:w-full max-w-lg mx-auto md:mx-0">
+                                    <PostActionButtons post={post} variant="compact" />
+                                </div>
+                            )}
                         </div>
 
                     </div>

@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Message extends Model
+{
+    protected $fillable = [
+        'conversation_id',
+        'user_id',
+        'body',
+        'type',
+    ];
+
+    /**
+     * Conversation tempat pesan ini berada.
+     */
+    public function conversation(): BelongsTo
+    {
+        return $this->belongsTo(Conversation::class);
+    }
+
+    /**
+     * User yang mengirim pesan ini.
+     */
+    public function sender(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+}
