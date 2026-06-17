@@ -1,12 +1,16 @@
+import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
+import PostDetailModal from '@/Components/Home/PostDetailModal';
 
 export default function MyPostTab({ posts }) {
+    const [selectedPost, setSelectedPost] = useState(null);
+
     if (!posts || posts.length === 0) {
         return (
             <div className="text-center py-12 bg-secondary/10 rounded-2xl">
                 <div className="text-5xl mb-4">📋</div>
-                <p className="text-tertiary font-semibold text-lg mb-2">Belum ada postingan</p>
-                <p className="text-tertiary/60 text-sm mb-6">Buat postingan pertamamu untuk melaporkan barang hilang atau ditemukan.</p>
+                <p className="text-tertiary font-semibold text-lg mb-2">No posts yet</p>
+                <p className="text-tertiary/60 text-sm mb-6">Create your first post to report a lost or found item.</p>
                 <Link
                     href="/posts/create"
                     className="inline-flex items-center gap-2 bg-primary text-tertiary font-bold px-6 py-2.5 rounded-xl hover:bg-secondary transition-all duration-200 shadow-sm"
@@ -14,14 +18,14 @@ export default function MyPostTab({ posts }) {
                     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                     </svg>
-                    Buat Post Baru
+                    Create New Post
                 </Link>
             </div>
         );
     }
 
     const handleDelete = (post) => {
-        if (!confirm(`Hapus postingan "${post.title}"?\n\nTindakan ini tidak dapat dibatalkan.`)) {
+        if (!confirm(`Delete post "${post.title}"?\n\nThis action cannot be undone.`)) {
             return;
         }
         router.delete(`/posts/${post.id}`, {
@@ -33,11 +37,12 @@ export default function MyPostTab({ posts }) {
     };
 
     return (
+        <>
         <div className="flex flex-col gap-4">
             {/* Header dengan count dan tombol buat post */}
             <div className="flex items-center justify-between">
                 <p className="text-sm text-tertiary/70 font-medium">
-                    {posts.length} posts found
+                    {posts.length} {posts.length === 1 ? 'post' : 'posts'} found
                 </p>
                 <Link
                     href="/posts/create"
@@ -67,7 +72,7 @@ export default function MyPostTab({ posts }) {
                                     ? 'bg-green-500 text-white'
                                     : 'bg-yellow-400 text-tertiary'
                             }`}>
-                                {item.status === 'resolved' ? 'Selesai' : 'Aktif'}
+                                {item.status === 'resolved' ? 'Resolved' : 'Active'}
                             </span>
                         </div>
 
@@ -111,18 +116,19 @@ export default function MyPostTab({ posts }) {
                             {/* Tanggal + Tombol Aksi */}
                             <div className="flex items-center justify-between mt-3">
                                 <span className="text-xs text-tertiary/50 font-medium">
-                                    {new Date(item.created_at).toLocaleDateString('id-ID', {
+                                    {new Date(item.created_at).toLocaleDateString('en-US', {
                                         day: 'numeric', month: 'long', year: 'numeric'
                                     })}
                                 </span>
 
                                 <div className="flex items-center gap-2">
-                                    <Link
-                                        href={`/posts/${item.id}`}
-                                        className="text-xs text-secondary/80 hover:text-tertiary font-semibold underline underline-offset-2 transition-colors"
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedPost(item)}
+                                        className="text-xs text-secondary/80 hover:text-tertiary font-semibold underline underline-offset-2 transition-colors cursor-pointer"
                                     >
                                         Detail
-                                    </Link>
+                                    </button>
                                     <Link
                                         href={`/posts/${item.id}/edit`}
                                         className="bg-highlight text-tertiary hover:bg-yellow-400 text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all duration-200"
@@ -142,5 +148,13 @@ export default function MyPostTab({ posts }) {
                 </div>
             ))}
         </div>
+
+        {selectedPost && (
+            <PostDetailModal
+                post={selectedPost}
+                onClose={() => setSelectedPost(null)}
+            />
+        )}
+        </>
     );
 }

@@ -208,7 +208,7 @@ export default function PostDetailModal({ post, onClose }) {
                                 )}
                                 <div className="flex items-center gap-2 text-base md:text-xl text-tertiary">
                                     <span className="font-quicksand font-medium">
-                                        {isFounded ? 'Date Found:' : 'Date Lost:'}
+                                        {isFounded ? 'Found On:' : 'Date Lost:'}
                                     </span>
                                     <span className="font-quicksand">{formattedDate}</span>
                                 </div>

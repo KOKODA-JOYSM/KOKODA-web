@@ -9,9 +9,7 @@ export default function Show({ post, auth }) {
     const labelText = isFounded ? 'FOUND' : 'LOST';
     const isOwnPost = auth.user.id === post.user_id;
 
-    const imageUrl = post.image_url
-        ? `/storage/${post.image_url}`
-        : '/images/placeholder.jpg';
+    const imageUrl = post.image_url || '/images/default.img.webp';
 
     return (
         <AppLayout title={`${post.title} - KOKODA`}>
