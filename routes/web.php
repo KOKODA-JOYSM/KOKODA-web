@@ -35,6 +35,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// 3. Public profile – bisa diakses siapa saja (tidak perlu login)
+Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
 // ─────────────────────────────────────────────────────────────────
 
 Route::get('/search', function () {
