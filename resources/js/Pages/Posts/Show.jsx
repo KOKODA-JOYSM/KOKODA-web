@@ -101,7 +101,7 @@ export default function Show({ post, auth }) {
                             /* Owner: Edit & Delete */
                             <div className="flex gap-3 pt-6 border-t border-gray-300">
                                 <button
-                                    onClick={() => window.location.href = `/posts/${post.id}/edit`}
+                                    onClick={() => router.visit(`/posts/${post.id}/edit`)}
                                     className="flex-1 px-5 py-3 bg-primary text-white text-sm font-semibold rounded-lg font-quicksand transition-all duration-200 hover:bg-secondary cursor-pointer"
                                 >
                                     Edit Post

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
 import tailwindConfig from '../../../../tailwind.config.js';
 
@@ -50,7 +50,7 @@ export default function Edit({ post }) {
         e.preventDefault();
         patch(route('posts.update', post.id), {
             onSuccess: () => {
-                window.location.href = `/posts/${post.id}`;
+                router.visit(`/posts/${post.id}`);
             },
         });
     };
