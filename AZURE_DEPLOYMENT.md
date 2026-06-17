@@ -68,3 +68,56 @@ Setelah mengisi DB di atas, jalankan ulang deploy / restart App Service supaya
 - Restart App Service **dan** lakukan deploy ulang → gambar post lama tetap
   tampil (file persisten di `/home/storage/app/public`).
 - Search (`/search`) dengan filter lokasi → hasil tetap menampilkan gambar.
+
+### Fitur Chat (Realtime)
+
+- Buka `/chat` di dua browser berbeda (login sebagai 2 user berbeda).
+- Mulai conversation baru dari salah satu user → conversation muncul di kedua sisi.
+- Kirim pesan dari satu user → pesan muncul **realtime** di window lainnya tanpa refresh.
+- Typing indicator → muncul saat user mengetik di sisi lawan bicara.
+- Online status → indicator hijau muncul untuk user yang online.
+- Refresh halaman → semua conversations dan messages tetap tersimpan.
+- Periksa console browser: WebSocket connection ke `wss://<app>.azurewebsites.net/app/...`
+  harus **connected** (bukan error 502/503).
+
+## 4. Chat / Reverb (WebSocket)
+
+### Prasyarat
+
+> **App Service Plan harus B1 atau lebih tinggi** — Free (F1) dan Shared (D1) tidak
+> mendukung WebSocket dan "Always On" yang dibutuhkan Reverb.
+
+- Azure Portal → App Service → **Configuration → General settings**:
+  - **Web sockets**: `On`
+  - **Always On**: `On`
+
+### Application Settings tambahan untuk Chat
+
+| Setting | Nilai | Keterangan |
+|---|---|---|
+| `BROADCAST_CONNECTION` | `reverb` | Aktifkan broadcasting via Reverb |
+| `REVERB_APP_ID` | `kokoda-chat` | ID aplikasi Reverb |
+| `REVERB_APP_KEY` | `<random-string>` | Key untuk client authentication |
+| `REVERB_APP_SECRET` | `<random-string>` | Secret untuk server authentication |
+| `REVERB_HOST` | `0.0.0.0` | Server listen host (internal) |
+| `REVERB_PORT` | `6001` | Server listen port (internal, di-proxy Nginx) |
+| `REVERB_SCHEME` | `https` | Scheme di production |
+| `VITE_REVERB_APP_KEY` | (sama dengan `REVERB_APP_KEY`) | Frontend key |
+| `VITE_REVERB_HOST` | `<app>.azurewebsites.net` | Frontend WebSocket host |
+| `VITE_REVERB_PORT` | `443` | Frontend port (wss via Nginx) |
+| `VITE_REVERB_SCHEME` | `https` | Frontend scheme |
+
+> **Catatan**: `VITE_*` variables harus di-set saat **build time** (bukan runtime)
+> karena Vite me-replace variabel ini saat bundling. Jika menggunakan GitHub Actions
+> untuk build, set `VITE_*` sebagai environment variables di workflow file.
+
+### Cara kerja di Azure
+
+1. `startup.sh` menjalankan `php artisan reverb:start --host=0.0.0.0 --port=6001 &`
+   sebagai background process.
+2. Nginx (konfigurasi `default`) mem-proxy WebSocket connections dari path `/app`
+   ke `127.0.0.1:6001`.
+3. Client (browser) connect ke `wss://<app>.azurewebsites.net/app/<key>` via
+   Laravel Echo.
+4. Queue worker (`php artisan queue:work &`) memproses broadcast events.
+

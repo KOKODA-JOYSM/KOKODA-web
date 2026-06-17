@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Claim;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -34,6 +35,14 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'unreadConversationsCount' => fn() => $request->user()
+                ? $request->user()->unreadConversationsCount()
+                : 0,
+            'pendingClaimsCount' => fn() => $request->user()
+                ? Claim::where('owner_id', $request->user()->id)
+                    ->where('status', 'pending')
+                    ->count()
+                : 0,
         ];
     }
 }

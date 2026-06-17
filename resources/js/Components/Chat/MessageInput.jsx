@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image as ImageIcon, Plus, Send } from 'lucide-react';
 
-export default function MessageInput({ value, onChange, onSend }) {
+export default function MessageInput({ value, onChange, onSend, disabled = false }) {
     const handleKeyDown = (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
@@ -34,7 +34,8 @@ export default function MessageInput({ value, onChange, onSend }) {
                     onChange={(event) => onChange(event.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Type a message..."
-                    className="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 font-roboto text-[13px] text-tertiary placeholder:text-tertiary/35 focus:outline-none focus:ring-0 md:text-[14px]"
+                    disabled={disabled}
+                    className="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 font-roboto text-[13px] text-tertiary placeholder:text-tertiary/35 focus:outline-none focus:ring-0 md:text-[14px] disabled:opacity-50"
                 />
 
                 <button
@@ -42,7 +43,7 @@ export default function MessageInput({ value, onChange, onSend }) {
                     onClick={onSend}
                     className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary text-tertiary transition-transform hover:scale-105 hover:bg-secondary/70 disabled:cursor-not-allowed disabled:opacity-50"
                     aria-label="Send message"
-                    disabled={!value.trim()}
+                    disabled={!value.trim() || disabled}
                 >
                     <Send className="h-4 w-4" />
                 </button>
