@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 
 // ─────────────────────────────────────────────
 //  NAV ITEMS 
@@ -18,6 +18,8 @@ export default function Navbar() {
     // Ambil URL dan props dengan aman
     const { url, props } = usePage();
     const user = props?.auth?.user || null;
+    const pendingClaimsCount = props?.pendingClaimsCount || 0;
+    const unreadConversationsCount = props?.unreadConversationsCount || 0;
 
     // Pastikan state isOpen ini ADA (ini yang bikin error tadi)
     const [isOpen, setIsOpen] = useState(false);
@@ -80,40 +82,65 @@ export default function Navbar() {
                 {/* NAV LINKS */}
                 <nav className="w-full flex-1 overflow-y-auto no-scrollbar min-h-0">
                     <ul className="list-none m-0 p-0 flex flex-col gap-1 sm:gap-1.5 w-full">
-                        {NAV_ITEMS.map((item) => (
-                            <li key={item.href} className="w-full">
-                                <Link
-                                    href={item.href}
-                                    className={`flex items-center gap-3 sm:gap-3.5
-                                    py-2 px-3 sm:py-2.5 sm:px-3.5 lg:py-3 lg:px-4
-                                    rounded-xl cursor-pointer no-underline text-[#FEFEFE] font-quicksand
-                                    text-base sm:text-lg lg:text-xl font-semibold border-2 transition-all duration-200 select-none w-full box-border hover:translate-x-1 group ${isActive(item) ? 'border-secondary' : 'border-transparent'}`}
-                                    aria-current={isActive(item) ? 'page' : undefined}
-                                    onClick={closeMenu}
-                                >
-                                    <img
-                                        src={item.icon}
-                                        alt={`${item.label} icon`}
-                                        className="brightness-0 invert w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 object-contain shrink-0 transition-transform duration-200 group-hover:scale-110"
-                                    />
-                                    <span>{item.label}</span>
-                                </Link>
-                            </li>
-                        ))}
+                        {NAV_ITEMS.map((item) => {
+                            // Chat requires authentication
+                            const requiresAuth = item.label === 'Chat';
+                            const needsLogin = requiresAuth && !user;
+
+                            return (
+                                <li key={item.href} className="w-full">
+                                    <Link
+                                        href={needsLogin ? '/login' : item.href}
+                                        className={`flex items-center gap-3 sm:gap-3.5
+                                        py-2 px-3 sm:py-2.5 sm:px-3.5 lg:py-3 lg:px-4
+                                        rounded-xl cursor-pointer no-underline text-[#FEFEFE] font-quicksand
+                                        text-base sm:text-lg lg:text-xl font-semibold border-2 transition-all duration-200 select-none w-full box-border hover:translate-x-1 group ${isActive(item) ? 'border-secondary' : 'border-transparent'}`}
+                                        aria-current={isActive(item) ? 'page' : undefined}
+                                        onClick={closeMenu}
+                                    >
+                                        <img
+                                            src={item.icon}
+                                            alt={`${item.label} icon`}
+                                            className="brightness-0 invert w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 object-contain shrink-0 transition-transform duration-200 group-hover:scale-110"
+                                        />
+                                        <div className="flex items-center justify-between flex-1">
+                                            <span>{item.label}</span>
+                                            {item.label === 'Chat' && unreadConversationsCount > 0 && (
+                                                <span 
+                                                    className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-label-lost text-white text-[11px] font-quicksand font-bold shadow-md"
+                                                    style={{ animation: 'bubblePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
+                                                >
+                                                    {unreadConversationsCount > 99 ? '99+' : unreadConversationsCount}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </Link>
+                                </li>
+                            );
+                        })}
                     </ul>
                 </nav>
 
                 {/* PROFILE LINK (Bisa diklik & Data Dinamis) */}
                 <div className="flex-shrink-0 pt-3">
                     <Link
-                        href="/profile"
-                        className={`flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-secondary no-underline border-2 transition-colors duration-200 cursor-pointer w-full box-border hover:border-base ${
+                        href={user ? '/profile' : '/login'}
+                        className={`relative flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-secondary no-underline border-2 transition-colors duration-200 cursor-pointer w-full box-border hover:border-base ${
                             url?.startsWith('/profile') ? 'border-base' : 'border-transparent'
                         }`}
                         id="nav-profile"
-                        aria-label="Go to profile"
+                        aria-label={user ? 'Go to profile' : 'Log in'}
                         onClick={closeMenu}
                     >
+                        {/* Notification bubble for pending requests */}
+                        {user && pendingClaimsCount > 0 && (
+                            <span
+                                className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-label-lost text-white text-[11px] font-quicksand font-bold shadow-md border-2 border-primary z-10"
+                                style={{ animation: 'bubblePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
+                            >
+                                {pendingClaimsCount > 99 ? '99+' : pendingClaimsCount}
+                            </span>
+                        )}
                         <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full shrink-0 overflow-hidden bg-background">
                             <img
                                 src={
@@ -126,16 +153,33 @@ export default function Navbar() {
                             />
                         </div>
                         <div className="flex flex-col gap-0.5 overflow-hidden min-w-0">
-                            <p className="text-base font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
-                                {user?.name || 'Joysm'}
-                            </p>
-                            <p className="text-base font-quicksand text-xs font-normal m-0 whitespace-nowrap overflow-hidden text-ellipsis opacity-75">
-                                @ {user?.email || 'findit.joysm@gmail.com'}
-                            </p>
+                            {user ? (
+                                <>
+                                    <p className="text-base font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
+                                        {user.name}
+                                    </p>
+                                    <p className="text-base font-quicksand text-xs font-normal m-0 whitespace-nowrap overflow-hidden text-ellipsis opacity-75">
+                                        @ {user.email}
+                                    </p>
+                                </>
+                            ) : (
+                                <p className="text-base font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
+                                    Log in
+                                </p>
+                            )}
                         </div>
                     </Link>
                 </div>
             </aside>
+
+            {/* Notification bubble animation */}
+            <style>{`
+                @keyframes bubblePop {
+                    0%   { transform: scale(0); }
+                    70%  { transform: scale(1.15); }
+                    100% { transform: scale(1); }
+                }
+            `}</style>
         </>
     );
 }
