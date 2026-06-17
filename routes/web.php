@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PostController;
@@ -58,8 +60,23 @@ Route::middleware('auth')->group(function () {
     Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
-    // Chat routes
-    Route::get('/chat', fn() => Inertia::render('Chat/Chat'))->name('chat');
+    // ─────────────────────────────────────────────────────────────
+    // CLAIM / REQUEST ROUTES
+    // ─────────────────────────────────────────────────────────────
+    Route::post('/posts/{post}/claim', [ClaimController::class, 'store'])->name('claims.store');
+    Route::get('/api/posts/{post}/claim-status', [ClaimController::class, 'getUserClaim'])->name('claims.status');
+
+    // ─────────────────────────────────────────────────────────────
+    // CHAT ROUTES
+    // ─────────────────────────────────────────────────────────────
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat');
+    Route::get('/chat/conversations', [ChatController::class, 'conversations'])->name('chat.conversations');
+    Route::post('/chat/conversations', [ChatController::class, 'startConversation'])->name('chat.start');
+    Route::get('/chat/conversations/{conversation}/messages', [ChatController::class, 'messages'])->name('chat.messages');
+    Route::post('/chat/conversations/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('chat.send');
+    Route::post('/chat/conversations/{conversation}/read', [ChatController::class, 'markAsRead'])->name('chat.read');
+    Route::post('/chat/conversations/{conversation}/typing', [ChatController::class, 'typing'])->name('chat.typing');
+    Route::get('/chat/users/search', [ChatController::class, 'searchUsers'])->name('chat.users.search');
 });
 
 require __DIR__.'/auth.php';

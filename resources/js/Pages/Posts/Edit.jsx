@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
 import tailwindConfig from '../../../../tailwind.config.js';
 
@@ -9,7 +9,7 @@ const COLOR_PRIMARY = colors.primary;    // '#F4C799'
 const COLOR_SECONDARY = colors.secondary; // '#C0976C'
 
 export default function Edit({ post }) {
-    const [preview, setPreview] = useState(post.image_url ? `/storage/${post.image_url}` : null);
+    const [preview, setPreview] = useState(post.image_url || null);
 
     // Resolve existing location data from the post's location relation
     const existingLocationName = post.location?.place_name ?? post.location_name ?? '';
@@ -50,7 +50,7 @@ export default function Edit({ post }) {
         e.preventDefault();
         patch(route('posts.update', post.id), {
             onSuccess: () => {
-                window.location.href = `/posts/${post.id}`;
+                router.visit(`/posts/${post.id}`);
             },
         });
     };

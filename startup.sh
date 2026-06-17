@@ -48,5 +48,18 @@ php artisan migrate --force
 # 6) Cache config & view untuk performa production. Startup script berjalan
 #    ulang setiap deploy/restart, jadi cache selalu segar setelah perubahan
 #    Application Settings di portal.
+php artisan config:clear
 php artisan config:cache
 php artisan view:cache
+
+# 7) Start Laravel Reverb WebSocket server sebagai background process.
+#    Reverb berjalan di port 6001 internal, di-proxy oleh Nginx (lihat
+#    file `default`) ke path /app untuk koneksi WebSocket client.
+#    Tanpa ini, fitur chat realtime tidak berfungsi di Azure.
+php artisan reverb:start --host=0.0.0.0 --port=6001 &
+
+# 8) Start queue worker untuk memproses broadcast events.
+#    Events seperti MessageSent, ConversationUpdated akan di-dispatch
+#    ke queue dan perlu worker untuk memprosesnya.
+php artisan queue:work --tries=3 --timeout=60 --sleep=3 &
+

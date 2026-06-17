@@ -1,6 +1,7 @@
 import React from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import ProfileLocationPicker from '@/Pages/Profile/ProfileLocationPicker';
 
 export default function Edit({ mustVerifyEmail }) {
     // Mengambil data user yang sedang login dari props bawaan Inertia
@@ -23,18 +24,44 @@ export default function Edit({ mustVerifyEmail }) {
         });
     };
 
-    // Handle file input change
+    // Handle file input change — kompres gambar sebelum upload
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            setData('profile_icon', file);
-            // Create preview URL
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewUrl(reader.result);
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const MAX = 800;
+                let w = img.width;
+                let h = img.height;
+
+                if (w > MAX || h > MAX) {
+                    if (w > h) { h = Math.round((h * MAX) / w); w = MAX; }
+                    else       { w = Math.round((w * MAX) / h); h = MAX; }
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                setPreviewUrl(dataUrl);
+
+                canvas.toBlob((blob) => {
+                    const compressed = new File(
+                        [blob],
+                        file.name.replace(/\.[^.]+$/, '.jpg'),
+                        { type: 'image/jpeg', lastModified: Date.now() }
+                    );
+                    setData('profile_icon', compressed);
+                }, 'image/jpeg', 0.85);
             };
-            reader.readAsDataURL(file);
-        }
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
     };
 
     // Get avatar URL
@@ -74,14 +101,30 @@ export default function Edit({ mustVerifyEmail }) {
                     <div className="bg-secondary rounded-[28px] p-8 sm:p-10 flex flex-col sm:flex-row justify-between items-center gap-6 shadow-md">
                         {/* Kiri: Foto & Info Singkat */}
                         <div className="flex items-center gap-6 w-full sm:w-auto">
-                            {/* Foto Profil */}
-                            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-base shrink-0 bg-white shadow-inner">
-                                <img
-                                    src={getAvatarUrl()}
-                                    alt={user.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
+                            {/* Foto Profil — klik untuk ganti */}
+                            <label htmlFor="photo-input" className="relative cursor-pointer group shrink-0">
+                                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-base bg-white shadow-inner">
+                                    <img
+                                        src={getAvatarUrl()}
+                                        alt={user.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                {/* Hover overlay */}
+                                <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
+                                {/* Badge kamera permanen */}
+                                <div className="absolute bottom-0 right-0 bg-tertiary rounded-full p-1.5 border-2 border-base shadow">
+                                    <svg className="w-3.5 h-3.5 text-base" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
+                            </label>
 
                             {/* Nama & Email */}
                             <div className="text-base flex flex-col justify-center">
@@ -92,6 +135,9 @@ export default function Edit({ mustVerifyEmail }) {
                                     </svg>
                                     <span>{user.email}</span>
                                 </div>
+                                {previewUrl && (
+                                    <p className="text-xs opacity-70 mt-2">New photo selected — click Save Change to save</p>
+                                )}
                             </div>
                         </div>
 
@@ -152,15 +198,12 @@ export default function Edit({ mustVerifyEmail }) {
 
                         {/* Input Location */}
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="location" className="font-semibold text-base">
+                            <label className="font-semibold text-base">
                                 Location
                             </label>
-                            <input
-                                id="location"
-                                type="text"
-                                value={data.location}
-                                onChange={(e) => setData('location', e.target.value)}
-                                className="w-full bg-base text-tertiary rounded-xl border-none px-4 py-3 text-sm focus:ring-2 focus:ring-tertiary shadow-sm"
+                            <ProfileLocationPicker
+                                selected={data.location}
+                                onChange={(locationName) => setData('location', locationName)}
                             />
                             {errors.location && <span className="text-red-300 text-xs">{errors.location}</span>}
                         </div>

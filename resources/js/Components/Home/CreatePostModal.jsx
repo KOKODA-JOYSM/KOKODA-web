@@ -64,7 +64,6 @@ export default function CreatePostModal({ onClose }) {
             onSuccess: () => {
                 setProcessing(false);
                 onClose();
-                window.location.href = '/home';
             },
             onError: (errs) => {
                 setProcessing(false);

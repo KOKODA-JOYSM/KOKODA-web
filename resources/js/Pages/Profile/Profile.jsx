@@ -14,9 +14,9 @@ export default function Profile({ posts, status }) {
     // State untuk tab aktif: 'request', 'my_post', 'history'
     const [activeTab, setActiveTab] = useState('request');
 
-    // Fallback data pelengkap (karena kolom ini biasanya belum ada di tabel users bawaan Breeze)
     const userLocation = user.location || 'Tangerang';
-    const userRating = user.rating || '4,7/5';
+    const userRating = user.rating > 0 ? Number(user.rating).toFixed(1) + '/5' : '0.0/5';
+    const userPoints = user.points ?? 0;
     const userAvatar = user.profile_icon
         ? ('/' + user.profile_icon)
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=F4C799&color=311A05`;
@@ -29,13 +29,6 @@ export default function Profile({ posts, status }) {
         <AppLayout title="Profile - KOKODA">
             {/* Kontainer Utama */}
             <div className="px-6 py-8 bg-background min-h-screen w-full font-quicksand flex flex-col items-center">
-
-                {/* Notifikasi sukses setelah update profil */}
-                {status === 'profile-updated' && (
-                    <div className="w-full max-w-4xl mb-4 px-4 py-3 bg-green-500/20 border border-green-500 text-green-300 rounded-xl text-sm font-medium">
-                        Profile updated successfully.
-                    </div>
-                )}
 
                 {/* Batasi lebar konten maksimal */}
                 <div className="w-full max-w-4xl flex flex-col gap-8">
@@ -79,6 +72,14 @@ export default function Profile({ posts, status }) {
                                             <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                                         </svg>
                                         <span>{userRating}</span>
+                                    </div>
+
+                                    {/* Points */}
+                                    <div className="flex items-center gap-1">
+                                        <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                                        </svg>
+                                        <span>{userPoints} Points</span>
                                     </div>
                                 </div>
                             </div>
