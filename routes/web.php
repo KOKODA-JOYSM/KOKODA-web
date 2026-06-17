@@ -5,12 +5,13 @@ use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PostController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Empty endpoint ("/") langsung diarahkan ke home feed.
+// Empty endpoint ("/"): tamu diarahkan ke halaman login, user yang sudah login ke home feed.
 Route::get('/', function () {
-    return redirect()->route('home');
+    return redirect()->route(Auth::check() ? 'home' : 'login');
 });
 
 Route::get('/dashboard', function () {
