@@ -1,3 +1,5 @@
+import { Link } from '@inertiajs/react';
+
 export default function CurrentUserCard({ user }) {
     const getInitials = (name) => {
         return name
@@ -33,3 +35,4 @@ export default function CurrentUserCard({ user }) {
         </div>
     );
 }
+
