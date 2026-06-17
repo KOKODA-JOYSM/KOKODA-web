@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { router } from '@inertiajs/react';
 import { MessageSquare, HandHelping, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import RequestModal from './RequestModal';
 
@@ -45,8 +46,8 @@ export default function PostActionButtons({ post, variant = 'default' }) {
     };
 
     const handleChat = () => {
-        // Redirect to chat page with the post owner
-        window.location.href = `/chat?user=${post.user_id}`;
+        // Navigate to chat page with the post owner using Inertia
+        router.visit(`/chat?user=${post.user_id}`);
     };
 
     // Status badge config

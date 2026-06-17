@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { usePage } from '@inertiajs/react';
+import { usePage, router } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, X, ExternalLink, MapPin, Pencil, Trash2 } from 'lucide-react';
 import PostActionButtons from '@/Components/Posts/PostActionButtons';
 
@@ -243,7 +243,7 @@ export default function PostDetailModal({ post, onClose }) {
                                 /* Owner: Edit & Delete */
                                 <div className="flex gap-3 w-11/12 md:w-full max-w-lg mx-auto md:mx-0">
                                     <button
-                                        onClick={() => window.location.href = `/posts/${post.id}/edit`}
+                                        onClick={() => router.visit(`/posts/${post.id}/edit`)}
                                         className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-secondary text-white rounded-xl text-sm font-semibold font-quicksand transition-all duration-200 hover:opacity-90 active:scale-[0.97] cursor-pointer shadow-md"
                                     >
                                         <Pencil size={16} />
@@ -253,7 +253,7 @@ export default function PostDetailModal({ post, onClose }) {
                                         onClick={() => {
                                             if (confirm('Are you sure you want to delete this post?')) {
                                                 window.axios.delete(`/posts/${post.id}`).then(() => {
-                                                    window.location.href = '/home';
+                                                    router.visit('/home');
                                                 });
                                             }
                                         }}
