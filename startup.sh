@@ -10,6 +10,7 @@
 # 1) Terapkan konfigurasi Nginx custom: document root diarahkan ke folder
 #    public/ Laravel dan semua request difallback ke index.php.
 cp /home/site/wwwroot/default /etc/nginx/sites-available/default
+cp /home/site/wwwroot/default /etc/nginx/conf.d/default.conf
 service nginx reload
 
 cd /home/site/wwwroot
