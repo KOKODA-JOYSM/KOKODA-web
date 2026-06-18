@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Inertia\Response;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class LeaderboardController extends Controller
 {
@@ -20,13 +20,13 @@ class LeaderboardController extends Controller
             ->get(['id', 'name', 'username', 'points', 'profile_icon', 'rating', 'location'])
             ->map(function ($user, $index) {
                 return [
-                    'id'              => $user->id,
-                    'name'            => $user->name,
-                    'username'        => $user->username,
-                    'points'          => $user->points ?? 0,
-                    'rank'            => $index + 1,
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'points' => $user->points ?? 0,
+                    'rank' => $index + 1,
                     'profile_picture' => $user->profile_icon
-                        ? '/' . $user->profile_icon
+                        ? '/'.$user->profile_icon
                         : null,
                 ];
             });
@@ -44,15 +44,15 @@ class LeaderboardController extends Controller
 
         if ($user) {
             $currentUserRank = $leaderboard->firstWhere('id', $user->id);
-            if (!$currentUserRank) {
+            if (! $currentUserRank) {
                 $currentUserRank = [
-                    'id'              => $user->id,
-                    'name'            => $user->name,
-                    'username'        => $user->username,
-                    'points'          => $user->points ?? 0,
-                    'rank'            => $leaderboard->count() + 1,
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'points' => $user->points ?? 0,
+                    'rank' => $leaderboard->count() + 1,
                     'profile_picture' => $user->profile_icon
-                        ? '/' . $user->profile_icon
+                        ? '/'.$user->profile_icon
                         : null,
                 ];
             }
@@ -76,15 +76,15 @@ class LeaderboardController extends Controller
 
         if ($user) {
             $currentUserRank = $leaderboard->firstWhere('id', $user->id);
-            if (!$currentUserRank) {
+            if (! $currentUserRank) {
                 $currentUserRank = [
-                    'id'              => $user->id,
-                    'name'            => $user->name,
-                    'username'        => $user->username,
-                    'points'          => $user->points ?? 0,
-                    'rank'            => $leaderboard->count() + 1,
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'points' => $user->points ?? 0,
+                    'rank' => $leaderboard->count() + 1,
                     'profile_picture' => $user->profile_icon
-                        ? '/' . $user->profile_icon
+                        ? '/'.$user->profile_icon
                         : null,
                 ];
             }

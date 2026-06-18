@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\OtpEmail;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -12,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -152,14 +150,14 @@ class RegisteredUserController extends Controller
                 'template_params' => [
                     'to_email' => $email,
                     'passcode' => $otp,
-                ]
+                ],
             ]);
 
-            if (!$response->successful()) {
-                Log::error('EmailJS OTP Failed: ' . $response->body());
+            if (! $response->successful()) {
+                Log::error('EmailJS OTP Failed: '.$response->body());
             }
         } catch (\Exception $e) {
-            Log::error('EmailJS OTP Exception: ' . $e->getMessage());
+            Log::error('EmailJS OTP Exception: '.$e->getMessage());
         }
     }
 }

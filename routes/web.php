@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ClaimController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -23,7 +23,8 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     // 1. Menampilkan halaman utama profil custom kamu (Pages/Profile/Profile.jsx)
     Route::get('/profile', function () {
-        $posts = app(\App\Http\Controllers\PostController::class)->myPosts();
+        $posts = app(PostController::class)->myPosts();
+
         return Inertia::render('Profile/Profile', [
             'posts' => $posts,
             'status' => session('status'),

@@ -29,8 +29,11 @@ class RegistrationTest extends TestCase
 
         $response->assertRedirect(route('register.otp'));
 
+        $pending = session('pending_registration');
+        $this->assertNotNull($pending);
+
         $verifyResponse = $this->post('/register/otp/verify', [
-            'otp' => '1111',
+            'otp' => $pending['otp_code'],
         ]);
 
         $this->assertAuthenticated();

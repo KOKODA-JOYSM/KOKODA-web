@@ -45,7 +45,7 @@ class Post extends Model
      */
     public function getImageUrlAttribute($value): ?string
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
 
@@ -53,6 +53,6 @@ class Post extends Model
             return $value;
         }
 
-        return asset('storage/' . $value);
+        return asset('storage/'.$value);
     }
 }

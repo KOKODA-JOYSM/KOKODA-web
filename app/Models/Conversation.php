@@ -52,7 +52,7 @@ class Conversation extends Model
     {
         $participant = $this->participants()->where('user_id', $userId)->first();
 
-        if (!$participant) {
+        if (! $participant) {
             return 0;
         }
 

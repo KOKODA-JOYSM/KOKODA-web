@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('claimant_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete();
             $table->enum('status', ['pending', 'accepted', 'rejected', 'completed'])
-                  ->default('pending');
+                ->default('pending');
             $table->text('message')->nullable();
             $table->timestamps();
 

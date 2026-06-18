@@ -33,7 +33,7 @@ class Rating extends Model
 
     protected static function booted(): void
     {
-        static::saved(fn(Rating $rating) => $rating->ratee->recalculateStats());
-        static::deleted(fn(Rating $rating) => $rating->ratee->recalculateStats());
+        static::saved(fn (Rating $rating) => $rating->ratee->recalculateStats());
+        static::deleted(fn (Rating $rating) => $rating->ratee->recalculateStats());
     }
 }

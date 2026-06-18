@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use App\Models\Post;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -60,29 +60,29 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'         => 'required|string|max:255',
-            'description'   => 'required|string',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
             'location_name' => 'required|string|max:255',
-            'latitude'      => 'required|numeric|between:-90,90',
-            'longitude'     => 'required|numeric|between:-180,180',
-            'type'          => 'required|in:lost,found',
-            'image_url'     => 'nullable|image|max:2048',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+            'type' => 'required|in:lost,found',
+            'image_url' => 'nullable|image|max:2048',
         ]);
 
         // Create Location record
         $location = Location::create([
-            'user_id'    => Auth::id(),
+            'user_id' => Auth::id(),
             'place_name' => $validated['location_name'],
-            'latitude'   => $validated['latitude'],
-            'longitude'  => $validated['longitude'],
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
         ]);
 
         $postData = [
-            'user_id'     => Auth::id(),
+            'user_id' => Auth::id(),
             'location_id' => $location->id,
-            'title'       => $validated['title'],
+            'title' => $validated['title'],
             'description' => $validated['description'],
-            'type'        => $validated['type'],
+            'type' => $validated['type'],
         ];
 
         if ($request->hasFile('image_url')) {
@@ -130,44 +130,44 @@ class PostController extends Controller
         $this->authorize('update', $post);
 
         $validated = $request->validate([
-            'title'         => 'required|string|max:255',
-            'description'   => 'required|string',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
             'location_name' => 'required|string|max:255',
-            'latitude'      => 'required|numeric|between:-90,90',
-            'longitude'     => 'required|numeric|between:-180,180',
-            'type'          => 'required|in:lost,found',
-            'status'        => 'required|in:active,resolved',
-            'image_url'     => 'nullable|image|max:2048',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+            'type' => 'required|in:lost,found',
+            'status' => 'required|in:active,resolved',
+            'image_url' => 'nullable|image|max:2048',
         ]);
 
         // Update or create location
         if ($post->location_id) {
             $post->location->update([
                 'place_name' => $validated['location_name'],
-                'latitude'   => $validated['latitude'],
-                'longitude'  => $validated['longitude'],
+                'latitude' => $validated['latitude'],
+                'longitude' => $validated['longitude'],
             ]);
         } else {
             $location = Location::create([
-                'user_id'    => Auth::id(),
+                'user_id' => Auth::id(),
                 'place_name' => $validated['location_name'],
-                'latitude'   => $validated['latitude'],
-                'longitude'  => $validated['longitude'],
+                'latitude' => $validated['latitude'],
+                'longitude' => $validated['longitude'],
             ]);
             $post->location_id = $location->id;
         }
 
         $postData = [
-            'title'       => $validated['title'],
+            'title' => $validated['title'],
             'description' => $validated['description'],
-            'type'        => $validated['type'],
-            'status'      => $validated['status'],
+            'type' => $validated['type'],
+            'status' => $validated['status'],
         ];
 
         if ($request->hasFile('image_url')) {
             // Delete old image if exists (use raw stored path, not the accessor URL)
             $oldImage = $post->getRawOriginal('image_url');
-            if ($oldImage && !str_starts_with($oldImage, 'http')) {
+            if ($oldImage && ! str_starts_with($oldImage, 'http')) {
                 Storage::disk('public')->delete($oldImage);
             }
             $postData['image_url'] = $request->file('image_url')->store('posts', 'public');
@@ -187,7 +187,7 @@ class PostController extends Controller
 
         // Delete image from storage (use raw stored path, not the accessor URL)
         $oldImage = $post->getRawOriginal('image_url');
-        if ($oldImage && !str_starts_with($oldImage, 'http')) {
+        if ($oldImage && ! str_starts_with($oldImage, 'http')) {
             Storage::disk('public')->delete($oldImage);
         }
 
@@ -230,7 +230,7 @@ class PostController extends Controller
             $searchTerm = $request->q;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'like', "%{$searchTerm}%")
-                  ->orWhere('description', 'like', "%{$searchTerm}%");
+                    ->orWhere('description', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -250,7 +250,7 @@ class PostController extends Controller
 
             // Filter and calculate distance for each post
             $filteredByRadius = $posts->filter(function ($post) use ($userLat, $userLng, $radiusKm) {
-                if (!$post->location || $post->location->latitude === null || $post->location->longitude === null) {
+                if (! $post->location || $post->location->latitude === null || $post->location->longitude === null) {
                     return false;
                 }
 
@@ -263,23 +263,31 @@ class PostController extends Controller
 
                 // Store distance in post object for sorting
                 $post->distance = $distance;
+
                 return $distance <= $radiusKm;
             });
 
             if ($filteredByRadius->isNotEmpty()) {
                 // Sort by distance (closest first)
                 $posts = $filteredByRadius->sortBy('distance')->values();
-            } else if ($request->has('location') && $request->location !== 'All Locations') {
+            } elseif ($request->has('location') && $request->location !== 'All Locations') {
                 // Fallback ke name search jika radius tidak dapat hasil
                 $locationName = $request->location;
                 $keywords = array_filter(preg_split('/\s+/', trim($locationName)));
                 $posts = $posts->filter(function ($post) use ($locationName, $keywords) {
-                    if (!$post->location) return false;
-                    $placeName = $post->location->place_name;
-                    if (stripos($placeName, $locationName) !== false) return true;
-                    foreach ($keywords as $keyword) {
-                        if (strlen($keyword) >= 3 && stripos($placeName, $keyword) !== false) return true;
+                    if (! $post->location) {
+                        return false;
                     }
+                    $placeName = $post->location->place_name;
+                    if (stripos($placeName, $locationName) !== false) {
+                        return true;
+                    }
+                    foreach ($keywords as $keyword) {
+                        if (strlen($keyword) >= 3 && stripos($placeName, $keyword) !== false) {
+                            return true;
+                        }
+                    }
+
                     return false;
                 })->values();
             } else {
@@ -287,13 +295,13 @@ class PostController extends Controller
             }
         }
         // Fallback to location name filter if no coordinates provided
-        else if ($request->has('location') && $request->location !== 'All Locations') {
+        elseif ($request->has('location') && $request->location !== 'All Locations') {
             $locationName = $request->location;
             // Pecah kata kunci menjadi beberapa kata untuk pencarian yang lebih fleksibel
             // Contoh: "Aeon Sentul Bogor" → ["Aeon", "Sentul", "Bogor"]
             $keywords = array_filter(preg_split('/\s+/', trim($locationName)));
             $posts = $posts->filter(function ($post) use ($locationName, $keywords) {
-                if (!$post->location) {
+                if (! $post->location) {
                     return false;
                 }
                 $placeName = $post->location->place_name;
@@ -307,6 +315,7 @@ class PostController extends Controller
                         return true;
                     }
                 }
+
                 return false;
             })->values();
         }
@@ -314,7 +323,7 @@ class PostController extends Controller
         // image_url is resolved to a full public URL by the Post model accessor.
         return response()->json([
             'data' => $posts->values(),
-            'total' => count($posts)
+            'total' => count($posts),
         ]);
     }
 
