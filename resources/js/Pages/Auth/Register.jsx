@@ -3,13 +3,13 @@ import TextInput from '@/Components/Auth/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function Register() {
+export default function Register({ previousName = '', previousEmail = '' }) {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
+        name: previousName,
+        email: previousEmail,
         password: '',
         password_confirmation: '',
     });

@@ -85,7 +85,7 @@ class PostSeeder extends Seeder
 
         foreach ($locations as $index => $location) {
             $template = $postTemplates[$index % count($postTemplates)];
-            $title = $template['title'] . ' near ' . $location->place_name;
+            $title = $template['title'].' near '.$location->place_name;
 
             Post::updateOrCreate(
                 ['location_id' => $location->id],

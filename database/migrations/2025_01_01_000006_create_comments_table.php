@@ -14,9 +14,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             // Nullable: NULL = top-level comment, ada nilai = reply
             $table->foreignId('parent_id')
-                  ->nullable()
-                  ->constrained('comments')
-                  ->cascadeOnDelete();
+                ->nullable()
+                ->constrained('comments')
+                ->cascadeOnDelete();
             $table->text('text');
             $table->timestamps();
 

@@ -29,12 +29,12 @@ return new class extends Migration
             }
 
             // 3. Add location_id FK (nullable — existing posts have no location)
-            if (!Schema::hasColumn('posts', 'location_id')) {
+            if (! Schema::hasColumn('posts', 'location_id')) {
                 $table->unsignedBigInteger('location_id')->nullable()->after('user_id');
                 $table->foreign('location_id')
-                      ->references('id')
-                      ->on('locations')
-                      ->nullOnDelete();
+                    ->references('id')
+                    ->on('locations')
+                    ->nullOnDelete();
             }
         });
     }
@@ -49,10 +49,10 @@ return new class extends Migration
             }
 
             // Re-add old columns
-            if (!Schema::hasColumn('posts', 'category')) {
+            if (! Schema::hasColumn('posts', 'category')) {
                 $table->string('category')->nullable()->after('title');
             }
-            if (!Schema::hasColumn('posts', 'location')) {
+            if (! Schema::hasColumn('posts', 'location')) {
                 $table->string('location')->nullable()->after('category');
             }
         });

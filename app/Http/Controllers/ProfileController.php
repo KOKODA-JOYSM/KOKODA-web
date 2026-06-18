@@ -35,14 +35,14 @@ class ProfileController extends Controller
 
         return Inertia::render('Profile/Show', [
             'profileUser' => [
-                'id'              => $user->id,
-                'name'            => $user->name,
-                'username'        => $user->username,
-                'email'           => $user->email,
-                'location'        => $user->location,
-                'rating'          => $user->rating,
-                'points'          => $user->points ?? 0,
-                'profile_icon'    => $user->profile_icon,
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+                'location' => $user->location,
+                'rating' => $user->rating,
+                'points' => $user->points ?? 0,
+                'profile_icon' => $user->profile_icon,
             ],
             'posts' => $posts,
         ]);
@@ -71,7 +71,7 @@ class ProfileController extends Controller
         if ($request->hasFile('profile_icon')) {
             // Ensure directory exists in public folder
             $uploadDir = public_path('images/profile-icons');
-            if (!File::exists($uploadDir)) {
+            if (! File::exists($uploadDir)) {
                 File::makeDirectory($uploadDir, 0755, true);
             }
 
@@ -85,11 +85,11 @@ class ProfileController extends Controller
 
             // Store new file directly to public/images/profile-icons
             $file = $request->file('profile_icon');
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
             $file->move($uploadDir, $filename);
 
             // Save relative path for database
-            $validated['profile_icon'] = 'images/profile-icons/' . $filename;
+            $validated['profile_icon'] = 'images/profile-icons/'.$filename;
         } else {
             // Jangan timpa foto yang sudah ada jika tidak ada file baru
             unset($validated['profile_icon']);
@@ -127,4 +127,3 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 }
-

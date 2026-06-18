@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\OtpEmail;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -21,9 +21,14 @@ class RegisteredUserController extends Controller
     /**
      * Display the registration view.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        return Inertia::render('Auth/Register');
+        $pending = $request->session()->get('pending_registration');
+
+        return Inertia::render('Auth/Register', [
+            'previousName' => $pending['name'] ?? '',
+            'previousEmail' => $pending['email'] ?? '',
+        ]);
     }
 
     /**
@@ -41,70 +46,58 @@ class RegisteredUserController extends Controller
         ]);
 
         $username = $validated['username'] ?? $validated['name'];
-        $otp = config('app.debug') ? '1111' : (string) random_int(1000, 9999);
+        $otp = (string) random_int(1000, 9999);
 
-        // Create user with OTP for verification
-        $user = User::create([
+        // Store user data in session until OTP is verified
+        $pendingRegistration = [
             'name' => $validated['name'],
             'username' => $username,
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'otp_code' => $otp,
-            'otp_expires_at' => now()->addMinutes(10),
-        ]);
+            'otp_expires_at' => now()->addMinutes(10)->timestamp,
+        ];
 
-        // Send OTP via Resend email
-        Mail::to($user->email)->send(new OtpEmail($otp, $user->email));
+        $request->session()->put('pending_registration', $pendingRegistration);
 
-        $request->session()->put('pending_email', $user->email);
+        // Send OTP via EmailJS
+        $this->sendEmailJsOtp($validated['email'], $otp);
 
         return redirect()->route('register.otp');
     }
 
     public function showOtp(Request $request): Response|RedirectResponse
     {
-        $email = $request->session()->get('pending_email');
+        $pending = $request->session()->get('pending_registration');
 
-        if (! $email) {
-            return redirect()->route('register');
-        }
-
-        $user = User::where('email', $email)->first();
-
-        if (! $user || ! $user->otp_code) {
+        if (! $pending) {
             return redirect()->route('register');
         }
 
         return Inertia::render('Auth/RegisterOtp', [
-            'expiresAt' => $user->otp_expires_at->timestamp,
-            'email' => $email,
+            'expiresAt' => $pending['otp_expires_at'],
+            'email' => $pending['email'],
             'status' => session('status'),
-            'otpPreview' => config('app.debug') ? $user->otp_code : null,
+            'otpPreview' => null,
         ]);
     }
 
     public function resendOtp(Request $request): RedirectResponse
     {
-        $email = $request->session()->get('pending_email');
+        $pending = $request->session()->get('pending_registration');
 
-        if (! $email) {
+        if (! $pending) {
             return redirect()->route('register');
         }
 
-        $user = User::where('email', $email)->first();
+        $otp = (string) random_int(1000, 9999);
 
-        if (! $user) {
-            return redirect()->route('register');
-        }
+        $pending['otp_code'] = $otp;
+        $pending['otp_expires_at'] = now()->addMinutes(10)->timestamp;
 
-        $otp = config('app.debug') ? '1111' : (string) random_int(1000, 9999);
+        $request->session()->put('pending_registration', $pending);
 
-        $user->update([
-            'otp_code' => $otp,
-            'otp_expires_at' => now()->addMinutes(10),
-        ]);
-
-        Mail::to($user->email)->send(new OtpEmail($otp, $user->email));
+        $this->sendEmailJsOtp($pending['email'], $otp);
 
         return redirect()->route('register.otp')->with('status', 'A new OTP has been sent to your email.');
     }
@@ -115,42 +108,56 @@ class RegisteredUserController extends Controller
             'otp' => ['required', 'digits:4'],
         ]);
 
-        $email = $request->session()->get('pending_email');
+        $pending = $request->session()->get('pending_registration');
 
-        if (! $email) {
+        if (! $pending) {
             return redirect()->route('register');
         }
 
-        $user = User::where('email', $email)->first();
-
-        if (! $user) {
-            return redirect()->route('register');
-        }
-
-        if (! $user->otp_code) {
-            return back()->withErrors(['otp' => 'Invalid request. Please register again.']);
-        }
-
-        if (now()->isAfter($user->otp_expires_at)) {
+        if (now()->timestamp > $pending['otp_expires_at']) {
             return back()->withErrors(['otp' => 'OTP has expired. Please request a new code.']);
         }
 
-        if ($validated['otp'] !== $user->otp_code) {
+        if ($validated['otp'] !== $pending['otp_code']) {
             return back()->withErrors(['otp' => 'Invalid OTP. Please try again.']);
         }
 
-        // Clear OTP and mark email as verified
-        $user->update([
-            'otp_code' => null,
-            'otp_expires_at' => null,
+        // Create the user permanently in the database now that OTP is valid
+        $user = User::create([
+            'name' => $pending['name'],
+            'username' => $pending['username'],
+            'email' => $pending['email'],
+            'password' => $pending['password'],
             'email_verified_at' => now(),
         ]);
 
         event(new Registered($user));
         Auth::login($user);
 
-        $request->session()->forget('pending_email');
+        $request->session()->forget('pending_registration');
 
         return redirect()->route('home');
+    }
+
+    private function sendEmailJsOtp(string $email, string $otp): void
+    {
+        try {
+            $response = Http::post('https://api.emailjs.com/api/v1.0/email/send', [
+                'service_id' => env('EMAILJS_SERVICE_ID'),
+                'template_id' => env('EMAILJS_TEMPLATE_ID'),
+                'user_id' => env('EMAILJS_PUBLIC_KEY'),
+                'accessToken' => env('EMAILJS_PRIVATE_KEY'),
+                'template_params' => [
+                    'to_email' => $email,
+                    'passcode' => $otp,
+                ],
+            ]);
+
+            if (! $response->successful()) {
+                Log::error('EmailJS OTP Failed: '.$response->body());
+            }
+        } catch (\Exception $e) {
+            Log::error('EmailJS OTP Exception: '.$e->getMessage());
+        }
     }
 }

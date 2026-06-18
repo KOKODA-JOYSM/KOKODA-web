@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Models\Rating;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
@@ -99,7 +98,7 @@ class User extends Authenticatable
             $lastReadAt = $conversation->pivot->last_read_at;
             $unread = $conversation->messages
                 ->where('user_id', '!=', $this->id)
-                ->when($lastReadAt, fn($col) => $col->where('created_at', '>', $lastReadAt))
+                ->when($lastReadAt, fn ($col) => $col->where('created_at', '>', $lastReadAt))
                 ->count();
 
             if ($unread > 0) {
