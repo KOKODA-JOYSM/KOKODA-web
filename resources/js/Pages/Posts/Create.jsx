@@ -193,7 +193,7 @@ export default function Create() {
                         <GooglePlacesInput
                             value={data.location_name}
                             onSelect={handleLocationSelect}
-                            placeholder="Cari lokasi tempat hilang/ditemukan…"
+                            placeholder="Search for lost/found location…"
                             inputStyle={{
                                 ...formFieldStyle,
                                 paddingLeft: '36px',

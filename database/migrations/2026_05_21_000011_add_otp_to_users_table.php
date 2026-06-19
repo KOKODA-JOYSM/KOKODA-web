@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('otp_code')->nullable();
-            $table->timestamp('otp_expires_at')->nullable();
+            if (! Schema::hasColumn('users', 'otp_code')) {
+                $table->string('otp_code')->nullable();
+            }
+            if (! Schema::hasColumn('users', 'otp_expires_at')) {
+                $table->timestamp('otp_expires_at')->nullable();
+            }
         });
     }
 

@@ -24,7 +24,11 @@ return new class extends Migration
         DB::statement("UPDATE users SET username = {$username} WHERE username = '' OR username IS NULL");
 
         Schema::table('users', function (Blueprint $table) {
-            $table->unique('username');
+            try {
+                $table->unique('username');
+            } catch (\Exception $e) {
+                // Index may already exist on SQLite — safe to skip
+            }
         });
     }
 

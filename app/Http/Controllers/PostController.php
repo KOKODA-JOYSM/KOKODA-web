@@ -20,6 +20,7 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::with(['user', 'location'])
+            ->withCount('comments')
             ->where('status', 'active')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -100,6 +101,7 @@ class PostController extends Controller
     public function show(Post $post)
     {
         $post->load(['user', 'location']);
+        $post->loadCount('comments');
         // image_url is resolved to a full public URL by the Post model accessor.
 
         return Inertia::render('Posts/Show', [

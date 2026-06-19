@@ -159,7 +159,7 @@ export default function CreatePostModal({ onClose }) {
                         <GooglePlacesInput
                             value={data.location_name}
                             onSelect={handleLocationSelect}
-                            placeholder="Cari lokasi tempat hilang/ditemukan…"
+                            placeholder="Search for lost/found location…"
                             className="w-full py-2.5 pr-3 rounded-lg border-2 border-primary text-base md:text-xl font-quicksand box-border transition-colors focus:border-secondary outline-none"
                         />
                         {(errors.location_name || errors.latitude) && (
