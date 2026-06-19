@@ -17,7 +17,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 export default function GooglePlacesInput({
     value = '',
     onSelect,
-    placeholder = 'Cari lokasi…',
+    placeholder = 'Search location…',
     className = '',
     inputStyle = {},
     onFocus,

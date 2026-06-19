@@ -80,6 +80,22 @@ Setelah mengisi DB di atas, jalankan ulang deploy / restart App Service supaya
 - Periksa console browser: WebSocket connection ke `wss://<app>.azurewebsites.net/app/...`
   harus **connected** (bukan error 502/503).
 
+### Fitur Comment (Realtime)
+
+Fitur comment memakai **infrastruktur Reverb yang sama** dengan chat, jadi tidak
+ada Application Setting tambahan yang perlu diisi — selama bagian Chat/Reverb di
+bawah sudah dikonfigurasi (`BROADCAST_CONNECTION=reverb`, Web sockets `On`,
+queue worker jalan via `startup.sh`), comment otomatis realtime. Comment
+disiarkan lewat **public channel** `post.{id}`, jadi tidak butuh auth channel.
+
+- Buka satu post yang sama di dua browser berbeda → klik ikon comment.
+- Kirim comment dari satu user → comment muncul **realtime** di window lain
+  tanpa refresh.
+- Hapus comment milik sendiri (atau comment di post milikmu sebagai pemilik
+  post) → comment hilang **realtime** di kedua sisi.
+- Refresh halaman → semua comment tetap tersimpan (tersimpan di tabel
+  `comments` di MySQL Azure).
+
 ## 4. Chat / Reverb (WebSocket)
 
 ### Prasyarat
