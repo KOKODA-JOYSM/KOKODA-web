@@ -30,6 +30,7 @@ class User extends Authenticatable
         'phone_number',
         'location',
         'points',
+        'points_updated_at',
         'rating',
         'otp_code',
         'otp_expires_at',
@@ -55,6 +56,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'otp_expires_at' => 'datetime',
+            'points_updated_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -118,9 +120,18 @@ class User extends Authenticatable
     public function recalculateStats(): void
     {
         $query = $this->ratings();
-        $this->update([
-            'points' => (int) $query->sum('point'),
+        $newPoints = (int) $query->sum('point');
+
+        $data = [
+            'points' => $newPoints,
             'rating' => round((float) ($query->avg('score') ?? 0), 1),
-        ]);
+        ];
+
+        // Hanya update timestamp jika points berubah
+        if ($this->points !== $newPoints) {
+            $data['points_updated_at'] = now();
+        }
+
+        $this->update($data);
     }
 }
