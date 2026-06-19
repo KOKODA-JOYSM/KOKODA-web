@@ -24,7 +24,7 @@ export default function ResetPassword({ token, email }) {
 
             <div className="w-full max-w-md rounded-2xl bg-base px-6 py-10 shadow-xl sm:px-10">
                 <div className="mb-8 flex flex-col items-center text-center">
-                    <img src="/images/LogoKokoda.svg" alt="KOKODA logo" className="mb-4 h-14 w-auto" />
+                    <img src="/images/logo-kokoda-black.svg" alt="KOKODA logo" className="mb-4 h-14 w-auto" />
                     <h1 className="text-[2.3rem] font-bold leading-tight text-secondary" style={{ textShadow: '3.2px 3.2px 0.8px rgba(0, 0, 0, 0.5)' }}>
                         Reset Password
                     </h1>

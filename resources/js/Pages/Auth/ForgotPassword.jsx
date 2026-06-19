@@ -31,7 +31,7 @@ export default function ForgotPassword({ status }) {
                     <div className="w-full max-w-md">
                         <div className="mb-9 flex flex-col items-center text-center">
                             <div className="mb-4 flex items-center gap-2 text-tertiary">
-                                    <img src="/images/LogoKokoda.svg" alt="KOKODA logo" className="h-14 w-auto" />
+                                    <img src="/images/logo-kokoda-black.svg" alt="KOKODA logo" className="h-14 w-auto" />
                             </div>
                             <h1 className="text-[2.87rem] font-bold leading-tight text-secondary" style={{ textShadow: '3.2px 3.2px 0.8px rgba(0, 0, 0, 0.5)' }}>
                                 Forgot Password
