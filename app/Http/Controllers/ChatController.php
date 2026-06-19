@@ -11,7 +11,6 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -66,11 +65,11 @@ class ChatController extends Controller
         $messages = $query->take(50)->get()->reverse()->values();
 
         $hasMore = $conversation->messages()
-            ->when($messages->isNotEmpty(), fn($q) => $q->where('id', '<', $messages->first()->id))
+            ->when($messages->isNotEmpty(), fn ($q) => $q->where('id', '<', $messages->first()->id))
             ->exists();
 
         return response()->json([
-            'messages' => $messages->map(fn(Message $msg) => $this->formatMessage($msg, $request->user()->id)),
+            'messages' => $messages->map(fn (Message $msg) => $this->formatMessage($msg, $request->user()->id)),
             'has_more' => $hasMore,
         ]);
     }
@@ -219,7 +218,7 @@ class ChatController extends Controller
         $users = User::where('id', '!=', $request->user()->id)
             ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
-                  ->orWhere('username', 'like', "%{$query}%");
+                    ->orWhere('username', 'like', "%{$query}%");
             })
             ->take(10)
             ->get(['id', 'name', 'username', 'profile_icon']);
@@ -240,7 +239,7 @@ class ChatController extends Controller
             ->where('user_id', $user->id)
             ->exists();
 
-        if (!$isParticipant) {
+        if (! $isParticipant) {
             abort(403, 'Kamu bukan peserta conversation ini.');
         }
     }

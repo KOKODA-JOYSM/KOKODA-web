@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Models\Rating;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable
 {
@@ -61,6 +62,41 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Kirim link reset password lewat EmailJS (bukan SMTP Laravel).
+     *
+     * Seluruh email aplikasi ini dikirim via EmailJS REST API. Method bawaan
+     * Laravel mengirim notifikasi via channel mail (SMTP), yang di server tidak
+     * terkonfigurasi, sehingga di-override agar memakai EmailJS dengan template
+     * khusus reset (EMAILJS_RESET_TEMPLATE_ID) dan variabel `link`.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $resetUrl = route('password.reset', [
+            'token' => $token,
+            'email' => $this->getEmailForPasswordReset(),
+        ]);
+
+        try {
+            $response = Http::post('https://api.emailjs.com/api/v1.0/email/send', [
+                'service_id' => env('EMAILJS_SERVICE_ID'),
+                'template_id' => env('EMAILJS_RESET_TEMPLATE_ID'),
+                'user_id' => env('EMAILJS_PUBLIC_KEY'),
+                'accessToken' => env('EMAILJS_PRIVATE_KEY'),
+                'template_params' => [
+                    'to_email' => $this->getEmailForPasswordReset(),
+                    'link' => $resetUrl,
+                ],
+            ]);
+
+            if (! $response->successful()) {
+                Log::error('EmailJS password reset failed: '.$response->body());
+            }
+        } catch (\Exception $e) {
+            Log::error('EmailJS password reset exception: '.$e->getMessage());
+        }
+    }
+
     public function locations(): HasMany
     {
         return $this->hasMany(Location::class);
@@ -101,7 +137,7 @@ class User extends Authenticatable
             $lastReadAt = $conversation->pivot->last_read_at;
             $unread = $conversation->messages
                 ->where('user_id', '!=', $this->id)
-                ->when($lastReadAt, fn($col) => $col->where('created_at', '>', $lastReadAt))
+                ->when($lastReadAt, fn ($col) => $col->where('created_at', '>', $lastReadAt))
                 ->count();
 
             if ($unread > 0) {

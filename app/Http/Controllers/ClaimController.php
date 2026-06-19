@@ -65,7 +65,7 @@ class ClaimController extends Controller
             ->where('claimant_id', $user->id)
             ->first();
 
-        if (!$claim) {
+        if (! $claim) {
             return response()->json([
                 'has_claim' => false,
                 'claim' => null,

@@ -2,9 +2,10 @@
 
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ClaimController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -23,7 +24,8 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     // 1. Menampilkan halaman utama profil custom kamu (Pages/Profile/Profile.jsx)
     Route::get('/profile', function () {
-        $posts = app(\App\Http\Controllers\PostController::class)->myPosts();
+        $posts = app(PostController::class)->myPosts();
+
         return Inertia::render('Profile/Profile', [
             'posts' => $posts,
             'status' => session('status'),
@@ -55,6 +57,9 @@ Route::get('/api/search', [PostController::class, 'search']);
 Route::get('/home', [PostController::class, 'index'])->name('home');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
+// Public route — anyone can read comments
+Route::get('/api/posts/{post}/comments', [CommentController::class, 'index'])->name('comments.index');
+
 // Protected routes for posts
 Route::middleware('auth')->group(function () {
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -62,6 +67,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+    // ─────────────────────────────────────────────────────────────
+    // COMMENT ROUTES
+    // ─────────────────────────────────────────────────────────────
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::delete('/posts/{post}/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
     // ─────────────────────────────────────────────────────────────
     // CLAIM / REQUEST ROUTES

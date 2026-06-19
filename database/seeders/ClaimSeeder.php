@@ -38,7 +38,7 @@ class ClaimSeeder extends Seeder
             }
 
             foreach ($eligibleClaimants->shuffle()->take(2) as $claimant) {
-                $pairKey = $post->id . ':' . $claimant->id;
+                $pairKey = $post->id.':'.$claimant->id;
                 if (isset($usedPairs[$pairKey])) {
                     continue;
                 }
@@ -64,7 +64,7 @@ class ClaimSeeder extends Seeder
 
         foreach ($otherPosts as $post) {
             $claimant = $allUsers->where('id', '!=', $post->user_id)->random();
-            $pairKey = $post->id . ':' . $claimant->id;
+            $pairKey = $post->id.':'.$claimant->id;
             if (isset($usedPairs[$pairKey])) {
                 continue;
             }
@@ -82,7 +82,7 @@ class ClaimSeeder extends Seeder
             $usedPairs[$pairKey] = true;
         }
 
-        if (!empty($claims)) {
+        if (! empty($claims)) {
             DB::table('claims')->upsert(
                 $claims,
                 ['post_id', 'claimant_id'],

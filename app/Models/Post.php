@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Post extends Model
 {
@@ -36,6 +37,14 @@ class Post extends Model
     }
 
     /**
+     * All comments on this post.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
      * Always expose image_url as a full, publicly reachable URL.
      *
      * Single source of truth for image URLs across home, search, profile,
@@ -45,7 +54,7 @@ class Post extends Model
      */
     public function getImageUrlAttribute($value): ?string
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
 
@@ -53,6 +62,6 @@ class Post extends Model
             return $value;
         }
 
-        return asset('storage/' . $value);
+        return asset('storage/'.$value);
     }
 }

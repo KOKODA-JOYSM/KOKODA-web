@@ -3,71 +3,89 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_reset_password_link_screen_can_be_rendered(): void
+    protected function setUp(): void
     {
-        $response = $this->get('/forgot-password');
+        parent::setUp();
 
-        $response->assertStatus(200);
+        // Link reset dikirim via EmailJS REST API (bukan SMTP) — stub agar tidak
+        // ada panggilan jaringan nyata saat test.
+        Http::fake([
+            'api.emailjs.com/*' => Http::response('OK', 200),
+        ]);
     }
 
-    public function test_reset_password_link_can_be_requested(): void
+    public function test_forgot_password_screen_can_be_rendered(): void
     {
-        Notification::fake();
+        $this->get('/forgot-password')->assertStatus(200);
+    }
 
+    public function test_reset_link_is_emailed_via_emailjs_for_existing_user(): void
+    {
         $user = User::factory()->create();
 
-        $this->post('/forgot-password', ['email' => $user->email]);
+        $response = $this->post('/forgot-password', ['email' => $user->email]);
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        $response->assertSessionHasNoErrors();
+
+        Http::assertSent(function ($request) use ($user) {
+            return str_contains($request->url(), 'emailjs.com')
+                && str_contains($request['template_params']['link'] ?? '', '/reset-password/')
+                && ($request['template_params']['to_email'] ?? null) === $user->email;
+        });
+    }
+
+    public function test_reset_link_is_not_sent_for_unknown_email(): void
+    {
+        $this->post('/forgot-password', ['email' => 'nobody@example.com'])
+            ->assertSessionHasErrors('email');
+
+        Http::assertNothingSent();
     }
 
     public function test_reset_password_screen_can_be_rendered(): void
     {
-        Notification::fake();
-
         $user = User::factory()->create();
+        $token = Password::createToken($user);
 
-        $this->post('/forgot-password', ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-            $response = $this->get('/reset-password/'.$notification->token);
-
-            $response->assertStatus(200);
-
-            return true;
-        });
+        $this->get('/reset-password/'.$token.'?email='.urlencode($user->email))
+            ->assertStatus(200);
     }
 
     public function test_password_can_be_reset_with_valid_token(): void
     {
-        Notification::fake();
+        $user = User::factory()->create();
+        $token = Password::createToken($user);
 
+        $response = $this->post('/reset-password', [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'new-password-123',
+            'password_confirmation' => 'new-password-123',
+        ]);
+
+        $response->assertSessionHasNoErrors()->assertRedirect(route('login'));
+        $this->assertTrue(Hash::check('new-password-123', $user->fresh()->password));
+    }
+
+    public function test_password_is_not_reset_with_invalid_token(): void
+    {
         $user = User::factory()->create();
 
-        $this->post('/forgot-password', ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-            $response = $this->post('/reset-password', [
-                'token' => $notification->token,
-                'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
-            ]);
-
-            $response
-                ->assertSessionHasNoErrors()
-                ->assertRedirect(route('login'));
-
-            return true;
-        });
+        $this->post('/reset-password', [
+            'token' => 'invalid-token',
+            'email' => $user->email,
+            'password' => 'new-password-123',
+            'password_confirmation' => 'new-password-123',
+        ])->assertSessionHasErrors('email');
     }
 }

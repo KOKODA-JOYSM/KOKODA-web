@@ -24,7 +24,7 @@ class UserTyping implements ShouldBroadcast
      */
     public function broadcastOn(): PrivateChannel
     {
-        return new PrivateChannel('conversation.' . $this->conversationId);
+        return new PrivateChannel('conversation.'.$this->conversationId);
     }
 
     /**

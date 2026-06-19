@@ -27,7 +27,7 @@ class ConversationUpdated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return $this->conversation->participants
-            ->map(fn($user) => new PrivateChannel('user.' . $user->id))
+            ->map(fn ($user) => new PrivateChannel('user.'.$user->id))
             ->toArray();
     }
 
