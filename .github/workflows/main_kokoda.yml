@@ -72,3 +72,19 @@ jobs:
           app-name: 'KOKODA'
           slot-name: 'Production'
           package: .
+
+      # Azure zip-deploy overlays files onto the persistent /home disk instead of
+      # wiping it, so a stale bootstrap/cache/routes-v7.php (or config.php) survives
+      # forever and Laravel serves it *instead of* routes/web.php — silently 404ing
+      # every route added after the cache was built. Delete the cached files via the
+      # Kudu VFS API after each deploy so routing/config are always read fresh.
+      - name: Clear stale Laravel route/config cache on App Service
+        run: |
+          TOKEN=$(az account get-access-token --resource https://management.core.windows.net/ --query accessToken -o tsv)
+          SCM="https://kokoda-dyg6f8dhgghbang2.scm.southeastasia-01.azurewebsites.net"
+          for f in routes-v7.php config.php; do
+            echo "Clearing bootstrap/cache/$f"
+            curl -sS -o /dev/null -w "  HTTP %{http_code}\n" -X DELETE \
+              -H "Authorization: Bearer $TOKEN" -H "If-Match: *" \
+              "$SCM/api/vfs/site/wwwroot/bootstrap/cache/$f" || true
+          done

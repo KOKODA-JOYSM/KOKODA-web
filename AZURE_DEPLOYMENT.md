@@ -137,3 +137,28 @@ disiarkan lewat **public channel** `post.{id}`, jadi tidak butuh auth channel.
    Laravel Echo.
 4. Queue worker (`php artisan queue:work &`) memproses broadcast events.
 
+## 5. Stale route/config cache (penyebab route 404 di prod, padahal jalan di lokal)
+
+**Gejala:** sebuah route yang ada di `routes/web.php` dan berfungsi di lokal malah
+balas `404` di Azure (contoh nyata: `/profile/{user}` dari leaderboard). `Route::fallback()`
+juga tidak jalan.
+
+**Penyebab:** kalau `bootstrap/cache/routes-v7.php` (atau `config.php`) pernah ter-generate
+di server, Laravel **hanya** membaca file cache itu dan mengabaikan `routes/web.php`
+sepenuhnya. Azure zip-deploy menumpuk file ke disk `/home` yang persistent (bukan
+menghapusnya), jadi cache lama bisa bertahan berminggu-minggu dan menyembunyikan
+semua route yang ditambahkan setelah cache dibuat.
+
+**Perbaikan cepat (manual):** hapus file cache-nya, lalu Laravel kembali baca route live:
+
+```bash
+TOKEN=$(az account get-access-token --resource https://management.core.windows.net/ --query accessToken -o tsv)
+SCM="https://kokoda-dyg6f8dhgghbang2.scm.southeastasia-01.azurewebsites.net"
+curl -X DELETE -H "Authorization: Bearer $TOKEN" -H "If-Match: *" \
+  "$SCM/api/vfs/site/wwwroot/bootstrap/cache/routes-v7.php"
+```
+
+**Pencegahan:** workflow deploy (`.github/workflows/main_kokoda.yml`) sudah punya step
+**"Clear stale Laravel route/config cache on App Service"** yang menghapus
+`routes-v7.php` + `config.php` lewat Kudu VFS setiap selesai deploy.
+
