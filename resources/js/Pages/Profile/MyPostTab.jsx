@@ -1,26 +1,35 @@
 import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
 import PostDetailModal from '@/Components/Home/PostDetailModal';
+import CreatePostModal from '@/Components/Home/CreatePostModal';
 
 export default function MyPostTab({ posts }) {
     const [selectedPost, setSelectedPost] = useState(null);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     if (!posts || posts.length === 0) {
         return (
-            <div className="text-center py-12 bg-secondary/10 rounded-2xl">
-                <div className="text-5xl mb-4">📋</div>
-                <p className="text-tertiary font-semibold text-lg mb-2">No posts yet</p>
-                <p className="text-tertiary/60 text-sm mb-6">Create your first post to report a lost or found item.</p>
-                <Link
-                    href="/posts/create"
-                    className="inline-flex items-center gap-2 bg-primary text-tertiary font-bold px-6 py-2.5 rounded-xl hover:bg-secondary transition-all duration-200 shadow-sm"
-                >
-                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                    </svg>
-                    Create New Post
-                </Link>
-            </div>
+            <>
+                <div className="text-center py-12 bg-secondary/10 rounded-2xl">
+                    <div className="text-5xl mb-4">📋</div>
+                    <p className="text-tertiary font-semibold text-lg mb-2">No posts yet</p>
+                    <p className="text-tertiary/60 text-sm mb-6">Create your first post to report a lost or found item.</p>
+                    <button
+                        type="button"
+                        onClick={() => setShowCreateModal(true)}
+                        className="inline-flex items-center gap-2 bg-primary text-tertiary font-bold px-6 py-2.5 rounded-xl hover:bg-secondary transition-all duration-200 shadow-sm"
+                    >
+                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                        </svg>
+                        Create New Post
+                    </button>
+                </div>
+
+                {showCreateModal && (
+                    <CreatePostModal onClose={() => setShowCreateModal(false)} />
+                )}
+            </>
         );
     }
 
@@ -44,19 +53,32 @@ export default function MyPostTab({ posts }) {
                 <p className="text-sm text-tertiary/70 font-medium">
                     {posts.length} {posts.length === 1 ? 'post' : 'posts'} found
                 </p>
-                <Link
-                    href="/posts/create"
+                <button
+                    type="button"
+                    onClick={() => setShowCreateModal(true)}
                     className="inline-flex items-center gap-1.5 bg-primary hover:bg-secondary text-tertiary text-sm font-bold px-4 py-2 rounded-xl shadow-sm transition-all duration-200"
                 >
                     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                     </svg>
                     New Post
-                </Link>
+                </button>
             </div>
 
             {posts.map((item) => (
-                <div key={item.id} className="bg-secondary rounded-[20px] p-3 shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div
+                    key={item.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setSelectedPost(item)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setSelectedPost(item);
+                        }
+                    }}
+                    className="bg-secondary rounded-[20px] p-3 shadow-sm cursor-pointer transition-all duration-200 ease-out hover:shadow-lg hover:scale-[1.02] active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+                >
                     <div className="bg-base rounded-xl p-4 flex flex-col sm:flex-row gap-5 items-stretch">
 
                         {/* Gambar */}
@@ -122,39 +144,13 @@ export default function MyPostTab({ posts }) {
                                 </span>
 
                                 <div className="flex items-center gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setSelectedPost(item)}
-                                        className="text-xs text-secondary/80 hover:text-tertiary font-semibold underline underline-offset-2 transition-colors cursor-pointer"
-                                    >
-                                        Detail
-                                    </button>
                                     <Link
                                         href={`/posts/${item.id}/edit`}
+                                        onClick={(e) => e.stopPropagation()}
                                         className="bg-highlight text-tertiary hover:bg-yellow-400 text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all duration-200"
                                     >
                                         Edit
                                     </Link>
                                     <button
-                                        onClick={() => handleDelete(item)}
-                                        className="bg-label-lost/80 hover:bg-label-lost text-base text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all duration-200 cursor-pointer"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ))}
-        </div>
-
-        {selectedPost && (
-            <PostDetailModal
-                post={selectedPost}
-                onClose={() => setSelectedPost(null)}
-            />
-        )}
-        </>
-    );
-}
+                                        onClick={(e) => {
+                                            e.stop
