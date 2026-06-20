@@ -55,10 +55,6 @@ class LocationSeeder extends Seeder
             ];
         }
 
-        Location::query()->upsert(
-            $rows,
-            ['user_id', 'place_name', 'latitude', 'longitude'],
-            ['updated_at']
-        );
+        Location::query()->insert($rows);
     }
 }
