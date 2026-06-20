@@ -15,6 +15,26 @@ service nginx reload
 
 cd /home/site/wwwroot
 
+# 1b) Paksa konfigurasi SERVER-SIDE Reverb agar broadcasting (mis. comment &
+#     chat) selalu menerbitkan event ke instance Reverb yang DIJALANKAN script
+#     ini di langkah (7): 127.0.0.1:6001 via plain HTTP.
+#
+#     Kenapa di-hardcode di sini, bukan mengandalkan Application Settings:
+#       - Reverb di Azure listen di port 6001 (lihat `reverb:start` di bawah),
+#         bukan 8080 (default dev di .env). Salah port => connection refused.
+#       - Reverb berbicara HTTP polos di 6001. Kalau REVERB_SCHEME=https, PHP
+#         melakukan TLS handshake ke port non-TLS => publish gagal.
+#     Keduanya membuat comment/chat realtime diam-diam tidak terkirim. Dengan
+#     meng-export sebelum `config:cache`, nilai benar ini ikut "dibakar" ke
+#     bootstrap/cache/config.php sehingga php-fpm memakainya.
+#
+#     Catatan: ini HANYA jalur publish server->Reverb. Sisi browser memakai
+#     VITE_REVERB_* (build-time, wss/443 via Nginx) dan tidak terpengaruh.
+export BROADCAST_CONNECTION=reverb
+export REVERB_HOST=127.0.0.1
+export REVERB_PORT=6001
+export REVERB_SCHEME=http
+
 # 2) Naikkan limit upload PHP (default 2M) agar gambar post yang lolos
 #    validasi Laravel (max:2048 KB) tidak ditolak duluan oleh PHP, dan user
 #    yang upload file terlalu besar mendapat pesan validasi yang jelas.

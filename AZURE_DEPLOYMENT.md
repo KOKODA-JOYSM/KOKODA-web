@@ -115,13 +115,23 @@ disiarkan lewat **public channel** `post.{id}`, jadi tidak butuh auth channel.
 | `REVERB_APP_ID` | `kokoda-chat` | ID aplikasi Reverb |
 | `REVERB_APP_KEY` | `<random-string>` | Key untuk client authentication |
 | `REVERB_APP_SECRET` | `<random-string>` | Secret untuk server authentication |
-| `REVERB_HOST` | `0.0.0.0` | Server listen host (internal) |
-| `REVERB_PORT` | `6001` | Server listen port (internal, di-proxy Nginx) |
-| `REVERB_SCHEME` | `https` | Scheme di production |
+| `REVERB_HOST` | `127.0.0.1` | Target publish **server->Reverb** (lokal). Bukan `0.0.0.0`/`localhost:8080`. |
+| `REVERB_PORT` | `6001` | Port Reverb internal (sama dengan `reverb:start`, di-proxy Nginx) |
+| `REVERB_SCHEME` | `http` | Reverb di 6001 berbicara HTTP polos. **Jangan `https`** — TLS ke port non-TLS = publish gagal. |
 | `VITE_REVERB_APP_KEY` | (sama dengan `REVERB_APP_KEY`) | Frontend key |
 | `VITE_REVERB_HOST` | `<app>.azurewebsites.net` | Frontend WebSocket host |
 | `VITE_REVERB_PORT` | `443` | Frontend port (wss via Nginx) |
 | `VITE_REVERB_SCHEME` | `https` | Frontend scheme |
+
+> **Penting — server-side vs frontend:** `REVERB_HOST/PORT/SCHEME` mengatur jalur
+> **publish PHP -> Reverb** (harus `127.0.0.1:6001` HTTP). `VITE_REVERB_*` mengatur
+> koneksi **browser -> Reverb** (selalu `wss`/443 via Nginx). Keduanya berbeda dan
+> tidak boleh disamakan.
+>
+> **Sudah di-hardcode:** `startup.sh` (langkah 1b) meng-`export` `REVERB_HOST=127.0.0.1`,
+> `REVERB_PORT=6001`, `REVERB_SCHEME=http`, `BROADCAST_CONNECTION=reverb` sebelum
+> `config:cache`, jadi nilai server-side yang benar selalu dipakai walau Application
+> Setting di portal salah/kosong. Comment realtime tidak lagi bergantung pada portal.
 
 > **Catatan**: `VITE_*` variables harus di-set saat **build time** (bukan runtime)
 > karena Vite me-replace variabel ini saat bundling. Jika menggunakan GitHub Actions
