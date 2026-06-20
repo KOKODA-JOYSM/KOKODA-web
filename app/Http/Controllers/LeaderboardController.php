@@ -16,7 +16,8 @@ class LeaderboardController extends Controller
     {
         return User::query()
             ->orderByDesc('points')
-            ->orderBy('name')
+            ->orderByRaw('points_updated_at IS NULL ASC')
+            ->orderBy('points_updated_at', 'asc')
             ->get(['id', 'name', 'username', 'points', 'profile_icon', 'rating', 'location'])
             ->map(function ($user, $index) {
                 return [
