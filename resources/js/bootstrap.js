@@ -17,9 +17,12 @@ window.Pusher = Pusher;
 window.Echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
-    wsHost: import.meta.env.VITE_REVERB_HOST,
-    wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
-    wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
-    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    
+    // Secara dinamis mengikuti URL website di production Azure (HTTPS),
+    // sehingga terhindar dari error hardcode localhost atau port 8080.
+    wsHost: window.location.protocol === 'https:' ? window.location.hostname : import.meta.env.VITE_REVERB_HOST,
+    wsPort: window.location.protocol === 'https:' ? 443 : (import.meta.env.VITE_REVERB_PORT ?? 80),
+    wssPort: window.location.protocol === 'https:' ? 443 : (import.meta.env.VITE_REVERB_PORT ?? 443),
+    forceTLS: window.location.protocol === 'https:' ? true : (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
 });
