@@ -9,10 +9,13 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Empty endpoint ("/") langsung diarahkan ke home feed.
+// Empty endpoint ("/") -> Landing Page
 Route::get('/', function () {
-    return redirect()->route('home');
-});
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+    ]);
+})->name('welcome');
 
 Route::get('/dashboard', function () {
     return redirect()->route('home');
