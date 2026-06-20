@@ -8,6 +8,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CommentController extends Controller
 {
@@ -63,8 +64,18 @@ class CommentController extends Controller
         // Load the user relationship for the broadcast payload
         $comment->load('user');
 
-        // Broadcast the new comment to all clients viewing this post
-        broadcast(new CommentPosted($comment))->toOthers();
+        // Broadcast the new comment to all clients viewing this post.
+        // Real-time delivery is a "nice to have", not a hard requirement.
+        // On environments where the Reverb websocket server isn't running
+        // (e.g. Azure App Service) the broadcast would otherwise throw and
+        // turn a successful comment into a 500 error. We swallow that failure
+        // so the comment is still saved and returned — clients simply fall
+        // back to fetching the comment list on their next open/refresh.
+        try {
+            broadcast(new CommentPosted($comment))->toOthers();
+        } catch (\Throwable $e) {
+            Log::warning('Comment broadcast failed (non-fatal): ' . $e->getMessage());
+        }
 
         return response()->json([
             'id'         => $comment->id,
@@ -99,8 +110,13 @@ class CommentController extends Controller
         $comment->delete();
 
         // Broadcast the deletion so every other client viewing this post
-        // removes the comment from their list in real-time.
-        broadcast(new CommentDeleted($commentId, $postId))->toOthers();
+        // removes the comment from their list in real-time. Non-fatal:
+        // if Reverb is unavailable the delete still succeeds.
+        try {
+            broadcast(new CommentDeleted($commentId, $postId))->toOthers();
+        } catch (\Throwable $e) {
+            Log::warning('Comment-delete broadcast failed (non-fatal): ' . $e->getMessage());
+        }
 
         return response()->json(['message' => 'Comment deleted successfully']);
     }
