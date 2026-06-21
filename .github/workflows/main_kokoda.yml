@@ -6,6 +6,15 @@ on:
       - main
   workflow_dispatch:
 
+# Azure App Service OneDeploy refuses overlapping deployments to the same app
+# and returns 409 Conflict. Two pushes to main close together (e.g. PRs #65 and
+# #66 merged 44s apart on 2026-06-20) therefore raced and the second deploy
+# failed, leaving prod stale. Serialise deploys per ref and let later runs WAIT
+# for the in-flight one instead of cancelling it, so every merge reaches prod.
+concurrency:
+  group: azure-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
