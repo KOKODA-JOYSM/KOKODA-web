@@ -57,8 +57,20 @@ export default function PostCard({ post }) {
             echoChannelRef.current = channel;
         }
 
-        // 3. Cleanup: leave the channel when panel closes or component unmounts
+        // 3. Polling fallback — keeps comments live even where WebSockets
+        //    aren't available (e.g. Azure prod has no Reverb server). Re-fetches
+        //    the comment list every few seconds; the server list is the source
+        //    of truth so this also reflects others' new + deleted comments.
+        const pollId = setInterval(() => {
+            window.axios
+                .get(`/api/posts/${post.id}/comments`)
+                .then((res) => setComments(res.data))
+                .catch(() => {});
+        }, 4000);
+
+        // 4. Cleanup: leave the channel + stop polling when panel closes or unmounts
         return () => {
+            clearInterval(pollId);
             if (echoChannelRef.current && window.Echo) {
                 window.Echo.leaveChannel(`post.${post.id}`);
                 echoChannelRef.current = null;
