@@ -186,6 +186,51 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
     }, [conversations]);
 
     // ─────────────────────────────────────────────────────────────
+    // POLLING FALLBACK
+    // Keeps chat live even where WebSockets aren't available (Azure prod
+    // has no Reverb server). Echo (when it works locally) still delivers
+    // instantly; merge-by-id below means no duplicates when both run.
+    // ─────────────────────────────────────────────────────────────
+    useEffect(() => {
+        if (!authUser) return;
+
+        const intervalId = setInterval(() => {
+            // Refresh conversation list (unread counts, ordering, new chats)
+            refreshConversations();
+
+            // Pull new messages for the open conversation and append only ids
+            // we don't already have (skips optimistic "temp-" messages).
+            const conversationId = currentConversationIdRef.current;
+            if (!conversationId) return;
+
+            window.axios
+                .get(`/chat/conversations/${conversationId}/messages`)
+                .then((response) => {
+                    const fetched = response.data.messages.map(transformMessage);
+                    let appended = false;
+
+                    setMessages((prev) => {
+                        const existingIds = new Set(
+                            prev
+                                .filter((m) => !String(m.id).startsWith('temp-'))
+                                .map((m) => m.id)
+                        );
+                        const newOnes = fetched.filter((m) => !existingIds.has(m.id));
+                        if (newOnes.length === 0) return prev;
+                        appended = true;
+                        return [...prev, ...newOnes];
+                    });
+
+                    // If new messages arrived while viewing, mark them read
+                    if (appended) markAsRead(conversationId);
+                })
+                .catch(() => {});
+        }, 3500);
+
+        return () => clearInterval(intervalId);
+    }, [authUser?.id]);
+
+    // ─────────────────────────────────────────────────────────────
     // CONVERSATION SELECTION & MESSAGES
     // ─────────────────────────────────────────────────────────────
 
