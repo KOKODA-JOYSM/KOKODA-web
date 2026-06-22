@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { usePage, Link } from '@inertiajs/react';
 import PostDetailModal from './PostDetailModal';
 import PostCommentsView from './PostCommentsView';
+import Avatar from '../Common/Avatar';
 import { MessageCircle, MapPin } from 'lucide-react';
 
 export default function PostCard({ post }) {
@@ -131,18 +132,14 @@ export default function PostCard({ post }) {
                                 onClick={(e) => e.stopPropagation()}
                                 className="flex items-center gap-3 min-w-0 group/profile"
                             >
-                                <div className="w-9 h-9 rounded-full bg-highlight flex items-center justify-center text-sm font-bold text-tertiary flex-shrink-0">
-                                    {post.user?.name?.charAt(0)?.toUpperCase() || '?'}
-                                </div>
+                                <Avatar user={post.user} size={36} className="w-9 h-9" />
                                 <span className="font-quicksand text-sm font-semibold text-tertiary truncate group-hover/profile:underline">
                                     {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'Unknown'}`}
                                 </span>
                             </Link>
                         ) : (
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-9 h-9 rounded-full bg-highlight flex items-center justify-center text-sm font-bold text-tertiary flex-shrink-0">
-                                    {post.user?.name?.charAt(0)?.toUpperCase() || '?'}
-                                </div>
+                                <Avatar user={post.user} size={36} className="w-9 h-9" />
                                 <span className="font-quicksand text-sm font-semibold text-tertiary truncate">
                                     {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'Unknown'}`}
                                 </span>
