@@ -43,6 +43,8 @@ class CommentController extends Controller
         return response()->json($comments);
     }
 
+    //tes
+
     /**
      * Store a new comment on a post.
      * Auth required — only logged-in users can comment.
