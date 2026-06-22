@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Send, ChevronLeft, MessageCircle, Loader2, Trash2 } from 'lucide-react';
+import Avatar from '../Common/Avatar';
 
 /**
  * Compute a friendly relative time string (e.g. "2 min ago", "just now").
@@ -10,14 +11,6 @@ function relativeTime(isoString) {
     if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
     return new Date(isoString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-/**
- * Avatar initials helper — uses username if available, falls back to name.
- */
-function getInitial(user) {
-    const src = user?.username || user?.name || '?';
-    return src.charAt(0).toUpperCase();
 }
 
 export default function PostCommentsView({
@@ -124,9 +117,7 @@ export default function PostCommentsView({
                     return (
                         <div key={comment.id} className="flex gap-3 group">
                             {/* Avatar */}
-                            <div className="w-9 h-9 rounded-full bg-highlight flex items-center justify-center text-sm font-bold text-tertiary flex-shrink-0 uppercase">
-                                {getInitial(comment.user)}
-                            </div>
+                            <Avatar user={comment.user} size={36} className="w-9 h-9" />
 
                             {/* Bubble */}
                             <div className="flex-1 min-w-0">
@@ -173,9 +164,7 @@ export default function PostCommentsView({
                 {currentUser ? (
                     <>
                         {/* Current user avatar */}
-                        <div className="w-8 h-8 rounded-full bg-highlight flex items-center justify-center text-xs font-bold text-tertiary flex-shrink-0 uppercase self-center">
-                            {getInitial(currentUser)}
-                        </div>
+                        <Avatar user={currentUser} size={32} className="w-8 h-8 self-center" />
 
                         <input
                             ref={inputRef}
