@@ -100,29 +100,20 @@ export default function Edit({ post }) {
                         }}>
                             Item Type <span style={{ color: '#D56666' }}>*</span>
                         </label>
-                        <div style={{ display: 'flex', gap: '12px' }}>
+                        <div className="flex rounded-lg p-1.5 shadow-md gap-1.5 w-fit border-2 border-primary bg-primary">
                             {['lost', 'found'].map(type => (
-                                <label key={type} style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    cursor: 'pointer',
-                                }}>
-                                    <input
-                                        type="radio"
-                                        name="type"
-                                        value={type}
-                                        checked={data.type === type}
-                                        onChange={(e) => setData('type', e.target.value)}
-                                        style={{ cursor: 'pointer' }}
-                                    />
-                                    <span style={{
-                                        fontSize: '14px',
-                                        color: '#333',
-                                    }}>
-                                        {type === 'lost' ? '❌ Lost Item' : '✅ Found Item'}
-                                    </span>
-                                </label>
+                                <button
+                                    key={type}
+                                    type="button"
+                                    onClick={() => setData('type', type)}
+                                    className={`px-8 md:px-12 py-3 rounded-lg border-none font-bold cursor-pointer font-quicksand transition-all duration-300 uppercase tracking-wide text-tertiary ${
+                                        data.type === type
+                                            ? 'bg-highlight shadow-sm'
+                                            : 'bg-base'
+                                    }`}
+                                >
+                                    {type === 'lost' ? 'Lost' : 'Found'}
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -230,29 +221,20 @@ export default function Edit({ post }) {
                         }}>
                             Status <span style={{ color: '#D56666' }}>*</span>
                         </label>
-                        <div style={{ display: 'flex', gap: '12px' }}>
+                        <div className="flex rounded-lg p-1.5 shadow-md gap-1.5 w-fit border-2 border-primary bg-primary">
                             {['active', 'resolved'].map(status => (
-                                <label key={status} style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    cursor: 'pointer',
-                                }}>
-                                    <input
-                                        type="radio"
-                                        name="status"
-                                        value={status}
-                                        checked={data.status === status}
-                                        onChange={(e) => setData('status', e.target.value)}
-                                        style={{ cursor: 'pointer' }}
-                                    />
-                                    <span style={{
-                                        fontSize: '14px',
-                                        color: '#333',
-                                    }}>
-                                        {status === 'active' ? 'Active' : 'Resolved'}
-                                    </span>
-                                </label>
+                                <button
+                                    key={status}
+                                    type="button"
+                                    onClick={() => setData('status', status)}
+                                    className={`px-8 md:px-12 py-3 rounded-lg border-none font-bold cursor-pointer font-quicksand transition-all duration-300 uppercase tracking-wide text-tertiary ${
+                                        data.status === status
+                                            ? 'bg-highlight shadow-sm'
+                                            : 'bg-base'
+                                    }`}
+                                >
+                                    {status === 'active' ? 'Active' : 'Resolved'}
+                                </button>
                             ))}
                         </div>
                     </div>

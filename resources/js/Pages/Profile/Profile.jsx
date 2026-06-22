@@ -25,6 +25,9 @@ export default function Profile({ posts, status }) {
     // Backend mengirim array Collection langsung (sudah difilter user_id di controller)
     const myPosts = Array.isArray(posts) ? posts : (posts?.data || []);
 
+    // Resolved posts otomatis masuk ke tab History
+    const resolvedPosts = myPosts.filter((p) => p.status === 'resolved');
+
     return (
         <AppLayout title="Profile - KOKODA">
             {/* Kontainer Utama */}
@@ -128,7 +131,7 @@ export default function Profile({ posts, status }) {
                         {activeTab === 'my_post' && <MyPostTab posts={myPosts} />}
 
                         {/* TAB 3: HISTORY */}
-                        {activeTab === 'history' && <HistoryTab />}
+                        {activeTab === 'history' && <HistoryTab posts={resolvedPosts} />}
 
                     </div>
 

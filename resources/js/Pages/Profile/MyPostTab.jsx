@@ -77,7 +77,9 @@ export default function MyPostTab({ posts }) {
                             setSelectedPost(item);
                         }
                     }}
-                    className="bg-secondary rounded-[20px] p-3 shadow-sm cursor-pointer transition-all duration-200 ease-out hover:shadow-lg hover:scale-[1.02] active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+                    className={`bg-secondary rounded-[20px] p-3 shadow-sm cursor-pointer transition-all duration-200 ease-out hover:shadow-lg hover:scale-[1.02] active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
+                        item.status === 'resolved' ? 'opacity-60 hover:opacity-100' : ''
+                    }`}
                 >
                     <div className="bg-base rounded-xl p-4 flex flex-col sm:flex-row gap-5 items-stretch">
 

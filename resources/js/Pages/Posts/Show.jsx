@@ -1,6 +1,7 @@
 import React from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { useForm, router } from '@inertiajs/react';
+import { MapPin } from 'lucide-react';
 import PostActionButtons from '@/Components/Posts/PostActionButtons';
 
 export default function Show({ post, auth }) {
@@ -46,10 +47,16 @@ export default function Show({ post, auth }) {
                             <h1 className="text-2xl font-bold text-tertiary font-quicksand mb-3">
                                 {post.title}
                             </h1>
-                            <div className="flex items-center gap-4 text-sm text-gray-600">
-                                <span>📍 {typeof post.location === 'object' ? post.location?.place_name : post.location}</span>
-                                <span>•</span>
-                                <span>📅 {new Date(post.created_at).toLocaleDateString()}</span>
+                            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                                <span className="inline-flex items-center gap-1.5">
+                                    <MapPin size={16} className="text-tertiary flex-shrink-0" />
+                                    {typeof post.location === 'object' ? post.location?.place_name : post.location}
+                                </span>
+                                <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/20 text-tertiary text-xs font-semibold tracking-wide">
+                                    {new Date(post.created_at).toLocaleDateString('en-US', {
+                                        day: 'numeric', month: 'long', year: 'numeric'
+                                    })}
+                                </span>
                             </div>
                         </div>
 
@@ -98,23 +105,19 @@ export default function Show({ post, auth }) {
 
                         {/* Actions */}
                         {isOwnPost ? (
-                            /* Owner: Edit & Delete */
+                            /* Owner: OK (confirm & back to profile) & Edit Post */
                             <div className="flex gap-3 pt-6 border-t border-gray-300">
                                 <button
-                                    onClick={() => router.visit(`/posts/${post.id}/edit`)}
+                                    onClick={() => router.visit('/profile')}
                                     className="flex-1 px-5 py-3 bg-primary text-white text-sm font-semibold rounded-lg font-quicksand transition-all duration-200 hover:bg-secondary cursor-pointer"
                                 >
-                                    Edit Post
+                                    OK
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        if (confirm('Are you sure you want to delete this post?')) {
-                                            router.delete(`/posts/${post.id}`);
-                                        }
-                                    }}
-                                    className="flex-1 px-5 py-3 bg-label-lost text-white text-sm font-semibold rounded-lg font-quicksand transition-all duration-200 hover:opacity-80 cursor-pointer"
+                                    onClick={() => router.visit(`/posts/${post.id}/edit`)}
+                                    className="flex-1 px-5 py-3 border-2 border-primary text-tertiary text-sm font-semibold rounded-lg font-quicksand transition-all duration-200 hover:bg-primary hover:text-white cursor-pointer"
                                 >
-                                    Delete Post
+                                    Edit Post
                                 </button>
                             </div>
                         ) : (
