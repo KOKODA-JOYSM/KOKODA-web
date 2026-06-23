@@ -29,12 +29,12 @@ export default function SearchResult({ items, onItemClick }) {
                     </div>
 
                     {/* Content Section */}
-                    <div className="bg-base rounded-xl p-4 flex-1 relative flex flex-col min-h-[176px]">
-                        <h3 className="font-quicksand font-bold text-tertiary text-xl">{item.title}</h3>
+                    <div className="bg-base rounded-xl p-4 flex-1 relative flex flex-col min-h-[176px] min-w-0">
+                        <h3 className="font-quicksand font-bold text-tertiary text-xl truncate">{item.title}</h3>
 
-                        <div className="inline-flex items-center bg-tertiary text-base rounded-full px-3 py-1 text-xs font-semibold mt-1 w-max">
-                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            {item.location?.place_name || 'Unknown Location'}
+                        <div className="inline-flex items-center bg-tertiary text-base rounded-full px-3 py-1 text-xs font-semibold mt-1 max-w-full">
+                            <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <span className="truncate">{item.location?.place_name || 'Unknown Location'}</span>
                         </div>
 
                         {item.distance !== undefined && (
@@ -44,7 +44,7 @@ export default function SearchResult({ items, onItemClick }) {
                             </div>
                         )}
 
-                        <p className="font-roboto text-tertiary mt-2 text-sm pr-28">
+                        <p className="font-roboto text-tertiary mt-2 text-sm pr-28 break-words line-clamp-2">
                             {item.description} <span className="font-bold cursor-pointer">....... Read More</span>
                         </p>
 
