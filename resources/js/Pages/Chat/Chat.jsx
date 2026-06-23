@@ -205,7 +205,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
             if (!conversationId) return;
 
             window.axios
-                .get(`/chat/conversations/${conversationId}/messages`)
+                .get(`/chat/conversations/${conversationId}/messages?_t=${Date.now()}`)
                 .then((response) => {
                     const fetched = response.data.messages.map(transformMessage);
                     let appended = false;
@@ -566,14 +566,17 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
     // HELPERS
     // ─────────────────────────────────────────────────────────────
 
-    const refreshConversations = async () => {
-        try {
-            const response = await window.axios.get('/chat/conversations');
-            setConversations(response.data);
-        } catch (error) {
-            console.error('Failed to refresh conversations:', error);
-        }
-    };
+    const refreshConversations = useCallback(() => {
+        if (!authUser) return;
+        window.axios
+            .get(`/chat/conversations?_t=${Date.now()}`)
+            .then((res) => {
+                setConversations(res.data);
+            })
+            .catch((error) => {
+                console.error('Failed to refresh conversations:', error);
+            });
+    }, [authUser]);
 
     const markAsRead = (conversationId) => {
         window.axios

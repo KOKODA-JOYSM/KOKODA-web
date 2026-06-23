@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $adminUsername = $this->makeUniqueUsername('admin', 'admin@gmail.com');
+        $dummyUsername = $this->makeUniqueUsername('john', 'johnl@gmail.com');
 
         User::updateOrCreate(
             ['email' => 'admin@gmail.com'],
@@ -32,11 +33,25 @@ class DatabaseSeeder extends Seeder
                 'rating' => 5.0,
             ]
         );
+        User::updateOrCreate(
+            ['email' => 'johnl@gmail.com'],
+            [
+                'name' => 'John Liberto',
+                'username' => $dummyUsername,
+                'password' => Hash::make('john'),
+                'profile_icon' => 'avatar-1.png',
+                'phone_number' => '081200000000',
+                'location' => 'Jakarta',
+                'points' => 15,
+                'rating' => 5.0,
+            ]
+        );
 
         $users = [
             [
                 'name' => 'John Liberto',
                 'email' => 'john.liberto@example.com',
+                'password' => Hash::make('john'),
                 'profile_icon' => 'avatar-1.png',
                 'phone_number' => '081200000001',
                 'location' => 'Bogor',
