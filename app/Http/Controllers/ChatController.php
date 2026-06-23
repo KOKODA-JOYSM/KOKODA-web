@@ -54,7 +54,7 @@ class ChatController extends Controller
 
         $query = $conversation->messages()
             ->with('sender:id,name,username,profile_icon')
-            ->orderBy('created_at', 'desc');
+            ->orderBy('id', 'desc');
 
         // Cursor pagination: load pesan lebih lama dari cursor
         $before = $request->query('before');
@@ -71,7 +71,9 @@ class ChatController extends Controller
         // Get the other participant's last_read_at so frontend can show read receipts
         $authUserId = $request->user()->id;
         $otherParticipant = $conversation->participants()->where('user_id', '!=', $authUserId)->first();
-        $otherLastReadAt = $otherParticipant?->pivot?->last_read_at;
+        $otherLastReadAt = $otherParticipant?->pivot?->last_read_at 
+            ? \Carbon\Carbon::parse($otherParticipant->pivot->last_read_at) 
+            : null;
 
         return response()->json([
             'messages' => $messages->map(fn (Message $msg) => $this->formatMessage($msg, $authUserId, $otherLastReadAt)),
