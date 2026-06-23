@@ -68,9 +68,15 @@ class ChatController extends Controller
             ->when($messages->isNotEmpty(), fn ($q) => $q->where('id', '<', $messages->first()->id))
             ->exists();
 
+        // Get the other participant's last_read_at so frontend can show read receipts
+        $authUserId = $request->user()->id;
+        $otherParticipant = $conversation->participants()->where('user_id', '!=', $authUserId)->first();
+        $otherLastReadAt = $otherParticipant?->pivot?->last_read_at;
+
         return response()->json([
-            'messages' => $messages->map(fn (Message $msg) => $this->formatMessage($msg, $request->user()->id)),
+            'messages' => $messages->map(fn (Message $msg) => $this->formatMessage($msg, $authUserId, $otherLastReadAt)),
             'has_more' => $hasMore,
+            'other_last_read_at' => $otherLastReadAt?->toISOString(),
         ]);
     }
 
@@ -279,16 +285,28 @@ class ChatController extends Controller
 
     /**
      * Format pesan untuk response API.
+     * $otherLastReadAt is the other participant's last_read_at, used to determine
+     * if own messages have been read.
      */
-    private function formatMessage(Message $message, int $authUserId): array
+    private function formatMessage(Message $message, int $authUserId, $otherLastReadAt = null): array
     {
+        $isOwn = $message->user_id === $authUserId;
+
+        // A message is "read" when: it's our own message AND the other user's
+        // last_read_at is at or after the message's created_at.
+        $isRead = false;
+        if ($isOwn && $otherLastReadAt) {
+            $isRead = $message->created_at->lte($otherLastReadAt);
+        }
+
         return [
             'id' => $message->id,
             'conversation_id' => $message->conversation_id,
             'user_id' => $message->user_id,
             'body' => $message->body,
             'type' => $message->type,
-            'is_own' => $message->user_id === $authUserId,
+            'is_own' => $isOwn,
+            'is_read' => $isRead,
             'created_at' => $message->created_at->toISOString(),
             'sender' => [
                 'id' => $message->sender->id,

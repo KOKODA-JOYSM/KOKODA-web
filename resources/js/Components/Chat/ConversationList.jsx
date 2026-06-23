@@ -127,7 +127,7 @@ export default function ConversationList({
                             {!searchingUsers && query.length >= 2 && userSearchResults.length === 0 && (
                                 <div className="py-8 text-center">
                                     <p className="font-roboto text-sm text-tertiary/60">
-                                        Tidak ada user ditemukan
+                                        User Not Found
                                     </p>
                                 </div>
                             )}
@@ -135,7 +135,7 @@ export default function ConversationList({
                             {!searchingUsers && query.length < 2 && (
                                 <div className="py-8 text-center">
                                     <p className="font-roboto text-sm text-tertiary/60">
-                                        Ketik minimal 2 karakter untuk mencari
+                                        Type at least 2 characters to search
                                     </p>
                                 </div>
                             )}
@@ -179,10 +179,10 @@ export default function ConversationList({
                             {conversations.length === 0 && (
                                 <div className="py-8 text-center">
                                     <p className="font-roboto text-sm text-tertiary/60">
-                                        Belum ada percakapan
+                                        No conversations yet
                                     </p>
                                     <p className="mt-1 font-roboto text-xs text-tertiary/40">
-                                        Klik <UserPlus className="inline h-3.5 w-3.5" /> untuk memulai chat baru
+                                        Click <UserPlus className="inline h-3.5 w-3.5" /> to start a new chat
                                     </p>
                                 </div>
                             )}

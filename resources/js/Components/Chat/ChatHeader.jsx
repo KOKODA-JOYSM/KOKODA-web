@@ -1,6 +1,94 @@
 import React from 'react';
 import { ChevronLeft } from 'lucide-react';
 
+/**
+ * Animated typing dots — smooth pulsing opacity like iMessage / WhatsApp.
+ * Uses a CSS @keyframes injected via a <style> tag to avoid needing
+ * tailwind.config changes.
+ */
+function TypingDots() {
+    return (
+        <>
+            {/* Scoped keyframes for the pulsing dot animation */}
+            <style>{`
+                @keyframes typing-pulse {
+                    0%, 60%, 100% { opacity: 0.3; transform: scale(0.85); }
+                    30% { opacity: 1; transform: scale(1); }
+                }
+            `}</style>
+            <span className="inline-flex items-center gap-[3px]">
+                {[0, 1, 2].map((i) => (
+                    <span
+                        key={i}
+                        className="h-[5px] w-[5px] rounded-full"
+                        style={{
+                            backgroundColor: '#008000',
+                            animation: 'typing-pulse 1.4s ease-in-out infinite',
+                            animationDelay: `${i * 0.2}s`,
+                        }}
+                    />
+                ))}
+            </span>
+        </>
+    );
+}
+
+/**
+ * Status subtitle — shows typing, online, or offline with smooth
+ * cross-fade transitions so the text doesn't jump.
+ */
+function StatusLine({ isTyping, isOnline, typingUsers }) {
+    // Build typing label
+    const typingLabel =
+        typingUsers.length === 1
+            ? 'typing'
+            : `${typingUsers.length} people typing`;
+
+    return (
+        <div className="relative h-4 overflow-hidden">
+            {/* ── Typing state ─────────────────────────────── */}
+            <div
+                className="absolute inset-x-0 flex items-center gap-[5px] transition-all duration-300 ease-in-out"
+                style={{
+                    opacity: isTyping ? 1 : 0,
+                    transform: isTyping ? 'translateY(0)' : 'translateY(-8px)',
+                    pointerEvents: isTyping ? 'auto' : 'none',
+                }}
+            >
+                <TypingDots />
+                <span className="text-[11px] font-medium text-online-color md:text-[12px]">
+                    {typingLabel}
+                </span>
+            </div>
+
+            {/* ── Online state ─────────────────────────────── */}
+            <div
+                className="absolute inset-x-0 flex items-center gap-1 transition-all duration-300 ease-in-out"
+                style={{
+                    opacity: !isTyping && isOnline ? 1 : 0,
+                    transform: !isTyping && isOnline ? 'translateY(0)' : 'translateY(8px)',
+                    pointerEvents: !isTyping && isOnline ? 'auto' : 'none',
+                }}
+            >
+                <span className="text-online-color">●</span>
+                <span className="text-[11px] text-tertiary/65 md:text-[12px]">Online</span>
+            </div>
+
+            {/* ── Offline state ────────────────────────────── */}
+            <div
+                className="absolute inset-x-0 flex items-center transition-all duration-300 ease-in-out"
+                style={{
+                    opacity: !isTyping && !isOnline ? 1 : 0,
+                    transform: !isTyping && !isOnline ? 'translateY(0)' : 'translateY(8px)',
+                    pointerEvents: !isTyping && !isOnline ? 'auto' : 'none',
+                }}
+            >
+                <span className="text-[11px] text-tertiary/40 md:text-[12px]">Offline</span>
+            </div>
+        </div>
+    );
+}
+
 export default function ChatHeader({ conversation, onShowConversations, typingUsers = [] }) {
     const isTyping = typingUsers.length > 0;
 
@@ -31,29 +119,11 @@ export default function ChatHeader({ conversation, onShowConversations, typingUs
                     <h2 className="truncate font-quicksand text-[17px] font-bold leading-tight text-tertiary md:text-[20px] lg:text-[21px]">
                         {conversation.name}
                     </h2>
-                    <p className="flex items-center gap-1 text-[11px] text-tertiary/65 md:text-[12px]">
-                        {isTyping ? (
-                            <span className="flex items-center gap-1 text-tertiary/80">
-                                <span className="inline-flex gap-[2px]">
-                                    <span className="h-1 w-1 animate-bounce rounded-full bg-tertiary/60" style={{ animationDelay: '0ms' }} />
-                                    <span className="h-1 w-1 animate-bounce rounded-full bg-tertiary/60" style={{ animationDelay: '150ms' }} />
-                                    <span className="h-1 w-1 animate-bounce rounded-full bg-tertiary/60" style={{ animationDelay: '300ms' }} />
-                                </span>
-                                <span className="ml-0.5">
-                                    {typingUsers.length === 1
-                                        ? `${typingUsers[0]} sedang mengetik`
-                                        : `${typingUsers.join(', ')} sedang mengetik`}
-                                </span>
-                            </span>
-                        ) : conversation.isOnline ? (
-                            <>
-                                <span className="text-online-color">●</span>
-                                <span>Online now</span>
-                            </>
-                        ) : (
-                            <span className="text-tertiary/45">Offline</span>
-                        )}
-                    </p>
+                    <StatusLine
+                        isTyping={isTyping}
+                        isOnline={conversation.isOnline}
+                        typingUsers={typingUsers}
+                    />
                 </div>
             </div>
         </div>

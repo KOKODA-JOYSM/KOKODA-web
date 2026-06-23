@@ -6,6 +6,7 @@ import ChatHeader from '@/Components/Chat/ChatHeader';
 import MessageList from '@/Components/Chat/MessageList';
 import MessageInput from '@/Components/Chat/MessageInput';
 import { useEcho, createTypingThrottle } from '@/hooks/useEcho';
+import { avatarUrl } from '@/Components/Common/Avatar';
 
 /**
  * Format timestamp ISO ke jam:menit lokal (id-ID).
@@ -62,18 +63,17 @@ function addDayDividers(messages) {
 }
 
 /**
- * Generate avatar URL berdasarkan profile icon atau fallback ke DiceBear.
+ * Generate avatar URL berdasarkan profile icon atau fallback ke ui-avatars.
+ * Uses the shared avatarUrl() helper from Avatar.jsx for consistent URL
+ * generation, with a generated fallback when no icon is set.
  */
 function getAvatarUrl(user) {
     if (!user) return '';
-    if (user.profile_icon) {
-        // Jika profile_icon adalah path relatif
-        if (user.profile_icon.startsWith('/') || user.profile_icon.startsWith('http')) {
-            return user.profile_icon;
-        }
-        return `/images/profile-icons/${user.profile_icon}`;
-    }
-    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name || 'user')}`;
+    const url = avatarUrl(user);
+    if (url) return url;
+    // Fallback: generated avatar from user name
+    const name = user.name || user.username || 'User';
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=F4C799&color=311A05`;
 }
 
 export default function ChatPage({ initialConversations = [], targetUserId = null }) {
@@ -93,6 +93,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
     const [searchingUsers, setSearchingUsers] = useState(false);
     const [userSearchResults, setUserSearchResults] = useState([]);
     const [sendingMessage, setSendingMessage] = useState(false);
+    const [otherLastReadAt, setOtherLastReadAt] = useState(null);
 
     // Refs
     const typingThrottleRef = useRef(null);
@@ -209,16 +210,75 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                     const fetched = response.data.messages.map(transformMessage);
                     let appended = false;
 
+                    // Update read receipts from polling
+                    const polledReadAt = response.data.other_last_read_at;
+                    if (polledReadAt) {
+                        setOtherLastReadAt(polledReadAt);
+                    }
+
                     setMessages((prev) => {
+                        // Build a set of real (non-temp) IDs already present
                         const existingIds = new Set(
                             prev
                                 .filter((m) => !String(m.id).startsWith('temp-'))
                                 .map((m) => m.id)
                         );
                         const newOnes = fetched.filter((m) => !existingIds.has(m.id));
+
+                        // Even if no new messages, update isRead on existing own messages
+                        if (polledReadAt) {
+                            const updated = prev.map((m) => {
+                                if (m.isOwn && !m.isRead && m.created_at && m.created_at <= polledReadAt) {
+                                    return { ...m, isRead: true };
+                                }
+                                return m;
+                            });
+                            if (newOnes.length === 0) return updated;
+                            // Continue below with updated as base
+                            appended = true;
+
+                            const newById = new Map(newOnes.map((nm) => [nm.id, nm]));
+                            let replaced = new Set();
+                            const merged = updated.map((m) => {
+                                if (!String(m.id).startsWith('temp-')) return m;
+                                for (const [id, serverMsg] of newById) {
+                                    if (!replaced.has(id) && serverMsg.user_id === m.user_id && serverMsg.body === m.body) {
+                                        replaced.add(id);
+                                        return serverMsg;
+                                    }
+                                }
+                                return m;
+                            });
+                            const remaining = newOnes.filter((nm) => !replaced.has(nm.id));
+                            if (remaining.length === 0 && replaced.size > 0) return merged;
+                            return [...merged, ...remaining];
+                        }
+
                         if (newOnes.length === 0) return prev;
                         appended = true;
-                        return [...prev, ...newOnes];
+
+                        // Build a lookup from the new server messages
+                        const newById = new Map(newOnes.map((m) => [m.id, m]));
+
+                        // Replace optimistic temp- messages that now have a
+                        // matching server message (same user_id + body)
+                        let replaced = new Set();
+                        const merged = prev.map((m) => {
+                            if (!String(m.id).startsWith('temp-')) return m;
+                            // Find a server message that matches this temp message
+                            for (const [id, serverMsg] of newById) {
+                                if (!replaced.has(id) && serverMsg.user_id === m.user_id && serverMsg.body === m.body) {
+                                    replaced.add(id);
+                                    return serverMsg;
+                                }
+                            }
+                            return m;
+                        });
+
+                        // Append any truly new messages that weren't used as replacements
+                        const remaining = newOnes.filter((m) => !replaced.has(m.id));
+                        if (remaining.length === 0 && replaced.size > 0) return merged;
+                        return [...merged, ...remaining];
                     });
 
                     // If new messages arrived while viewing, mark them read
@@ -256,6 +316,12 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
             // Subscribe ke conversation channel
             subscribeToConversation(conversation.id, {
                 onMessageSent: (event) => {
+                    // Skip messages sent by the current user — they are
+                    // already handled by the optimistic update + HTTP
+                    // response replacement, so adding them again here
+                    // would cause a brief left-side flicker / duplicate.
+                    if (event.message.user_id === authUser.id) return;
+
                     setMessages((prev) => [...prev, transformMessage(event.message)]);
 
                     // Mark as read karena user sedang membuka conversation ini
@@ -281,7 +347,20 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                     }
                 },
                 onMessagesRead: (event) => {
-                    // Bisa digunakan untuk menampilkan read receipt di UI
+                    // Update otherLastReadAt when the other user reads messages.
+                    // This enables real-time read receipt (blue double-check) updates.
+                    if (event.user_id !== authUser.id && event.read_at) {
+                        setOtherLastReadAt(event.read_at);
+                        // Mark all own messages as read up to read_at
+                        setMessages((prev) =>
+                            prev.map((m) => {
+                                if (m.isOwn && !m.isRead && m.created_at && m.created_at <= event.read_at) {
+                                    return { ...m, isRead: true };
+                                }
+                                return m;
+                            })
+                        );
+                    }
                 },
             });
 
@@ -317,6 +396,11 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
             }
 
             setHasMoreMessages(response.data.has_more);
+
+            // Store the other participant's last_read_at for read receipts
+            if (response.data.other_last_read_at) {
+                setOtherLastReadAt(response.data.other_last_read_at);
+            }
         } catch (error) {
             console.error('Failed to fetch messages:', error);
         } finally {
@@ -341,7 +425,11 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
         typingThrottleRef.current?.stop();
 
         // Optimistic update: tambahkan pesan ke UI langsung
-        const optimisticMessage = {
+        // IMPORTANT: We must run this through transformMessage() so that
+        // the camelCase field `isOwn` is set correctly. Without this,
+        // MessageBubble sees `isOwn` as undefined → renders on the LEFT
+        // briefly before the server response replaces it on the RIGHT.
+        const rawOptimistic = {
             id: `temp-${Date.now()}`,
             conversation_id: selectedConversation.id,
             user_id: authUser.id,
@@ -355,6 +443,9 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                 username: authUser.username,
                 profile_icon: authUser.profile_icon,
             },
+        };
+        const optimisticMessage = {
+            ...transformMessage(rawOptimistic),
             _sending: true,
         };
 
@@ -504,6 +595,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
             timestamp: formatTime(msg.created_at),
             created_at: msg.created_at,
             isOwn: msg.is_own ?? msg.user_id === authUser?.id,
+            isRead: msg.is_read ?? false,
             sender: msg.sender,
         };
     }
@@ -606,10 +698,10 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                                         </svg>
                                     </div>
                                     <p className="font-quicksand text-lg font-semibold text-tertiary/60">
-                                        Pilih percakapan untuk mulai chat
+                                        Select a conversation to start chatting
                                     </p>
                                     <p className="mt-1 font-roboto text-sm text-tertiary/40">
-                                        atau cari user baru di daftar chat
+                                        or search for a new user in the chat list
                                     </p>
                                 </div>
                             </div>
