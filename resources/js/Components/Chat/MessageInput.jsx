@@ -12,13 +12,6 @@ export default function MessageInput({ value, onChange, onSend, disabled = false
     return (
         <div className="shrink-0 border-t border-secondary/25 bg-[#FBF4E8] px-4 py-4 md:px-6 md:py-5">
             <div className="mx-auto flex w-full max-w-[760px] items-center gap-2 rounded-full border border-secondary/35 bg-base px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.08)] md:gap-3 md:px-4">
-                <button
-                    type="button"
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-secondary/45 text-tertiary/70 transition-colors hover:bg-primary/50"
-                    aria-label="Add"
-                >
-                    <Plus className="h-4 w-4" />
-                </button>
 
                 <button
                     type="button"
