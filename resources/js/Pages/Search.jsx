@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import SearchBar from '@/Components/Search/SearchBar';
 import FilterLostFound from '@/Components/Search/FilterLostFound';
@@ -30,16 +30,10 @@ export default function Search() {
                     params.append('latitude', locationCoords.lat);
                     params.append('longitude', locationCoords.lng);
                     params.append('radius', 5); // 5km
-                    console.log('📍 Searching with radius:', locationCoords);
-                } else if (locationFilter !== 'All Locations') {
-                    // Fallback: search by location name without radius
-                    console.log('🏘️ Searching by location name:', locationFilter);
                 }
 
-                console.log('🔍 Search params:', params.toString());
                 const response = await fetch(`/api/search?${params}`);
                 const data = await response.json();
-                console.log('📦 Results:', data);
                 setPosts(data.data || []);
             } catch (err) {
                 console.error('Failed to fetch posts:', err);
@@ -53,7 +47,6 @@ export default function Search() {
     }, [searchQuery, typeFilter, locationFilter, locationCoords]);
 
     const handleLocationWithCoords = (locationName, coords) => {
-        console.log('📌 Location selected:', locationName, 'Coords:', coords);
         setLocationCoords(coords); // Can be null (fallback to name search)
         setLocationFilter(locationName);
     };
