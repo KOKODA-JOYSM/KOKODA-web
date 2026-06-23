@@ -95,13 +95,16 @@ export default function Show({ profileUser, posts = [] }) {
 
                         {myPosts.length === 0 ? (
                             <div className="text-center py-12 bg-secondary/10 rounded-2xl">
-                                <div className="text-5xl mb-4">📋</div>
-                                <p className="text-tertiary font-semibold text-lg mb-2">Belum ada postingan</p>
-                                <p className="text-tertiary/60 text-sm">User ini belum membuat postingan.</p>
+                                <p className="text-tertiary font-semibold text-lg mb-2">No posts yet</p>
+                                <p className="text-tertiary/60 text-sm">This user hasn't made any posts.</p>
                             </div>
                         ) : (
                             myPosts.map((item) => (
-                                <div key={item.id} className="bg-secondary rounded-[20px] p-3 shadow-sm hover:shadow-md transition-shadow duration-200">
+                                <div
+                                    key={item.id}
+                                    className="bg-secondary rounded-[20px] p-3 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                                    onClick={() => setSelectedPost(item)}
+                                >
                                     <div className="bg-base rounded-xl p-4 flex flex-col sm:flex-row gap-5 items-stretch">
 
                                         {/* Gambar */}
@@ -151,21 +154,13 @@ export default function Show({ profileUser, posts = [] }) {
                                                 <p className="text-sm text-tertiary/75 line-clamp-2 font-medium mt-1">{item.description}</p>
                                             </div>
 
-                                            {/* Tanggal + Detail Button (tanpa Edit/Delete) */}
+                                            {/* Tanggal */}
                                             <div className="flex items-center justify-between mt-3">
                                                 <span className="text-xs text-tertiary/50 font-medium">
                                                     {new Date(item.created_at).toLocaleDateString('en-US', {
                                                         day: 'numeric', month: 'long', year: 'numeric'
                                                     })}
                                                 </span>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setSelectedPost(item)}
-                                                    className="text-xs text-secondary/80 hover:text-tertiary font-semibold underline underline-offset-2 transition-colors cursor-pointer"
-                                                >
-                                                    Detail
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
