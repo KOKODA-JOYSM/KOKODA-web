@@ -22,7 +22,7 @@ export default function Welcome({ auth }) {
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex h-20 items-center justify-between">
                             <div className="flex items-center">
-                                <img src="/images/logo-kokoda-black.svg" alt="KOKODA Logo" className="h-10 w-auto" />
+                                <img src="/images/logo-kokoda.svg" alt="KOKODA Logo" className="h-10 w-auto" />
                             </div>
                             <div className="flex items-center gap-4">
                                 {auth?.user ? (
