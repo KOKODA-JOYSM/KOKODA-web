@@ -70,7 +70,7 @@ export default function Navbar() {
                 {/* LOGO */}
                 <div className="flex justify-center lg:justify-start items-center pt-8 sm:pt-6 lg:pt-2 mb-4 sm:mb-5 flex-shrink-0">
                     <img
-                        src="/images/logo-kokoda.svg"
+                        src="/images/LogoKokoda.svg"
                         alt="KOKODA Logo"
                         className="w-32 h-10 sm:w-40 sm:h-12 lg:w-48 lg:h-16 xl:w-56 xl:h-[72px] object-contain"
                     />
