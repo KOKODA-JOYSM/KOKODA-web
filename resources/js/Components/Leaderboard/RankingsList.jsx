@@ -20,7 +20,7 @@ export default function RankingsList({ users }) {
                             key={user.id}
                             className="flex items-center gap-4 bg-tertiary rounded-lg p-5 shadow-md hover:shadow-lg hover:opacity-70 transition-all cursor-pointer block w-full"
                         >
-                            <div className="font-quicksand font-bold text-base w-8 text-center md:text-left">
+                            <div className="font-quicksand font-bold text-base w-8 text-right tabular-nums flex-shrink-0">
                                 {user.rank}
                             </div>
                             <div className="w-14 h-14 rounded-full bg-primary border-2 border-secondary flex items-center justify-center flex-shrink-0 shadow overflow-hidden">
@@ -31,7 +31,7 @@ export default function RankingsList({ users }) {
                                 )}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="font-quicksand font-semibold text-base text-base truncate">
+                                <p className="font-quicksand font-semibold text-lg text-base truncate">
                                     {user.name}
                                 </p>
                             </div>
