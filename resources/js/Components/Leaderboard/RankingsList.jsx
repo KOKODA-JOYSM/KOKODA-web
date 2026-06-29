@@ -40,6 +40,4 @@ export default function RankingsList({ users }) {
                             </div>
                         </Link>
             ))}
-        </div>
-    );
-}
+        </div
