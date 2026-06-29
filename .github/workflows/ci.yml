@@ -33,8 +33,14 @@ jobs:
           node-version: '20'
           cache: npm
 
+      - name: Prepare .env
+        run: cp .env.example .env
+
       - name: Install PHP dependencies
         run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+
+      - name: Generate app key
+        run: php artisan key:generate
 
       - name: Install JS dependencies
         run: npm ci
@@ -42,10 +48,5 @@ jobs:
       - name: Build assets
         run: npm run build
 
-      - name: Prepare app key
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-
       - name: Run tests
-        run: composer test
+       

@@ -134,12 +134,4 @@ export default function Profile({ posts, incomingClaims = [], sentClaims = [], s
                         {activeTab === 'my_post' && <MyPostTab posts={myPosts} />}
 
                         {/* TAB 3: HISTORY */}
-                        {activeTab === 'history' && <HistoryTab posts={resolvedPosts} />}
-
-                    </div>
-
-                </div>
-            </div>
-        </AppLayout>
-    );
-}
+                        {activeTab === 'history' && <HistoryTab posts={resolvedPosts}

@@ -204,16 +204,4 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
                 </div>
             </div>
 
-            <style>{`
-                @keyframes imFadeIn {
-                    from { opacity: 0; }
-                    to   { opacity: 1; }
-                }
-                @keyframes imSlideUp {
-                    from { opacity: 0; transform: translate(-50%, -48%); }
-                    to   { opacity: 1; transform: translate(-50%, -50%); }
-                }
-            `}</style>
-        </>
-    );
-}
+            

@@ -118,13 +118,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/chat/conversations/{conversation}/messages', [ChatController::class, 'messages'])->name('chat.messages');
     Route::post('/chat/conversations/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('chat.send');
     Route::post('/chat/conversations/{conversation}/read', [ChatController::class, 'markAsRead'])->name('chat.read');
-    Route::post('/chat/conversations/{conversation}/typing', [ChatController::class, 'typing'])->name('chat.typing');
-    Route::get('/chat/users/search', [ChatController::class, 'searchUsers'])->name('chat.users.search');
-});
-
-require __DIR__.'/auth.php';
-
-// Endpoint yang tidak dikenal / kosong diarahkan kembali ke home.
-Route::fallback(function () {
-    return redirect()->route('home');
-});
+    Route::post
