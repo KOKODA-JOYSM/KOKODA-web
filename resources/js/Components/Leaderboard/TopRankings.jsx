@@ -30,7 +30,7 @@ export default function TopRankings({ users }) {
                                 2
                             </div>
                         </div>
-                        <h3 className="font-quicksand font-bold text-tertiary text-center text-base mt-4">
+                        <h3 className="font-quicksand font-bold text-tertiary text-center text-lg mt-4">
                             {users[1].name}
                         </h3>
                         <p className="font-quicksand font-semibold text-tertiary text-xl">
@@ -55,7 +55,7 @@ export default function TopRankings({ users }) {
                                 1
                             </div>
                         </div>
-                        <h3 className="font-quicksand font-bold text-tertiary text-center text-xl mt-4">
+                        <h3 className="font-quicksand font-bold text-tertiary text-center text-2xl mt-4">
                             {users[0].name}
                         </h3>
                         <p className="font-quicksand font-semibold text-tertiary text-2xl">
@@ -79,7 +79,7 @@ export default function TopRankings({ users }) {
                                 3
                             </div>
                         </div>
-                        <h3 className="font-quicksand font-bold text-tertiary text-center text-base mt-4">
+                        <h3 className="font-quicksand font-bold text-tertiary text-center text-lg mt-4">
                             {users[2].name}
                         </h3>
                         <p className="font-quicksand font-semibold text-tertiary text-xl">
