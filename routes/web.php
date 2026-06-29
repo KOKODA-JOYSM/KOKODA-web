@@ -6,6 +6,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RatingController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -27,11 +28,29 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     // 1. Menampilkan halaman utama profil custom kamu (Pages/Profile/Profile.jsx)
     Route::get('/profile', function () {
+        $user = auth()->user();
         $posts = app(PostController::class)->myPosts();
 
+        // Hanya klaim yang masih menunggu keputusan ditampilkan di Incoming Request.
+        // Setelah diresolve (completed) atau ditolak (rejected), klaim tidak lagi
+        // muncul di sini — post yang resolved akan muncul di tab History.
+        $incomingClaims = \App\Models\Claim::where('owner_id', $user->id)
+            ->where('status', 'pending')
+            ->whereHas('post', fn ($q) => $q->where('status', 'active'))
+            ->with(['post', 'post.location', 'claimant'])
+            ->orderByDesc('created_at')
+            ->get();
+
+        $sentClaims = \App\Models\Claim::where('claimant_id', $user->id)
+            ->with(['post', 'post.location', 'post.user', 'owner'])
+            ->orderByDesc('created_at')
+            ->get();
+
         return Inertia::render('Profile/Profile', [
-            'posts' => $posts,
-            'status' => session('status'),
+            'posts'          => $posts,
+            'incomingClaims' => $incomingClaims,
+            'sentClaims'     => $sentClaims,
+            'status'         => session('status'),
         ]);
     })->name('profile');
 
@@ -82,6 +101,13 @@ Route::middleware('auth')->group(function () {
     // ─────────────────────────────────────────────────────────────
     Route::post('/posts/{post}/claim', [ClaimController::class, 'store'])->name('claims.store');
     Route::get('/api/posts/{post}/claim-status', [ClaimController::class, 'getUserClaim'])->name('claims.status');
+    Route::patch('/api/claims/{claim}/resolve', [ClaimController::class, 'resolve'])->name('claims.resolve');
+    Route::patch('/api/claims/{claim}/reject', [ClaimController::class, 'reject'])->name('claims.reject');
+
+    // ─────────────────────────────────────────────────────────────
+    // RATING ROUTES
+    // ─────────────────────────────────────────────────────────────
+    Route::post('/api/ratings', [RatingController::class, 'store'])->name('ratings.store');
 
     // ─────────────────────────────────────────────────────────────
     // CHAT ROUTES

@@ -19,12 +19,6 @@ export default function HistoryTab({ posts = [] }) {
     return (
         <>
             <div className="flex flex-col gap-4">
-                {/* Header dengan jumlah post resolved */}
-                <div className="flex items-center justify-between">
-                    <p className="text-sm text-tertiary/70 font-medium">
-                        {posts.length} resolved {posts.length === 1 ? 'post' : 'posts'}
-                    </p>
-                </div>
 
                 {posts.map((item) => (
                     <div

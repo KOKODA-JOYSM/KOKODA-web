@@ -79,6 +79,43 @@ class ClaimController extends Controller
     }
 
     /**
+     * Resolve a claim — mark as completed and post as resolved.
+     * Only the post owner may call this.
+     */
+    public function resolve(Request $request, Claim $claim): JsonResponse
+    {
+        if ($request->user()->id !== $claim->owner_id) {
+            return response()->json(['error' => 'Unauthorized.'], 403);
+        }
+
+        $claim->update(['status' => 'completed']);
+        $claim->post->update(['status' => 'resolved']);
+
+        return response()->json([
+            'success' => true,
+            'claim'   => $this->formatClaim($claim),
+        ]);
+    }
+
+    /**
+     * Reject a claim — mark as rejected.
+     * Only the post owner may call this.
+     */
+    public function reject(Request $request, Claim $claim): JsonResponse
+    {
+        if ($request->user()->id !== $claim->owner_id) {
+            return response()->json(['error' => 'Unauthorized.'], 403);
+        }
+
+        $claim->update(['status' => 'rejected']);
+
+        return response()->json([
+            'success' => true,
+            'claim'   => $this->formatClaim($claim),
+        ]);
+    }
+
+    /**
      * Format claim for JSON response.
      */
     private function formatClaim(Claim $claim): array
