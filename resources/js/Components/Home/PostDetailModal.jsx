@@ -105,7 +105,7 @@ export default function PostDetailModal({ post, onClose }) {
                                     <div className="w-8 h-8 rounded-full bg-highlight flex items-center justify-center text-sm font-bold text-tertiary flex-shrink-0">
                                         {post.user?.name?.charAt(0)?.toUpperCase() || '?'}
                                     </div>
-                                    <span className="font-quicksand font-semibold text-sm text-tertiary truncate group-hover/profile:underline">
+                                    <span className="font-quicksand font-semibold text-xs text-tertiary truncate group-hover/profile:underline">
                                         {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'unknown'}`}
                                     </span>
                                 </Link>
@@ -114,7 +114,7 @@ export default function PostDetailModal({ post, onClose }) {
                                     <div className="w-8 h-8 rounded-full bg-highlight flex items-center justify-center text-sm font-bold text-tertiary flex-shrink-0">
                                         {post.user?.name?.charAt(0)?.toUpperCase() || '?'}
                                     </div>
-                                    <span className="font-quicksand font-semibold text-sm text-tertiary truncate">
+                                    <span className="font-quicksand font-semibold text-xs text-tertiary truncate">
                                         {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'unknown'}`}
                                     </span>
                                 </div>

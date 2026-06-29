@@ -122,7 +122,7 @@ export default function PostCommentsView({
                             {/* Bubble */}
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-baseline gap-2 mb-0.5">
-                                    <p className="font-quicksand text-base font-semibold text-tertiary">
+                                    <p className="font-quicksand text-sm font-semibold text-tertiary">
                                         {comment.user?.username
                                             ? `@${comment.user.username}`
                                             : (comment.user?.name || 'Unknown')}

@@ -42,7 +42,7 @@ export default function Show({ profileUser, posts = [] }) {
                             <div className="flex flex-col justify-center text-base text-center sm:text-left">
                                 <h1 className="text-3xl font-bold mb-1 text-base">{profileUser.name}</h1>
                                 {profileUser.username && (
-                                    <p className="font-quicksand text-base font-semibold opacity-70 mb-2">@{profileUser.username}</p>
+                                    <p className="text-sm font-medium opacity-70 mb-2">@{profileUser.username}</p>
                                 )}
 
                                 <div className="flex items-center justify-center sm:justify-start gap-2 mb-1.5 opacity-90">

@@ -165,7 +165,7 @@ export default function ConversationList({
                                             {user.name}
                                         </p>
                                         {user.username && (
-                                            <p className="truncate font-quicksand text-[14px] font-medium text-tertiary/60">
+                                            <p className="truncate font-roboto text-[12px] text-tertiary/60">
                                                 @{user.username}
                                             </p>
                                         )}
