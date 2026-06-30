@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
+import { useSeenClaims } from '@/hooks/useSeenClaims';
 
 // ─────────────────────────────────────────────
 //  NAV ITEMS 
@@ -18,8 +19,11 @@ export default function Navbar() {
     // Ambil URL dan props dengan aman
     const { url, props } = usePage();
     const user = props?.auth?.user || null;
-    const pendingClaimsCount = props?.pendingClaimsCount || 0;
+    const pendingClaimIds = props?.pendingClaimIds || [];
     const unreadConversationsCount = props?.unreadConversationsCount || 0;
+
+    const { seenIds } = useSeenClaims();
+    const pendingClaimsCount = pendingClaimIds.filter(id => !seenIds.has(id)).length;
 
     // Pastikan state isOpen ini ADA (ini yang bikin error tadi)
     const [isOpen, setIsOpen] = useState(false);
