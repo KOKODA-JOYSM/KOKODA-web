@@ -20,9 +20,10 @@ return new class extends Migration
         // Add the replacement non-unique index only if it doesn't already exist.
         // The unique index may serve as the backing index for the post_id FK, so
         // the non-unique index must exist BEFORE we drop the unique one.
-        $existingIndexes = collect(\DB::select("SHOW INDEX FROM claims"))
-            ->pluck('Key_name')
-            ->unique();
+        // Use the driver-agnostic schema inspector instead of raw `SHOW INDEX`
+        // (MySQL-only) so this migration also runs under SQLite (test suite).
+        $existingIndexes = collect(Schema::getIndexes('claims'))
+            ->pluck('name');
 
         if (! $existingIndexes->contains('claims_post_claimant_index')) {
             Schema::table('claims', function (Blueprint $table) {
@@ -41,9 +42,10 @@ return new class extends Migration
 
     public function down(): void
     {
-        $existingIndexes = collect(\DB::select("SHOW INDEX FROM claims"))
-            ->pluck('Key_name')
-            ->unique();
+        // Use the driver-agnostic schema inspector instead of raw `SHOW INDEX`
+        // (MySQL-only) so this migration also runs under SQLite (test suite).
+        $existingIndexes = collect(Schema::getIndexes('claims'))
+            ->pluck('name');
 
         if (! $existingIndexes->contains('claims_post_id_claimant_id_unique')) {
             Schema::table('claims', function (Blueprint $table) {
