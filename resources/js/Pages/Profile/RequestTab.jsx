@@ -119,7 +119,11 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
 
     const handleResolve = (claim) => {
         setSelectedClaim(null);
-        setResolvingClaim(claim);
+        // Only the item recipient rates the finder. The owner is the recipient
+        // only for lost posts; for found posts the claimant rates via chat.
+        if (claim?.post?.type === 'lost') {
+            setResolvingClaim(claim);
+        }
     };
 
     const handleReject = () => {
@@ -172,4 +176,41 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
                 : (sentClaims.length > 0
                     ? sentClaims.map((claim) => (
                         <ClaimCard
-                    
+                            key={claim.id}
+                            claim={claim}
+                            mode="sent"
+                            onClick={() => setSelectedSentClaim(claim)}
+                        />
+                    ))
+                    : <EmptyState message="You haven't sent any requests yet." />
+                )
+            }
+
+            {/* Incoming Request Modal */}
+            {selectedClaim && (
+                <IncomingRequestModal
+                    claim={selectedClaim}
+                    onClose={() => setSelectedClaim(null)}
+                    onResolve={handleResolve}
+                    onReject={handleReject}
+                />
+            )}
+
+            {/* Sent Request Modal */}
+            {selectedSentClaim && (
+                <SentRequestModal
+                    claim={selectedSentClaim}
+                    onClose={() => setSelectedSentClaim(null)}
+                />
+            )}
+
+            {/* Rate User Modal (after resolve) */}
+            {resolvingClaim && (
+                <RateUserModal
+                    claim={resolvingClaim}
+                    onClose={() => setResolvingClaim(null)}
+                />
+            )}
+        </div>
+    );
+}

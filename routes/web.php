@@ -34,8 +34,11 @@ Route::middleware('auth')->group(function () {
         // Hanya klaim yang masih menunggu keputusan ditampilkan di Incoming Request.
         // Setelah diresolve (completed) atau ditolak (rejected), klaim tidak lagi
         // muncul di sini — post yang resolved akan muncul di tab History.
+        // Show requests that are still in flight (pending or mid-handshake
+        // 'accepted'). Once 'completed'/'rejected' (or the post is resolved)
+        // they drop off here and move to History.
         $incomingClaims = \App\Models\Claim::where('owner_id', $user->id)
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'accepted'])
             ->whereHas('post', fn ($q) => $q->where('status', 'active'))
             ->with(['post', 'post.location', 'claimant'])
             ->orderByDesc('created_at')
@@ -103,6 +106,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/posts/{post}/claim-status', [ClaimController::class, 'getUserClaim'])->name('claims.status');
     Route::patch('/api/claims/{claim}/resolve', [ClaimController::class, 'resolve'])->name('claims.resolve');
     Route::patch('/api/claims/{claim}/reject', [ClaimController::class, 'reject'])->name('claims.reject');
+    Route::post('/api/claims/{claim}/follow-up', [ClaimController::class, 'followUp'])->name('claims.followup');
+    Route::post('/api/claims/{claim}/verify', [ClaimController::class, 'verify'])->name('claims.verify');
+    Route::post('/api/claims/{claim}/receive', [ClaimController::class, 'receive'])->name('claims.receive');
 
     // ─────────────────────────────────────────────────────────────
     // RATING ROUTES
@@ -118,4 +124,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/chat/conversations/{conversation}/messages', [ChatController::class, 'messages'])->name('chat.messages');
     Route::post('/chat/conversations/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('chat.send');
     Route::post('/chat/conversations/{conversation}/read', [ChatController::class, 'markAsRead'])->name('chat.read');
-    Route::post
+    Route::post('/chat/conversations/{conversation}/typing', [ChatController::class, 'typing'])->name('chat.typing');
+    Route::get('/chat/users/search', [ChatController::class, 'searchUsers'])->name('chat.users.search');
+});
+
+require __DIR__.'/auth.php';
+
+// Endpoint yang tidak dikenal / kosong diarahkan kembali ke home.
+Route::fallback(function () {
+    return redirect()->route('home');
+});

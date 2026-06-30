@@ -8,12 +8,14 @@ export default function RateUserModal({ claim, onClose }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const claimant = claim.claimant;
-    const username = claimant?.username || claimant?.name || 'this user';
+    // The person being rated is the item holder/finder. Fall back to the
+    // claimant for the legacy owner-resolve path (lost posts).
+    const ratee = claim.ratee || claim.claimant;
+    const username = ratee?.username || ratee?.name || 'this user';
 
-    const claimantAvatar = claimant?.profile_icon
-        ? ('/' + claimant.profile_icon)
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(claimant?.name || 'User')}&background=F4C799&color=311A05`;
+    const claimantAvatar = ratee?.profile_icon
+        ? ('/' + ratee.profile_icon)
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(ratee?.name || 'User')}&background=F4C799&color=311A05`;
 
     // Lock body scroll
     useEffect(() => {

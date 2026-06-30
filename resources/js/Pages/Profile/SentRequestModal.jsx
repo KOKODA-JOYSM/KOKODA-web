@@ -12,6 +12,12 @@ const statusPillConfig = {
         className: 'bg-secondary',
         Icon: CheckCircle2,
     },
+    // Set once the post owner has verified/received the item (handshake started).
+    accepted: {
+        label: 'Request Accepted',
+        className: 'bg-secondary',
+        Icon: CheckCircle2,
+    },
     rejected: {
         label: 'Request Rejected',
         className: 'bg-label-lost',
@@ -51,7 +57,12 @@ export default function SentRequestModal({ claim, onClose }) {
         return () => { document.body.style.overflow = ''; };
     }, []);
 
-    const handleChat = () => {
+    const handleChat = async () => {
+        try {
+            await window.axios.post(`/api/claims/${claim.id}/follow-up`);
+        } catch (e) {
+            // Non-fatal: still open the chat even if the card couldn't be posted.
+        }
         router.visit(`/chat?user=${claim.owner_id}`);
     };
 

@@ -58,7 +58,12 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
         }
     };
 
-    const handleChat = () => {
+    const handleChat = async () => {
+        try {
+            await window.axios.post(`/api/claims/${claim.id}/follow-up`);
+        } catch (e) {
+            // Non-fatal: still open the chat even if the card couldn't be posted.
+        }
         router.visit(`/chat?user=${claim.claimant_id}`);
     };
 
@@ -204,4 +209,16 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
                 </div>
             </div>
 
-            
+            <style>{`
+                @keyframes imFadeIn {
+                    from { opacity: 0; }
+                    to   { opacity: 1; }
+                }
+                @keyframes imSlideUp {
+                    from { opacity: 0; transform: translate(-50%, -48%); }
+                    to   { opacity: 1; transform: translate(-50%, -50%); }
+                }
+            `}</style>
+        </>
+    );
+}

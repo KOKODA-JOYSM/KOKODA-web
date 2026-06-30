@@ -32,4 +32,7 @@ export default function CurrentUserCard({ user }) {
                 <div className="font-quicksand font-bold text-tertiary text-lg">
                     {user.points} pts
                 </div>
-  
+        </div>
+    );
+}
+

@@ -7,6 +7,7 @@ import MessageList from '@/Components/Chat/MessageList';
 import MessageInput from '@/Components/Chat/MessageInput';
 import { useEcho, createTypingThrottle } from '@/hooks/useEcho';
 import { avatarUrl } from '@/Components/Common/Avatar';
+import RateUserModal from '@/Pages/Profile/RateUserModal';
 
 /**
  * Format timestamp ISO ke jam:menit lokal (id-ID).
@@ -94,6 +95,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
     const [userSearchResults, setUserSearchResults] = useState([]);
     const [sendingMessage, setSendingMessage] = useState(false);
     const [otherLastReadAt, setOtherLastReadAt] = useState(null);
+    const [ratingClaim, setRatingClaim] = useState(null);
 
     // Refs
     const typingThrottleRef = useRef(null);
@@ -595,6 +597,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
             body: msg.body,
             text: msg.body,
             type: msg.type || 'text',
+            meta: msg.meta || null,
             timestamp: formatTime(msg.created_at),
             created_at: msg.created_at,
             isOwn: msg.is_own ?? msg.user_id === authUser?.id,
@@ -673,6 +676,8 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                                     loading={loadingMessages}
                                     hasMore={hasMoreMessages}
                                     onLoadMore={handleLoadMore}
+                                    onRequestRating={setRatingClaim}
+                                    authUserId={authUser?.id}
                                 />
 
                                 <MessageInput
@@ -712,6 +717,13 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                     </section>
                 </div>
             </div>
+
+            {ratingClaim && (
+                <RateUserModal
+                    claim={ratingClaim}
+                    onClose={() => setRatingClaim(null)}
+                />
+            )}
         </AppLayout>
     );
 }

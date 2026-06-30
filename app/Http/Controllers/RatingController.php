@@ -21,10 +21,12 @@ class RatingController extends Controller
             'review_text' => 'nullable|string|max:500',
         ]);
 
-        $claim = Claim::findOrFail($validated['claim_id']);
+        $claim = Claim::with('post')->findOrFail($validated['claim_id']);
 
-        if ($request->user()->id !== $claim->owner_id) {
-            return response()->json(['error' => 'Unauthorized.'], 403);
+        // The item recipient (the person who lost it) rates the holder (the finder).
+        // This holds for both post types: lost-post owner / found-post claimant.
+        if ($request->user()->id !== $claim->recipientId()) {
+            return response()->json(['error' => 'Only the item recipient can rate.'], 403);
         }
 
         if ($claim->status !== 'completed') {
@@ -38,7 +40,7 @@ class RatingController extends Controller
         $rating = Rating::create([
             'claim_id'    => $claim->id,
             'rater_id'    => $request->user()->id,
-            'ratee_id'    => $claim->claimant_id,
+            'ratee_id'    => $claim->holderId(),
             'score'       => $validated['score'],
             'point'       => $validated['score'] * 2,
             'review_text' => $validated['review_text'] ?? null,
