@@ -97,3 +97,19 @@ jobs:
               -H "Authorization: Bearer $TOKEN" -H "If-Match: *" \
               "$SCM/api/vfs/site/wwwroot/bootstrap/cache/$f" || true
           done
+
+      # Run database migrations explicitly via the Kudu command API so new
+      # columns (e.g. messages.meta, claims.intro_message_sent) are guaranteed
+      # to exist before the first request hits the new code. startup.sh also
+      # runs `migrate --force`, but it executes during container restart which
+      # may race with this step; running it here ensures idempotent execution.
+      - name: Run Laravel migrations on App Service
+        run: |
+          TOKEN=$(az account get-access-token --resource https://management.core.windows.net/ --query accessToken -o tsv)
+          SCM="https://kokoda-dyg6f8dhgghbang2.scm.southeastasia-01.azurewebsites.net"
+          echo "Running php artisan migrate --force"
+          curl -sS -w "\n  HTTP %{http_code}\n" -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            --data-binary '{"command":"php artisan migrate --force","dir":"/home/site/wwwroot"}' \
+            "$SCM/api/command"
