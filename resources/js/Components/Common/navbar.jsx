@@ -76,7 +76,7 @@ export default function Navbar() {
                     <img
                         src="/images/LogoKokoda.svg"
                         alt="KOKODA Logo"
-                        className="w-32 h-10 sm:w-40 sm:h-12 lg:w-48 lg:h-16 xl:w-56 xl:h-[72px] object-contain"
+                        className="brightness-0 w-32 h-10 sm:w-40 sm:h-12 lg:w-48 lg:h-16 xl:w-56 xl:h-[72px] object-contain"
                     />
                 </div>
 
@@ -85,7 +85,7 @@ export default function Navbar() {
 
                 {/* NAV LINKS */}
                 <nav className="w-full flex-1 overflow-y-auto no-scrollbar min-h-0">
-                    <ul className="list-none m-0 p-0 flex flex-col gap-1 sm:gap-1.5 w-full">
+                    <ul className="list-none m-0 pt-0 pb-0 pl-0 pr-1 flex flex-col gap-1 sm:gap-1.5 w-full">
                         {NAV_ITEMS.map((item) => {
                             // Chat requires authentication
                             const requiresAuth = item.label === 'Chat';
@@ -97,7 +97,7 @@ export default function Navbar() {
                                         href={needsLogin ? '/login' : item.href}
                                         className={`flex items-center gap-3 sm:gap-3.5
                                         py-2 px-3 sm:py-2.5 sm:px-3.5 lg:py-3 lg:px-4
-                                        rounded-xl cursor-pointer no-underline text-[#FEFEFE] font-quicksand
+                                        rounded-xl cursor-pointer no-underline text-tertiary font-quicksand
                                         text-base sm:text-lg lg:text-xl font-semibold border-2 transition-all duration-200 select-none w-full box-border hover:translate-x-1 group ${isActive(item) ? 'border-secondary' : 'border-transparent'}`}
                                         aria-current={isActive(item) ? 'page' : undefined}
                                         onClick={closeMenu}
@@ -105,7 +105,7 @@ export default function Navbar() {
                                         <img
                                             src={item.icon}
                                             alt={`${item.label} icon`}
-                                            className="brightness-0 invert w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 object-contain shrink-0 transition-transform duration-200 group-hover:scale-110"
+                                            className="brightness-0 w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 object-contain shrink-0 transition-transform duration-200 group-hover:scale-110"
                                         />
                                         <div className="flex items-center justify-between flex-1">
                                             <span>{item.label}</span>
@@ -159,15 +159,15 @@ export default function Navbar() {
                         <div className="flex flex-col gap-0.5 overflow-hidden min-w-0">
                             {user ? (
                                 <>
-                                    <p className="text-base font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
+                                    <p className="text-tertiary font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
                                         {user.name}
                                     </p>
-                                    <p className="text-base font-quicksand text-xs font-normal m-0 whitespace-nowrap overflow-hidden text-ellipsis opacity-75">
+                                    <p className="text-tertiary font-quicksand text-xs font-normal m-0 whitespace-nowrap overflow-hidden text-ellipsis opacity-75">
                                         @ {user.email}
                                     </p>
                                 </>
                             ) : (
-                                <p className="text-base font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
+                                <p className="text-tertiary font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
                                     Log in
                                 </p>
                             )}

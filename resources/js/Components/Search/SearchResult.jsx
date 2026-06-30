@@ -15,7 +15,7 @@ export default function SearchResult({ items, onItemClick }) {
             {items.map((item) => (
                 <div key={item.id}
                     onClick={() => onItemClick && onItemClick(item)}
-                    className="bg-secondary rounded-[20px] shadow-md hover:shadow-lg transition-all cursor-pointer p-3 flex flex-col md:flex-row gap-3"
+                    className="bg-secondary rounded-[20px] shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 ease-out cursor-pointer p-3 flex flex-col md:flex-row gap-3"
                 >
                     {/* Image Section */}
                     <div className="w-full md:w-44 h-44 bg-gray-200 rounded-xl overflow-hidden flex-shrink-0">
