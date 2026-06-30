@@ -15,9 +15,16 @@ import RequestModal from './RequestModal';
 export default function PostActionButtons({ post, variant = 'default' }) {
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [claimStatus, setClaimStatus] = useState(null); // null | 'pending' | 'accepted' | 'rejected' | 'completed'
+    const [claimId, setClaimId] = useState(null);
     const [loadingStatus, setLoadingStatus] = useState(true);
+    const [chatLoading, setChatLoading] = useState(false);
 
     const isFounded = post.type === 'found';
+    const postResolved = post.status === 'resolved';
+    // A request still in flight blocks re-requesting; completed/rejected does not.
+    const activeClaim = claimStatus === 'pending' || claimStatus === 'accepted';
+    const showBadge = !!claimStatus && (activeClaim || postResolved);
+    const disableRequest = loadingStatus || activeClaim || postResolved;
 
     // Fetch claim status on mount
     useEffect(() => {
@@ -30,12 +37,15 @@ export default function PostActionButtons({ post, variant = 'default' }) {
             const response = await window.axios.get(`/api/posts/${post.id}/claim-status`);
             if (response.data.has_claim) {
                 setClaimStatus(response.data.claim.status);
+                setClaimId(response.data.claim.id);
             } else {
                 setClaimStatus(null);
+                setClaimId(null);
             }
         } catch (error) {
             console.error('Failed to fetch claim status:', error);
             setClaimStatus(null);
+            setClaimId(null);
         } finally {
             setLoadingStatus(false);
         }
@@ -43,10 +53,21 @@ export default function PostActionButtons({ post, variant = 'default' }) {
 
     const handleRequestSuccess = (claim) => {
         setClaimStatus(claim.status);
+        setClaimId(claim.id);
     };
 
-    const handleChat = () => {
-        // Navigate to chat page with the post owner using Inertia
+    const handleChat = async () => {
+        // If the user has a request for this post, drop the handshake cards into
+        // the conversation first so the templates also appear when chatting
+        // straight from a post (home/search), not only via the request tabs.
+        setChatLoading(true);
+        try {
+            if (claimId) {
+                await window.axios.post(`/api/claims/${claimId}/follow-up`);
+            }
+        } catch (e) {
+            // Non-fatal: open the chat regardless.
+        }
         router.visit(`/chat?user=${post.user_id}`);
     };
 
@@ -98,8 +119,8 @@ export default function PostActionButtons({ post, variant = 'default' }) {
                 className={`flex flex-col gap-3 w-full ${isCompact ? '' : 'mt-2'}`}
                 style={{ animation: 'pabFadeInUp 0.35s ease' }}
             >
-                {/* Status Badge (if already claimed) */}
-                {claimStatus && statusConfig[claimStatus] && (
+                {/* Status Badge (only while a claim is active or the post is resolved) */}
+                {showBadge && statusConfig[claimStatus] && (
                     <div
                         className={`flex items-center gap-3 ${statusConfig[claimStatus].bgColor} ${statusConfig[claimStatus].borderColor} border rounded-xl px-4 py-3`}
                         style={{ animation: 'pabFadeInUp 0.3s ease' }}
@@ -124,13 +145,13 @@ export default function PostActionButtons({ post, variant = 'default' }) {
                     {/* Request Button */}
                     <button
                         onClick={() => setShowRequestModal(true)}
-                        disabled={loadingStatus || !!claimStatus}
+                        disabled={disableRequest}
                         className={`
                             flex-1 flex items-center justify-center gap-2.5
                             ${isCompact ? 'px-4 py-2.5' : 'px-5 py-3.5'}
                             rounded-xl font-quicksand font-semibold
                             transition-all duration-200
-                            ${claimStatus
+                            ${disableRequest && !loadingStatus
                                 ? 'bg-gray-100 text-gray-400 border-2 border-gray-200 cursor-not-allowed'
                                 : 'bg-secondary text-white shadow-md hover:opacity-90 hover:shadow-lg active:scale-[0.97] cursor-pointer'
                             }
@@ -143,17 +164,20 @@ export default function PostActionButtons({ post, variant = 'default' }) {
                             <HandHelping size={isCompact ? 16 : 18} />
                         )}
                         <span>
-                            {claimStatus
-                                ? 'Already Requested'
-                                : isFounded
-                                    ? 'This is Mine'
-                                    : 'I Found This'}
+                            {postResolved
+                                ? 'Already Resolved'
+                                : activeClaim
+                                    ? 'Already Requested'
+                                    : isFounded
+                                        ? 'This is Mine'
+                                        : 'I Found This'}
                         </span>
                     </button>
 
                     {/* Chat Button */}
                     <button
                         onClick={handleChat}
+                        disabled={chatLoading}
                         className={`
                             flex-1 flex items-center justify-center gap-2.5
                             ${isCompact ? 'px-4 py-2.5' : 'px-5 py-3.5'}
@@ -161,11 +185,15 @@ export default function PostActionButtons({ post, variant = 'default' }) {
                             border-2 border-primary text-tertiary
                             transition-all duration-200
                             hover:bg-primary hover:text-white hover:shadow-md
-                            active:scale-[0.97] cursor-pointer
+                            active:scale-[0.97] cursor-pointer disabled:opacity-60
                             ${isCompact ? 'text-sm' : 'text-base'}
                         `}
                     >
-                        <MessageSquare size={isCompact ? 16 : 18} />
+                        {chatLoading ? (
+                            <Loader2 size={isCompact ? 16 : 18} className="animate-spin" />
+                        ) : (
+                            <MessageSquare size={isCompact ? 16 : 18} />
+                        )}
                         <span>Chat Now</span>
                     </button>
                 </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { avatarUrl } from '@/Components/Common/Avatar';
+import RequestCardMessage from '@/Components/Chat/RequestCardMessage';
 
 /**
  * Generate avatar URL dari data sender.
@@ -146,7 +147,17 @@ function BubbleTextContent({ message, isOwn, isSending }) {
     );
 }
 
-export default function MessageBubble({ message }) {
+export default function MessageBubble({ message, onRequestRating, authUserId }) {
+    if (message.type === 'card') {
+        return (
+            <RequestCardMessage
+                message={message}
+                onRequestRating={onRequestRating}
+                authUserId={authUserId}
+            />
+        );
+    }
+
     if (message.type === 'day-divider') {
         return (
             <div className="flex justify-center py-2">

@@ -307,6 +307,7 @@ class ChatController extends Controller
             'user_id' => $message->user_id,
             'body' => $message->body,
             'type' => $message->type,
+            'meta' => $this->cardMetaWithLiveStatus($message),
             'is_own' => $isOwn,
             'is_read' => $isRead,
             'created_at' => $message->created_at->toISOString(),
@@ -317,6 +318,33 @@ class ChatController extends Controller
                 'profile_icon' => $message->sender->profile_icon,
             ],
         ];
+    }
+
+    /**
+     * For card messages, overlay the claim's CURRENT status so the card
+     * reflects live handshake progress instead of a creation-time snapshot.
+     * Cached per-request to avoid N+1 across a page of messages.
+     *
+     * @var array<int,string|null>
+     */
+    private array $cardClaimStatusCache = [];
+
+    private function cardMetaWithLiveStatus(Message $message): ?array
+    {
+        $meta = $message->meta;
+
+        if ($message->type !== 'card' || ! is_array($meta) || ! isset($meta['claim_id'])) {
+            return $meta;
+        }
+
+        $claimId = (int) $meta['claim_id'];
+        if (! array_key_exists($claimId, $this->cardClaimStatusCache)) {
+            $this->cardClaimStatusCache[$claimId] = \App\Models\Claim::whereKey($claimId)->value('status');
+        }
+
+        $meta['claim_status'] = $this->cardClaimStatusCache[$claimId] ?? ($meta['claim_status'] ?? 'pending');
+
+        return $meta;
     }
 
     /**
