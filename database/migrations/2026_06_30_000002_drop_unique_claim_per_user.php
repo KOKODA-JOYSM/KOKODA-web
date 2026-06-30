@@ -17,23 +17,44 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('claims', function (Blueprint $table) {
-            $table->index(['post_id', 'claimant_id'], 'claims_post_claimant_index');
-        });
+        // Add the replacement non-unique index only if it doesn't already exist.
+        // The unique index may serve as the backing index for the post_id FK, so
+        // the non-unique index must exist BEFORE we drop the unique one.
+        $existingIndexes = collect(\DB::select("SHOW INDEX FROM claims"))
+            ->pluck('Key_name')
+            ->unique();
 
-        Schema::table('claims', function (Blueprint $table) {
-            $table->dropUnique('claims_post_id_claimant_id_unique');
-        });
+        if (! $existingIndexes->contains('claims_post_claimant_index')) {
+            Schema::table('claims', function (Blueprint $table) {
+                $table->index(['post_id', 'claimant_id'], 'claims_post_claimant_index');
+            });
+        }
+
+        // Drop the unique constraint only if it still exists (Azure MySQL may
+        // already have a different name or the migration may have partially run).
+        if ($existingIndexes->contains('claims_post_id_claimant_id_unique')) {
+            Schema::table('claims', function (Blueprint $table) {
+                $table->dropUnique('claims_post_id_claimant_id_unique');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('claims', function (Blueprint $table) {
-            $table->unique(['post_id', 'claimant_id'], 'claims_post_id_claimant_id_unique');
-        });
+        $existingIndexes = collect(\DB::select("SHOW INDEX FROM claims"))
+            ->pluck('Key_name')
+            ->unique();
 
-        Schema::table('claims', function (Blueprint $table) {
-            $table->dropIndex('claims_post_claimant_index');
-        });
+        if (! $existingIndexes->contains('claims_post_id_claimant_id_unique')) {
+            Schema::table('claims', function (Blueprint $table) {
+                $table->unique(['post_id', 'claimant_id'], 'claims_post_id_claimant_id_unique');
+            });
+        }
+
+        if ($existingIndexes->contains('claims_post_claimant_index')) {
+            Schema::table('claims', function (Blueprint $table) {
+                $table->dropIndex('claims_post_claimant_index');
+            });
+        }
     }
 };

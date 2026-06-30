@@ -66,11 +66,12 @@ php artisan storage:link --force
 #    tersimpan ke DB Azure (bukan ke file SQLite ephemeral bawaan repo).
 php artisan migrate --force
 
-# 6) Cache config & view untuk performa production. Startup script berjalan
-#    ulang setiap deploy/restart, jadi cache selalu segar setelah perubahan
-#    Application Settings di portal.
+# 6) Cache config, routes & view untuk performa production. Startup script
+#    berjalan ulang setiap deploy/restart, jadi cache selalu segar setelah
+#    perubahan Application Settings di portal.
 php artisan config:clear
 php artisan config:cache
+php artisan route:cache
 php artisan view:cache
 
 # 7) Start Laravel Reverb WebSocket server sebagai background process.
