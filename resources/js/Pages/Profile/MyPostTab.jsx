@@ -103,11 +103,11 @@ export default function MyPostTab({ posts }) {
 
                                 {/* Lokasi */}
                                 {item.location && (
-                                    <div className="inline-flex items-center gap-1.5 bg-tertiary/10 text-tertiary text-xs font-semibold px-3 py-1 rounded-full mb-2">
+                                    <div className="flex items-center gap-1.5 bg-tertiary/10 text-tertiary text-xs font-semibold px-3 py-1 rounded-full mb-2 max-w-full overflow-hidden">
                                         <svg className="w-3 h-3 fill-current shrink-0" viewBox="0 0 24 24">
                                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                                         </svg>
-                                        <span>{typeof item.location === 'object' ? item.location?.place_name : item.location}</span>
+                                        <span className="truncate">{typeof item.location === 'object' ? item.location?.place_name : item.location}</span>
                                     </div>
                                 )}
 
