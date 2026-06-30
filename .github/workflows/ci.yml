@@ -88,7 +88,10 @@ jobs:
           node-version: '20'
           cache: npm
 
+      # Use `npm install` (not `npm ci`) to mirror main_kokoda.yml exactly:
+      # build-check must predict the CD outcome, not enforce lock-file hygiene
+      # (that is the `ci` job's responsibility, which intentionally uses `npm ci`).
       - name: Build frontend assets
         run: |
-          npm ci
+          npm install
           npm run build
