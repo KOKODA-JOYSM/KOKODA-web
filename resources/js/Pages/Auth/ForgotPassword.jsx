@@ -1,8 +1,10 @@
 import InputError from '@/Components/Auth/InputError';
 import TextInput from '@/Components/Auth/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ForgotPassword({ status }) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         email: '',
     });
@@ -34,10 +36,10 @@ export default function ForgotPassword({ status }) {
                                     <img src="/images/logo-kokoda-black.svg" alt="KOKODA logo" className="h-14 w-auto" />
                             </div>
                             <h1 className="text-[2.87rem] font-bold leading-tight text-secondary" style={{ textShadow: '3.2px 3.2px 0.8px rgba(0, 0, 0, 0.5)' }}>
-                                Forgot Password
+                                {t('auth.forgotPasswordTitle')}
                             </h1>
                             <p className="mt-2 text-center text-base text-secondary/90">
-                                Enter your email and we will send a reset link to help you create a new password.
+                                {t('auth.forgotPasswordDesc')}
                             </p>
                         </div>
 
@@ -57,7 +59,7 @@ export default function ForgotPassword({ status }) {
                                     className="block w-full rounded-lg border-secondary bg-base px-4 py-3 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                                     isFocused={true}
                                     autoComplete="username"
-                                    placeholder="Email address"
+                                    placeholder={t('auth.emailAddressPlaceholder')}
                                     onChange={(e) => setData('email', e.target.value)}
                                 />
 
@@ -69,14 +71,14 @@ export default function ForgotPassword({ status }) {
                                 disabled={processing}
                                 className="mt-3 w-full rounded-lg bg-secondary px-4 py-3 text-base font-bold uppercase tracking-wide text-background transition hover:bg-tertiary hover:text-background disabled:cursor-not-allowed disabled:opacity-60"
                             >
-                                {processing ? 'Sending...' : 'Email Password Reset Link'}
+                                {processing ? t('auth.sending') : t('auth.emailResetLink')}
                             </button>
                         </form>
 
                         <p className="mt-7 text-center text-base text-tertiary">
-                            Back to{' '}
+                            {t('auth.backTo')}{' '}
                             <Link href={route('login')} className="font-semibold text-secondary underline underline-offset-2 hover:text-tertiary">
-                                Log in
+                                {t('auth.login')}
                             </Link>
                         </p>
                     </div>

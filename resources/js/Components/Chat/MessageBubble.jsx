@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { avatarUrl } from '@/Components/Common/Avatar';
 import RequestCardMessage from '@/Components/Chat/RequestCardMessage';
+import { useTranslation } from '@/hooks/useTranslation';
 
 /**
  * Generate avatar URL dari data sender.
@@ -152,6 +153,7 @@ function BubbleTextContent({ message, isOwn, isSending }) {
  * a subtle border, rounded corners, and a lightbox on click.
  */
 function BubbleImageContent({ message, isOwn, isSending }) {
+    const { t } = useTranslation();
     const [showLightbox, setShowLightbox] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -173,7 +175,7 @@ function BubbleImageContent({ message, isOwn, isSending }) {
                     )}
                     <img
                         src={imageUrl}
-                        alt="Chat image"
+                        alt={t('chat.chatImage')}
                         className={`max-h-[280px] min-h-[120px] w-auto min-w-[140px] max-w-[240px] object-cover transition-opacity duration-300 md:max-h-[320px] md:max-w-[280px] ${
                             imageLoaded ? 'opacity-100' : 'h-0 w-0 opacity-0'
                         }`}
@@ -226,7 +228,7 @@ function BubbleImageContent({ message, isOwn, isSending }) {
                         type="button"
                         className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/30"
                         onClick={() => setShowLightbox(false)}
-                        aria-label="Close"
+                        aria-label={t('post.close')}
                     >
                         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -234,7 +236,7 @@ function BubbleImageContent({ message, isOwn, isSending }) {
                     </button>
                     <img
                         src={imageUrl}
-                        alt="Full size"
+                        alt={t('chat.fullSize')}
                         className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
                         onClick={(e) => e.stopPropagation()}
                     />
@@ -245,6 +247,7 @@ function BubbleImageContent({ message, isOwn, isSending }) {
 }
 
 export default function MessageBubble({ message, onRequestRating, authUserId }) {
+    const { t } = useTranslation();
     if (message.type === 'card') {
         return (
             <RequestCardMessage
@@ -303,7 +306,7 @@ export default function MessageBubble({ message, onRequestRating, authUserId }) 
             <div className="mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-full bg-base ring-2 ring-[#F7D8B0] md:h-9 md:w-9">
                 <img
                     src={getSenderAvatar(message)}
-                    alt={message.senderName || 'User'}
+                    alt={message.senderName || t('chat.userFallback')}
                     className="h-full w-full object-cover"
                 />
             </div>

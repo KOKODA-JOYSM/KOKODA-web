@@ -1,7 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { Image as ImageIcon, Send, X } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function MessageInput({ value, onChange, onSend, onSendImage, disabled = false }) {
+    const { t } = useTranslation();
     const fileInputRef = useRef(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
@@ -24,13 +26,13 @@ export default function MessageInput({ value, onChange, onSend, onSendImage, dis
         // Validate file type
         const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         if (!validTypes.includes(file.type)) {
-            alert('Format file tidak didukung. Gunakan JPEG, PNG, GIF, atau WebP.');
+            alert(t('chat.unsupportedFileFormat'));
             return;
         }
 
         // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
-            alert('Ukuran file terlalu besar. Maksimal 5MB.');
+            alert(t('chat.fileTooLarge'));
             return;
         }
 
@@ -82,7 +84,7 @@ export default function MessageInput({ value, onChange, onSend, onSendImage, dis
                         <div className="overflow-hidden rounded-xl border-2 border-secondary/40 bg-base shadow-md">
                             <img
                                 src={imagePreview}
-                                alt="Preview"
+                                alt={t('chat.previewAlt')}
                                 className="h-24 w-24 object-cover md:h-28 md:w-28"
                             />
                         </div>
@@ -90,14 +92,14 @@ export default function MessageInput({ value, onChange, onSend, onSendImage, dis
                             type="button"
                             onClick={handleCancelPreview}
                             className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-transform hover:scale-110"
-                            aria-label="Cancel image"
+                            aria-label={t('chat.cancelImage')}
                         >
                             <X className="h-3.5 w-3.5" />
                         </button>
                     </div>
                     <div className="flex flex-col justify-center pt-2">
                         <p className="font-roboto text-[12px] font-medium text-tertiary/70">
-                            Ready to send
+                            {t('chat.readyToSend')}
                         </p>
                         <p className="font-roboto text-[11px] text-tertiary/40">
                             {(selectedFile.size / 1024).toFixed(0)} KB • {selectedFile.name}
@@ -121,7 +123,7 @@ export default function MessageInput({ value, onChange, onSend, onSendImage, dis
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-secondary/45 text-tertiary/70 transition-colors hover:bg-primary/50"
-                    aria-label="Attach image"
+                    aria-label={t('chat.attachImage')}
                     disabled={disabled}
                 >
                     <ImageIcon className="h-4 w-4" />
@@ -132,7 +134,7 @@ export default function MessageInput({ value, onChange, onSend, onSendImage, dis
                     value={value}
                     onChange={(event) => onChange(event.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={selectedFile ? 'Press Enter to send image...' : 'Type a message...'}
+                    placeholder={selectedFile ? t('chat.pressEnterToSendImage') : t('chat.typeMessage')}
                     disabled={disabled}
                     className="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 font-roboto text-[13px] text-tertiary placeholder:text-tertiary/35 focus:outline-none focus:ring-0 md:text-[14px] disabled:opacity-50"
                 />
@@ -141,7 +143,7 @@ export default function MessageInput({ value, onChange, onSend, onSendImage, dis
                     type="button"
                     onClick={handleSendClick}
                     className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary text-tertiary transition-transform hover:scale-105 hover:bg-secondary/70 disabled:cursor-not-allowed disabled:opacity-50"
-                    aria-label="Send message"
+                    aria-label={t('chat.sendMessage')}
                     disabled={!canSend || disabled}
                 >
                     <Send className="h-4 w-4" />

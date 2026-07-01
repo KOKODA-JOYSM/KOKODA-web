@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 /**
  * RequestModal — Confirmation modal for submitting a claim/request on a post.
@@ -10,6 +11,7 @@ import { X, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
  * - onSuccess: callback after claim succeeds (receives claim data)
  */
 export default function RequestModal({ post, onClose, onSuccess }) {
+    const { t } = useTranslation();
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState('idle'); // idle | success | error
@@ -46,7 +48,7 @@ export default function RequestModal({ post, onClose, onSuccess }) {
             setStatus('error');
             const msg =
                 error.response?.data?.error ||
-                'An error occurred while sending your request. Please try again.';
+                t('post.requestErrorRetry');
             setErrorMessage(msg);
         } finally {
             setLoading(false);
@@ -77,7 +79,7 @@ export default function RequestModal({ post, onClose, onSuccess }) {
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200/60">
                     <h3 className="font-quicksand font-bold text-tertiary text-lg">
-                        {isFounded ? '📦 Claim This Item' : '🔍 Submit a Request'}
+                        {isFounded ? `📦 ${t('post.claimThisItem')}` : `🔍 ${t('post.submitRequest')}`}
                     </h3>
                     <button
                         onClick={onClose}
@@ -96,10 +98,10 @@ export default function RequestModal({ post, onClose, onSuccess }) {
                                 <CheckCircle size={32} className="text-green-500" />
                             </div>
                             <p className="font-quicksand font-bold text-tertiary text-lg mb-1">
-                                Request Sent!
+                                {t('post.requestSentBang')}
                             </p>
                             <p className="font-quicksand text-sm text-gray-500 text-center">
-                                The post owner will be notified about your request.
+                                {t('post.ownerWillBeNotified')}
                             </p>
                         </div>
                     ) : (
@@ -114,7 +116,7 @@ export default function RequestModal({ post, onClose, onSuccess }) {
                                         {post.title}
                                     </p>
                                     <p className="font-quicksand text-xs text-gray-500">
-                                        Posted by @{post.user?.username || post.user?.name || 'unknown'}
+                                        {t('post.postedBy')} @{post.user?.username || post.user?.name || t('profile.unknown')}
                                     </p>
                                 </div>
                             </div>
@@ -122,15 +124,15 @@ export default function RequestModal({ post, onClose, onSuccess }) {
                             {/* Message Input */}
                             <div className="mb-5">
                                 <label className="block font-quicksand font-semibold text-sm text-tertiary mb-2">
-                                    Message (optional)
+                                    {t('post.messageOptional')}
                                 </label>
                                 <textarea
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     placeholder={
                                         isFounded
-                                            ? 'Explain why you believe this is yours...'
-                                            : 'Describe the item you found...'
+                                            ? t('post.explainWhyYours')
+                                            : t('post.describeItemFound')
                                     }
                                     maxLength={1000}
                                     rows={4}
@@ -163,7 +165,7 @@ export default function RequestModal({ post, onClose, onSuccess }) {
                             disabled={loading}
                             className="flex-1 px-4 py-3 rounded-xl border-2 border-primary text-sm font-quicksand font-semibold text-gray-500 hover:bg-red-200 hover:border-primary transition-all duration-200 disabled:opacity-50"
                         >
-                            Cancel
+                            {t('profile.cancel')}
                         </button>
                         <button
                             onClick={handleSubmit}
@@ -173,12 +175,12 @@ export default function RequestModal({ post, onClose, onSuccess }) {
                             {loading ? (
                                 <>
                                     <Loader2 size={16} className="animate-spin" />
-                                    Sending...
+                                    {t('auth.sending')}
                                 </>
                             ) : (
                                 <>
                                     <Send size={16} />
-                                    Send Request
+                                    {t('post.sendRequest')}
                                 </>
                             )}
                         </button>

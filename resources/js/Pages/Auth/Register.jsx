@@ -2,8 +2,10 @@ import InputError from '@/Components/Auth/InputError';
 import TextInput from '@/Components/Auth/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Register({ previousName = '', previousEmail = '' }) {
+    const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -43,7 +45,7 @@ export default function Register({ previousName = '', previousEmail = '' }) {
                                     <img src="/images/logo-kokoda-black.svg" alt="KOKODA logo" className="h-14 w-auto" />
                             </div>
                             <h1 className="text-[2.87rem] font-bold leading-tight text-secondary" style={{ textShadow: '3.2px 3.2px 0.8px rgba(0, 0, 0, 0.5)' }}>
-                                Create Account
+                                {t('auth.createAccount')}
                             </h1>
                         </div>
 
@@ -56,7 +58,7 @@ export default function Register({ previousName = '', previousEmail = '' }) {
                                     className="block w-full rounded-lg border-secondary bg-base px-4 py-3 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                                     autoComplete="name"
                                     isFocused={true}
-                                    placeholder="Username"
+                                    placeholder={t('profile.username')}
                                     onChange={(e) => setData('name', e.target.value)}
                                     required
                                 />
@@ -71,7 +73,7 @@ export default function Register({ previousName = '', previousEmail = '' }) {
                                     value={data.email}
                                     className="block w-full rounded-lg border-secondary bg-base px-4 py-3 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                                     autoComplete="username"
-                                    placeholder="Email address"
+                                    placeholder={t('auth.emailAddressPlaceholder')}
                                     onChange={(e) => setData('email', e.target.value)}
                                     required
                                 />
@@ -87,13 +89,13 @@ export default function Register({ previousName = '', previousEmail = '' }) {
                                         value={data.password}
                                         className="block w-full rounded-lg border-secondary bg-base px-4 py-3 pr-12 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                                         autoComplete="new-password"
-                                        placeholder="Password"
+                                        placeholder={t('auth.password')}
                                         onChange={(e) => setData('password', e.target.value)}
                                         required
                                     />
                                     <button
                                         type="button"
-                                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                        aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                                         onClick={() => setShowPassword((prev) => !prev)}
                                         className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-text-field transition hover:text-tertiary"
                                     >
@@ -115,13 +117,13 @@ export default function Register({ previousName = '', previousEmail = '' }) {
                                         value={data.password_confirmation}
                                         className="block w-full rounded-lg border-secondary bg-base px-4 py-3 pr-12 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                                         autoComplete="new-password"
-                                        placeholder="Confirm Password"
+                                        placeholder={t('auth.confirmPassword')}
                                         onChange={(e) => setData('password_confirmation', e.target.value)}
                                         required
                                     />
                                     <button
                                         type="button"
-                                        aria-label={showConfirmPassword ? 'Hide password confirmation' : 'Show password confirmation'}
+                                        aria-label={showConfirmPassword ? t('auth.hidePasswordConfirm') : t('auth.showPasswordConfirm')}
                                         onClick={() => setShowConfirmPassword((prev) => !prev)}
                                         className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-text-field transition hover:text-tertiary"
                                     >
@@ -139,7 +141,7 @@ export default function Register({ previousName = '', previousEmail = '' }) {
                                 disabled={processing}
                                 className="mt-3 w-full rounded-lg bg-secondary px-4 py-3 text-base font-bold uppercase tracking-wide text-background transition hover:bg-tertiary hover:text-background disabled:cursor-not-allowed disabled:opacity-60"
                             >
-                                {processing ? 'Signing up...' : 'Sign up'}
+                                {processing ? t('auth.signingUp') : t('auth.signUp')}
                             </button>
                         </form>
 
@@ -150,13 +152,13 @@ export default function Register({ previousName = '', previousEmail = '' }) {
                             className="flex w-full items-center justify-center gap-3 rounded-lg border border-secondary/60 bg-base px-4 py-3 font-semibold text-gray-text-field shadow-sm transition hover:bg-background"
                         >
                             <span className="text-xl leading-none text-[#DB4437]">G</span>
-                            Sign in with Google
+                            {t('auth.signInWithGoogle')}
                         </button>
 
                         <p className="mt-7 text-center text-base text-tertiary">
-                            Already have account?{' '}
+                            {t('auth.alreadyHaveAccount')}{' '}
                             <Link href={route('login')} className="font-semibold text-secondary underline underline-offset-2 hover:text-tertiary">
-                                Log in
+                                {t('auth.login')}
                             </Link>
                         </p>
                     </div>

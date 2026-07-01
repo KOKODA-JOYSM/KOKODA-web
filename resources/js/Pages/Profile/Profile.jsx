@@ -5,8 +5,10 @@ import TabNavigation from './TabNavigation';
 import RequestTab from './RequestTab';
 import MyPostTab from './MyPostTab';
 import HistoryTab from './HistoryTab';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Profile({ posts, incomingClaims = [], sentClaims = [], status }) {
+    const { t } = useTranslation();
     // 1. Ambil data user yang sedang login langsung dari backend (database)
     const { auth } = usePage().props;
     const user = auth.user;
@@ -83,7 +85,7 @@ export default function Profile({ posts, incomingClaims = [], sentClaims = [], s
                                         <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
                                         </svg>
-                                        <span>{userPoints} Points</span>
+                                        <span>{userPoints} {t('profile.points')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -95,7 +97,7 @@ export default function Profile({ posts, incomingClaims = [], sentClaims = [], s
                             <Link
                                 href="/profile/edit"
                                 className="w-10 h-10 rounded-full bg-base hover:bg-gray-100 flex items-center justify-center text-secondary shadow transition-all duration-200"
-                                title="Edit Profile"
+                                title={t('profile.editProfile')}
                             >
                                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
@@ -112,7 +114,7 @@ export default function Profile({ posts, incomingClaims = [], sentClaims = [], s
                                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                                     <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
                                 </svg>
-                                <span>Logout</span>
+                                <span>{t('profile.logout')}</span>
                             </Link>
                         </div>
                     </div>

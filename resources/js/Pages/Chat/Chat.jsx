@@ -789,7 +789,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
             conversation_id: msg.conversation_id,
             user_id: msg.user_id,
             senderId: msg.user_id,
-            senderName: msg.sender?.name || 'Unknown',
+            senderName: msg.sender?.name || t('profile.unknown'),
             senderAvatar: getAvatarUrl(msg.sender),
             body: msg.body,
             text: msg.body,
@@ -806,11 +806,11 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
 
     // Transform conversations untuk komponen ConversationList
     const transformedConversations = conversations.map((conv) => {
-        let lastMessage = 'Belum ada pesan';
+        let lastMessage = t('chat.noMessagesYet');
         if (conv.last_message) {
             if (conv.last_message.type === 'image') {
                 const body = conv.last_message.body;
-                lastMessage = body && body !== '📷 Image' ? `📷 ${body}` : '📷 Image';
+                lastMessage = body && body !== '📷 Image' ? `📷 ${body}` : `📷 ${t('chat.image')}`;
                 if (lastMessage.length > 35) lastMessage = lastMessage.substring(0, 35) + '...';
             } else if (conv.last_message.body?.length > 35) {
                 lastMessage = conv.last_message.body.substring(0, 35) + '...';
@@ -821,7 +821,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
 
         return {
             id: conv.id,
-            name: conv.other_user?.name || 'Unknown User',
+            name: conv.other_user?.name || t('chat.unknownUser'),
             avatar: getAvatarUrl(conv.other_user),
             lastMessage,
             timestamp: conv.last_message
@@ -924,10 +924,10 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                                         </svg>
                                     </div>
                                     <p className="font-quicksand text-lg font-semibold text-tertiary/60">
-                                        Select a conversation to start chatting
+                                        {t('chat.selectConversationToStart')}
                                     </p>
                                     <p className="mt-1 font-roboto text-sm text-tertiary/40">
-                                        or search for a new user in the chat list
+                                        {t('chat.orSearchNewUser')}
                                     </p>
                                 </div>
                             </div>

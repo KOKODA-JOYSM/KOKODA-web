@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { X } from 'lucide-react';
 import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function CreatePostModal({ onClose }) {
+    const { t } = useTranslation();
     const [preview, setPreview] = useState(null);
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
@@ -90,7 +92,7 @@ export default function CreatePostModal({ onClose }) {
                 {/* Header */}
                 <div className="flex justify-between items-center py-10 md:py-14 border-b border-secondary sticky top-0 bg-base mb-4 z-10">
                     <h2 className="absolute left-1/2 transform -translate-x-1/2 font-quicksand text-2xl md:text-3xl font-bold text-tertiary m-0">
-                        Create Post
+                        {t('post.createPost')}
                     </h2>
                     <button
                         onClick={onClose}
@@ -109,14 +111,14 @@ export default function CreatePostModal({ onClose }) {
                             ⚠️
                         </div>
                         <p className="m-0 font-quicksand text-sm md:text-base py-1 md:py-4 font-bold leading-relaxed" style={{ color: '#311A05' }}>
-                            To prevent false claims, please do not describe all specific details of the item. Keep some unique details as validation questions for anyone who claims it later.
+                            {t('post.falseClaimWarning')}
                         </p>
                     </div>
 
                     {/* Type Selection */}
                     <div className="mb-6 md:mb-8">
                         <label className="block font-quicksand text-2xl md:text-3xl font-semibold text-tertiary mb-3 md:mb-4">
-                            Item Type <span className="text-label-lost">*</span>
+                            {t('post.itemType')} <span className="text-label-lost">*</span>
                         </label>
                         <div className="flex rounded-lg p-1.5 shadow-md gap-1.5 w-fit border-2 border-primary bg-primary">
                             {['lost', 'found'].map(type => (
@@ -130,7 +132,7 @@ export default function CreatePostModal({ onClose }) {
                                         }`}
                                     type="button"
                                 >
-                                    {type === 'lost' ? 'Lost' : 'Found'}
+                                    {type === 'lost' ? t('home.lost') : t('home.found')}
                                 </button>
                             ))}
                         </div>
@@ -139,11 +141,11 @@ export default function CreatePostModal({ onClose }) {
                     {/* Title */}
                     <div className="mb-6 md:mb-8">
                         <label className="block font-quicksand text-2xl md:text-3xl font-semibold text-tertiary mb-3 md:mb-4">
-                            Title <span className="text-label-lost">*</span>
+                            {t('post.title')} <span className="text-label-lost">*</span>
                         </label>
                         <input
                             type="text"
-                            placeholder="Item title"
+                            placeholder={t('post.itemTitlePlaceholder')}
                             value={data.title}
                             onChange={(e) => setData('title', e.target.value)}
                             className="w-full px-3 py-2.5 rounded-lg border-2 border-primary text-base md:text-xl font-quicksand box-border transition-colors focus:border-secondary outline-none"
@@ -154,12 +156,12 @@ export default function CreatePostModal({ onClose }) {
                     {/* Location — Google Places Autocomplete */}
                     <div className="mb-6 md:mb-8">
                         <label className="block font-quicksand text-2xl md:text-3xl font-semibold text-tertiary mb-3 md:mb-4">
-                            Location <span className="text-label-lost">*</span>
+                            {t('profile.location')} <span className="text-label-lost">*</span>
                         </label>
                         <GooglePlacesInput
                             value={data.location_name}
                             onSelect={handleLocationSelect}
-                            placeholder="Search for lost/found location…"
+                            placeholder={t('post.searchLocationPlaceholder')}
                             className="w-full py-2.5 pr-3 rounded-lg border-2 border-primary text-base md:text-xl font-quicksand box-border transition-colors focus:border-secondary outline-none"
                         />
                         {(errors.location_name || errors.latitude) && (
@@ -173,10 +175,10 @@ export default function CreatePostModal({ onClose }) {
                     {/* Description */}
                     <div className="mb-6 md:mb-8">
                         <label className="block font-quicksand text-2xl md:text-3xl font-semibold text-tertiary mb-3 md:mb-4">
-                            Description <span className="text-label-lost">*</span>
+                            {t('post.description')} <span className="text-label-lost">*</span>
                         </label>
                         <textarea
-                            placeholder="Describe the item..."
+                            placeholder={t('post.describeItem')}
                             value={data.description}
                             onChange={(e) => setData('description', e.target.value)}
                             rows="4"
@@ -188,7 +190,7 @@ export default function CreatePostModal({ onClose }) {
                     {/* Image Upload */}
                     <div className="mb-6 md:mb-8">
                         <label className="block font-quicksand text-2xl md:text-3xl font-semibold text-tertiary mb-3 md:mb-4">
-                            Image
+                            {t('post.image')}
                         </label>
                         <div className="border-2 border-dashed border-primary rounded-lg py-16 md:py-24 px-4 text-center cursor-pointer transition-all hover:bg-orange-100"
                             onDragOver={(e) => {
@@ -209,12 +211,12 @@ export default function CreatePostModal({ onClose }) {
                                 {preview ? (
                                     <div>
                                         <img src={preview} alt="Preview" className="max-w-full max-h-[200px] rounded-lg mx-auto mb-2" />
-                                        <p className="text-xs text-gray-600 m-0">Click to change</p>
+                                        <p className="text-xs text-gray-600 m-0">{t('post.clickToChange')}</p>
                                     </div>
                                 ) : (
                                     <div>
                                         <div className="text-5xl font-bold mb-1 text-tertiary">+</div>
-                                        <p className="text-xs text-gray-600 m-0">Click to upload</p>
+                                        <p className="text-xs text-gray-600 m-0">{t('post.clickToUpload')}</p>
                                     </div>
                                 )}
                             </label>
@@ -229,7 +231,7 @@ export default function CreatePostModal({ onClose }) {
                             disabled={processing}
                             className="flex-1 px-2.5 py-3 bg-primary text-white border-none rounded-lg text-base md:text-xl font-semibold cursor-pointer font-quicksand transition-all hover:bg-secondary disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            {processing ? 'Creating...' : 'Post'}
+                            {processing ? t('post.creating') : t('post.post')}
                         </button>
                     </div>
                 </form>

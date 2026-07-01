@@ -2,8 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { usePage, router, Link } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, X, ExternalLink, MapPin, Pencil, Trash2 } from 'lucide-react';
 import PostActionButtons from '@/Components/Posts/PostActionButtons';
+import { useTranslation } from '@/hooks/useTranslation';
+
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
 
 export default function PostDetailModal({ post, onClose }) {
+    const { t, locale } = useTranslation();
+    const localeTag = LOCALE_TAGS[locale] || 'en-US';
     const { auth } = usePage().props;
     const [currentImage, setCurrentImage] = useState(0);
 
@@ -17,8 +22,8 @@ export default function PostDetailModal({ post, onClose }) {
 
     const isFounded = post.type === 'found';
     const labelColor = isFounded ? 'bg-label-found text-white' : 'bg-label-lost text-white';
-    const labelText = isFounded ? 'Found Item' : 'Lost Item';
-    const buttonText = isFounded ? 'I Found This Item' : 'This is My Item';
+    const labelText = isFounded ? t('profile.foundItem') : t('profile.lostItem');
+    const buttonText = isFounded ? t('post.iFoundThisItem') : t('post.thisIsMyItem');
     const isOwnPost = auth?.user?.id === post.user_id;
 
     // Normalize images array — support single image_url or multiple
@@ -29,7 +34,7 @@ export default function PostDetailModal({ post, onClose }) {
             : ['/images/default.img.webp'];
 
     const formattedDate = post.created_at
-        ? new Date(post.created_at).toLocaleDateString('en-US', {
+        ? new Date(post.created_at).toLocaleDateString(localeTag, {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -83,7 +88,7 @@ export default function PostDetailModal({ post, onClose }) {
                 <button
                     onClick={onClose}
                     className="hidden md:flex absolute top-3 right-3 z-20 w-8 h-8 items-center justify-center rounded-full bg-white/80 hover:bg-white text-tertiary shadow transition-all"
-                    aria-label="Close"
+                    aria-label={t('post.close')}
                 >
                     <X size={18} />
                 </button>
@@ -106,7 +111,7 @@ export default function PostDetailModal({ post, onClose }) {
                                         {post.user?.name?.charAt(0)?.toUpperCase() || '?'}
                                     </div>
                                     <span className="font-quicksand font-semibold text-xs text-tertiary truncate group-hover/profile:underline">
-                                        {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'unknown'}`}
+                                        {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || t('profile.unknown')}`}
                                     </span>
                                 </Link>
                             ) : (
@@ -115,7 +120,7 @@ export default function PostDetailModal({ post, onClose }) {
                                         {post.user?.name?.charAt(0)?.toUpperCase() || '?'}
                                     </div>
                                     <span className="font-quicksand font-semibold text-xs text-tertiary truncate">
-                                        {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'unknown'}`}
+                                        {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || t('profile.unknown')}`}
                                     </span>
                                 </div>
                             )}
@@ -126,7 +131,7 @@ export default function PostDetailModal({ post, onClose }) {
                             <button
                                 onClick={onClose}
                                 className="flex md:hidden flex-shrink-0 ml-1 w-7 h-7 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-all"
-                                aria-label="Close"
+                                aria-label={t('post.close')}
                             >
                                 <X size={15} />
                             </button>
@@ -186,7 +191,7 @@ export default function PostDetailModal({ post, onClose }) {
                                     className="absolute top-2 left-2 flex items-center gap-1.5 bg-white text-[#2D1606] text-xs font-quicksand font-bold px-3 py-1.5 rounded-lg shadow-md hover:bg-yellow-50 transition-colors border border-gray-200"
                                 >
                                     <ExternalLink size={12} />
-                                    Open in Maps
+                                    {t('post.openInMaps')}
                                 </a>
                             )}
                         </div>
@@ -217,13 +222,13 @@ export default function PostDetailModal({ post, onClose }) {
                             <div className="flex flex-col gap-2 mt-auto">
                                 {post.category && (
                                     <div className="flex items-center gap-2 text-base md:text-xl text-tertiary">
-                                        <span className="font-quicksand font-medium">Category:</span>
+                                        <span className="font-quicksand font-medium">{t('post.category')}:</span>
                                         <span className="font-quicksand">{post.category}</span>
                                     </div>
                                 )}
                                 <div className="flex items-center gap-2 text-base md:text-xl text-tertiary">
                                     <span className="font-quicksand font-medium">
-                                        {isFounded ? 'Found On:' : 'Date Lost:'}
+                                        {isFounded ? t('post.foundOn') : t('post.dateLost')}
                                     </span>
                                     <span className="font-quicksand">{formattedDate}</span>
                                 </div>
@@ -235,7 +240,7 @@ export default function PostDetailModal({ post, onClose }) {
                             <div className="flex items-center justify-between mb-2">
                                 <span className="flex items-center gap-1.5 font-quicksand font-semibold text-sm text-gray-500">
                                     <MapPin size={14} className="text-gray-400" strokeWidth={1.75} />
-                                    {locationName || 'Location'}
+                                    {locationName || t('profile.location')}
                                 </span>
                             </div>
                             <div className="rounded-xl overflow-hidden border border-gray-200" style={{ height: '200px' }}>
@@ -262,11 +267,11 @@ export default function PostDetailModal({ post, onClose }) {
                                         className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-secondary text-white rounded-xl text-sm font-semibold font-quicksand transition-all duration-200 hover:opacity-90 active:scale-[0.97] cursor-pointer shadow-md"
                                     >
                                         <Pencil size={16} />
-                                        Edit Post
+                                        {t('post.editPost')}
                                     </button>
                                     <button
                                         onClick={() => {
-                                            if (confirm('Are you sure you want to delete this post?')) {
+                                            if (confirm(t('post.deletePostConfirm'))) {
                                                 window.axios.delete(`/posts/${post.id}`).then(() => {
                                                     router.visit('/home');
                                                 });
@@ -275,7 +280,7 @@ export default function PostDetailModal({ post, onClose }) {
                                         className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-label-lost text-label-lost rounded-xl text-sm font-semibold font-quicksand transition-all duration-200 hover:bg-label-lost hover:text-white active:scale-[0.97] cursor-pointer"
                                     >
                                         <Trash2 size={16} />
-                                        Delete
+                                        {t('profile.delete')}
                                     </button>
                                 </div>
                             ) : (

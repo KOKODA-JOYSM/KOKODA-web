@@ -5,8 +5,10 @@ import FilterLostFound from '@/Components/Search/FilterLostFound';
 import FilterLocation from '@/Components/Search/FilterLocation';
 import SearchResult from '@/Components/Search/SearchResult';
 import PostDetailModal from '@/Components/Home/PostDetailModal';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Search() {
+    const { t } = useTranslation();
     const [searchQuery, setSearchQuery] = useState('');
     const [typeFilter, setTypeFilter] = useState('all');
     const [locationFilter, setLocationFilter] = useState('All Locations');
@@ -71,7 +73,7 @@ export default function Search() {
                     </div>
 
                     <div className="mb-6 text-gray-text-field font-quicksand font-semibold ml-2 text-sm">
-                        {loading ? 'Loading...' : `${posts.length} result${locationCoords ? ' within 5km radius' : ''}`}
+                        {loading ? t('chat.loadingEllipsis') : `${posts.length} ${t('search.result')}${locationCoords ? ` ${t('search.within5km')}` : ''}`}
                     </div>
 
                     {/* Results Section */}

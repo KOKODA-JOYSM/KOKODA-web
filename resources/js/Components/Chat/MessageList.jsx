@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import MessageBubble from '@/Components/Chat/MessageBubble';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function MessageList({ messages, loading = false, hasMore = false, onLoadMore, onRequestRating, authUserId }) {
+    const { t } = useTranslation();
     const endRef = useRef(null);
     const containerRef = useRef(null);
     const prevMessagesLengthRef = useRef(0);
@@ -53,7 +55,7 @@ export default function MessageList({ messages, loading = false, hasMore = false
                             disabled={loading}
                             className="rounded-full border border-secondary/45 bg-primary px-4 py-1.5 text-[12px] font-medium text-tertiary/70 shadow-sm transition-colors hover:bg-secondary/30 disabled:opacity-50"
                         >
-                            {loading ? 'Memuat...' : 'Muat pesan lama'}
+                            {loading ? t('chat.loadingEllipsis') : t('chat.loadOlderMessages')}
                         </button>
                     </div>
                 )}

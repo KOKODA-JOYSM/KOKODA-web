@@ -3,12 +3,14 @@ import AppLayout from '@/Layouts/AppLayout';
 import { useForm, router } from '@inertiajs/react';
 import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
 import tailwindConfig from '../../../../tailwind.config.js';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const { colors } = tailwindConfig.theme.extend;
 const COLOR_PRIMARY = colors.primary;    // '#F4C799'
 const COLOR_SECONDARY = colors.secondary; // '#C0976C'
 
 export default function Edit({ post }) {
+    const { t } = useTranslation();
     const [preview, setPreview] = useState(post.image_url || null);
 
     // Resolve existing location data from the post's location relation
@@ -83,7 +85,7 @@ export default function Edit({ post }) {
                     color: '#311A05',
                     margin: '0 0 24px 0',
                 }}>
-                    Edit Post
+                    {t('post.editPost')}
                 </h1>
 
                 <form onSubmit={handleSubmit}>
@@ -98,7 +100,7 @@ export default function Edit({ post }) {
                             color: '#311A05',
                             marginBottom: '10px',
                         }}>
-                            Item Type <span style={{ color: '#D56666' }}>*</span>
+                            {t('post.itemType')} <span style={{ color: '#D56666' }}>*</span>
                         </label>
                         <div className="flex rounded-lg p-1.5 shadow-md gap-1.5 w-fit border-2 border-primary bg-primary">
                             {['lost', 'found'].map(type => (
@@ -112,7 +114,7 @@ export default function Edit({ post }) {
                                             : 'bg-base'
                                     }`}
                                 >
-                                    {type === 'lost' ? 'Lost' : 'Found'}
+                                    {type === 'lost' ? t('home.lost') : t('home.found')}
                                 </button>
                             ))}
                         </div>
@@ -128,7 +130,7 @@ export default function Edit({ post }) {
                             color: '#311A05',
                             marginBottom: '8px',
                         }}>
-                            Title <span style={{ color: '#D56666' }}>*</span>
+                            {t('post.title')} <span style={{ color: '#D56666' }}>*</span>
                         </label>
                         <input
                             type="text"
@@ -155,12 +157,12 @@ export default function Edit({ post }) {
                             color: '#311A05',
                             marginBottom: '8px',
                         }}>
-                            Location <span style={{ color: '#D56666' }}>*</span>
+                            {t('profile.location')} <span style={{ color: '#D56666' }}>*</span>
                         </label>
                         <GooglePlacesInput
                             value={data.location_name}
                             onSelect={handleLocationSelect}
-                            placeholder="Search for lost/found location…"
+                            placeholder={t('post.searchLocationPlaceholder')}
                             inputStyle={{
                                 ...formFieldStyle,
                                 paddingLeft: '36px',
@@ -188,7 +190,7 @@ export default function Edit({ post }) {
                             color: '#311A05',
                             marginBottom: '8px',
                         }}>
-                            Description <span style={{ color: '#D56666' }}>*</span>
+                            {t('post.description')} <span style={{ color: '#D56666' }}>*</span>
                         </label>
                         <textarea
                             value={data.description}
@@ -219,7 +221,7 @@ export default function Edit({ post }) {
                             color: '#311A05',
                             marginBottom: '10px',
                         }}>
-                            Status <span style={{ color: '#D56666' }}>*</span>
+                            {t('post.status')} <span style={{ color: '#D56666' }}>*</span>
                         </label>
                         <div className="flex rounded-lg p-1.5 shadow-md gap-1.5 w-fit border-2 border-primary bg-primary">
                             {['active', 'resolved'].map(status => (
@@ -233,7 +235,7 @@ export default function Edit({ post }) {
                                             : 'bg-base'
                                     }`}
                                 >
-                                    {status === 'active' ? 'Active' : 'Resolved'}
+                                    {status === 'active' ? t('profile.active') : t('profile.resolved')}
                                 </button>
                             ))}
                         </div>
@@ -250,7 +252,7 @@ export default function Edit({ post }) {
                                 color: '#311A05',
                                 marginBottom: '8px',
                             }}>
-                                Current Image
+                                {t('post.currentImage')}
                             </label>
                             <img
                                 src={preview}
@@ -294,7 +296,7 @@ export default function Edit({ post }) {
                                 e.currentTarget.style.backgroundColor = '#E8E8E8';
                             }}
                         >
-                            Cancel
+                            {t('profile.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -324,7 +326,7 @@ export default function Edit({ post }) {
                                 }
                             }}
                         >
-                            {processing ? 'Updating...' : 'Update Post'}
+                            {processing ? t('post.updating') : t('post.updatePost')}
                         </button>
                     </div>
                 </form>

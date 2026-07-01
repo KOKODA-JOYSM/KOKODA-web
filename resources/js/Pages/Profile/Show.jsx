@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Link } from '@inertiajs/react';
 import PostDetailModal from '@/Components/Home/PostDetailModal';
+import { useTranslation } from '@/hooks/useTranslation';
+
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
 
 export default function Show({ profileUser, posts = [] }) {
+    const { t, locale } = useTranslation();
+    const localeTag = LOCALE_TAGS[locale] || 'en-US';
     const [selectedPost, setSelectedPost] = useState(null);
 
-    const userLocation = profileUser.location || 'Unknown';
+    const userLocation = profileUser.location || t('profile.unknown');
     const userRating = profileUser.rating > 0
         ? Number(profileUser.rating).toFixed(1) + '/5'
         : '0.0/5';
@@ -74,7 +79,7 @@ export default function Show({ profileUser, posts = [] }) {
                                         <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
                                         </svg>
-                                        <span>{userPoints} Points</span>
+                                        <span>{userPoints} {t('profile.points')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -86,17 +91,17 @@ export default function Show({ profileUser, posts = [] }) {
                     <div className="flex flex-col gap-6">
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg font-bold text-tertiary">
-                                Posts
+                                {t('profile.posts')}
                             </h2>
                             <p className="text-sm text-tertiary/70 font-medium">
-                                {myPosts.length} {myPosts.length === 1 ? 'post' : 'posts'}
+                                {myPosts.length} {myPosts.length === 1 ? t('profile.post') : t('profile.posts')}
                             </p>
                         </div>
 
                         {myPosts.length === 0 ? (
                             <div className="text-center py-12 bg-secondary/10 rounded-2xl">
-                                <p className="text-tertiary font-semibold text-lg mb-2">No posts yet</p>
-                                <p className="text-tertiary/60 text-sm">This user hasn't made any posts.</p>
+                                <p className="text-tertiary font-semibold text-lg mb-2">{t('profile.noPostsYet')}</p>
+                                <p className="text-tertiary/60 text-sm">{t('profile.noPostsDesc')}</p>
                             </div>
                         ) : (
                             myPosts.map((item) => (
@@ -120,7 +125,7 @@ export default function Show({ profileUser, posts = [] }) {
                                                     ? 'bg-green-500 text-white'
                                                     : 'bg-yellow-400 text-tertiary'
                                             }`}>
-                                                {item.status === 'resolved' ? 'Resolved' : 'Active'}
+                                                {item.status === 'resolved' ? t('profile.resolved') : t('profile.active')}
                                             </span>
                                         </div>
 
@@ -137,7 +142,7 @@ export default function Show({ profileUser, posts = [] }) {
                                                             ? 'bg-label-lost text-base'
                                                             : 'bg-label-found text-base'
                                                     }`}>
-                                                        {item.type}
+                                                        {item.type === 'lost' ? t('home.lost') : t('home.found')}
                                                     </span>
                                                 </div>
 
@@ -157,7 +162,7 @@ export default function Show({ profileUser, posts = [] }) {
                                             {/* Tanggal */}
                                             <div className="flex items-center justify-between mt-3">
                                                 <span className="text-xs text-tertiary/50 font-medium">
-                                                    {new Date(item.created_at).toLocaleDateString('en-US', {
+                                                    {new Date(item.created_at).toLocaleDateString(localeTag, {
                                                         day: 'numeric', month: 'long', year: 'numeric'
                                                     })}
                                                 </span>

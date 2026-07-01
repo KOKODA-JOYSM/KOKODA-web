@@ -93,8 +93,8 @@ export default function Welcome() {
                                     <CheckCircle2 className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-bold text-tertiary">Wallet Found!</p>
-                                    <p className="text-xs text-gray-text-field">Returned to owner 5 mins ago</p>
+                                    <p className="text-sm font-bold text-tertiary">{t('welcome.walletFound')}</p>
+                                    <p className="text-xs text-gray-text-field">{t('welcome.returnedToOwner')}</p>
                                 </div>
                             </div>
                         </div>
@@ -104,9 +104,9 @@ export default function Welcome() {
                     <div className="bg-base py-24 sm:py-32 border-y border-primary/30">
                         <div className="mx-auto max-w-7xl px-6 lg:px-8">
                             <div className="mx-auto max-w-2xl text-center">
-                                <h2 className="text-base font-bold leading-7 text-secondary tracking-widest uppercase">Faster Recovery</h2>
+                                <h2 className="text-base font-bold leading-7 text-secondary tracking-widest uppercase">{t('welcome.fasterRecovery')}</h2>
                                 <p className="mt-2 text-3xl font-extrabold tracking-tight text-tertiary sm:text-4xl font-roboto">
-                                    Everything you need to locate your items
+                                    {t('welcome.everythingYouNeed')}
                                 </p>
                             </div>
                             <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
@@ -122,10 +122,10 @@ export default function Welcome() {
                                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-highlight text-tertiary">
                                                 <Search className="h-6 w-6" />
                                             </div>
-                                            Smart Search
+                                            {t('welcome.smartSearch')}
                                         </dt>
                                         <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-text-field">
-                                            <p className="flex-auto">Easily filter and search for items by category, location, and date. Find exactly what you are looking for in seconds.</p>
+                                            <p className="flex-auto">{t('welcome.smartSearchDesc')}</p>
                                         </dd>
                                     </div>
                                     {/* Feature 2 */}
@@ -139,10 +139,10 @@ export default function Welcome() {
                                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-highlight text-tertiary">
                                                 <MapPin className="h-6 w-6" />
                                             </div>
-                                            Location Based
+                                            {t('welcome.locationBased')}
                                         </dt>
                                         <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-text-field">
-                                            <p className="flex-auto">See lost and found items on an interactive map. Find items dropped near your exact campus or workplace location.</p>
+                                            <p className="flex-auto">{t('welcome.locationBasedDesc')}</p>
                                         </dd>
                                     </div>
                                     {/* Feature 3 */}
@@ -156,10 +156,10 @@ export default function Welcome() {
                                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-highlight text-tertiary">
                                                 <Handshake className="h-6 w-6" />
                                             </div>
-                                            Secure Claiming
+                                            {t('welcome.secureClaiming')}
                                         </dt>
                                         <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-text-field">
-                                            <p className="flex-auto">Our built-in chat system and secure claim workflow ensures that items are safely returned to their rightful owners.</p>
+                                            <p className="flex-auto">{t('welcome.secureClaimingDesc')}</p>
                                         </dd>
                                     </div>
                                 </dl>
@@ -178,27 +178,27 @@ export default function Welcome() {
                         
                         <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
                             <div className="mx-auto max-w-2xl lg:mx-0">
-                                <h2 className="text-4xl font-extrabold tracking-tight text-base sm:text-5xl font-roboto">Trusted by the Community</h2>
+                                <h2 className="text-4xl font-extrabold tracking-tight text-base sm:text-5xl font-roboto">{t('welcome.trustedByCommunity')}</h2>
                                 <p className="mt-6 text-lg leading-8 text-primary font-medium">
-                                    Join thousands of users who have successfully recovered their lost belongings through KOKODA.
+                                    {t('welcome.joinThousands')}
                                 </p>
                             </div>
                             <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
                                 <dl className="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
                                     <div className="flex flex-col-reverse gap-y-2">
-                                        <dt className="text-base leading-7 text-background/80">Items Returned</dt>
+                                        <dt className="text-base leading-7 text-background/80">{t('welcome.itemsReturned')}</dt>
                                         <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">10,000+</dd>
                                     </div>
                                     <div className="flex flex-col-reverse gap-y-2">
-                                        <dt className="text-base leading-7 text-background/80">Active Users</dt>
+                                        <dt className="text-base leading-7 text-background/80">{t('welcome.activeUsers')}</dt>
                                         <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">5,000+</dd>
                                     </div>
                                     <div className="flex flex-col-reverse gap-y-2">
-                                        <dt className="text-base leading-7 text-background/80">Campuses</dt>
+                                        <dt className="text-base leading-7 text-background/80">{t('welcome.campuses')}</dt>
                                         <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">12</dd>
                                     </div>
                                     <div className="flex flex-col-reverse gap-y-2">
-                                        <dt className="text-base leading-7 text-background/80">Success Rate</dt>
+                                        <dt className="text-base leading-7 text-background/80">{t('welcome.successRate')}</dt>
                                         <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">94%</dd>
                                     </div>
                                 </dl>
@@ -211,16 +211,16 @@ export default function Welcome() {
                 <footer className="bg-background border-t border-primary/20">
                     <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
                         <div className="flex justify-center space-x-6 md:order-2">
-                            <span className="text-sm font-bold leading-5 text-gray-text-field hover:text-secondary cursor-pointer transition-colors">Privacy Policy</span>
-                            <span className="text-sm font-bold leading-5 text-gray-text-field hover:text-secondary cursor-pointer transition-colors">Terms of Service</span>
-                            <span className="text-sm font-bold leading-5 text-gray-text-field hover:text-secondary cursor-pointer transition-colors">Contact Support</span>
+                            <span className="text-sm font-bold leading-5 text-gray-text-field hover:text-secondary cursor-pointer transition-colors">{t('welcome.privacyPolicy')}</span>
+                            <span className="text-sm font-bold leading-5 text-gray-text-field hover:text-secondary cursor-pointer transition-colors">{t('welcome.termsOfService')}</span>
+                            <span className="text-sm font-bold leading-5 text-gray-text-field hover:text-secondary cursor-pointer transition-colors">{t('welcome.contactSupport')}</span>
                         </div>
                         <div className="mt-8 md:order-1 md:mt-0 flex items-center justify-center gap-2">
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-tertiary">
                                 <MapPin className="h-4 w-4" />
                             </div>
                             <p className="text-center text-sm font-bold leading-5 text-tertiary">
-                                &copy; {new Date().getFullYear()} KOKODA Lost & Found. All rights reserved.
+                                &copy; {new Date().getFullYear()} KOKODA {t('welcome.allRightsReserved')}
                             </p>
                         </div>
                     </div>

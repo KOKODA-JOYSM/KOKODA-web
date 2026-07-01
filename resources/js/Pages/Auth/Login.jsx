@@ -50,7 +50,7 @@ export default function Login({ status, canResetPassword }) {
                                     <img src="/images/logo-kokoda-black.svg" alt="KOKODA logo" className="h-14 w-auto" />
                             </div>
                             <h1 className="text-[2.87rem] font-bold leading-tight text-secondary" style={{ textShadow: '3.2px 3.2px 0.8px rgba(0, 0, 0, 0.5)' }}>
-                                Welcome Back!
+                                {t('auth.welcomeBack')}
                             </h1>
                         </div>
 
@@ -70,7 +70,7 @@ export default function Login({ status, canResetPassword }) {
                                     className="block w-full rounded-lg border-secondary bg-base px-4 py-3 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                                     autoComplete="username"
                                     isFocused={true}
-                                    placeholder="Username / Email address"
+                                    placeholder={t('auth.usernameOrEmail')}
                                     onChange={(e) => setData('email', e.target.value)}
                                 />
                                 <InputError message={errors.email} className="mt-2 text-label-lost" />
@@ -85,12 +85,12 @@ export default function Login({ status, canResetPassword }) {
                                         value={data.password}
                                         className="block w-full rounded-lg border-secondary bg-base px-4 py-3 pr-12 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                                         autoComplete="current-password"
-                                        placeholder="Password"
+                                        placeholder={t('auth.password')}
                                         onChange={(e) => setData('password', e.target.value)}
                                     />
                                     <button
                                         type="button"
-                                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                        aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                                         onClick={() => setShowPassword((prev) => !prev)}
                                         className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-text-field transition hover:text-tertiary"
                                     >
@@ -111,7 +111,7 @@ export default function Login({ status, canResetPassword }) {
                                         onChange={(e) => setData('remember', e.target.checked)}
                                         className="rounded border-secondary text-secondary focus:ring-secondary"
                                     />
-                                    Remember me for 30 days
+                                    {t('auth.rememberMe30')}
                                 </label>
 
                                 {canResetPassword && (
@@ -140,7 +140,7 @@ export default function Login({ status, canResetPassword }) {
                             className="flex w-full items-center justify-center gap-3 rounded-lg border border-secondary/60 bg-base px-4 py-3 font-semibold text-gray-text-field shadow-sm transition hover:bg-background"
                         >
                             <span className="text-xl leading-none text-[#DB4437]">G</span>
-                            Sign in with Google
+                            {t('auth.signInWithGoogle')}
                         </button>
 
                         {canRegister && (

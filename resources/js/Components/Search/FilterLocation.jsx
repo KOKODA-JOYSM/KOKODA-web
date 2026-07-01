@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
 import LeafletMap from '@/Components/Common/LeafletMap';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function FilterLocation({ selected, onChange, onLocationWithCoords }) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [inputValue, setInputValue] = useState(selected === 'All Locations' ? '' : selected);
     const [selectedCoords, setSelectedCoords] = useState(null);
@@ -97,14 +99,14 @@ export default function FilterLocation({ selected, onChange, onLocationWithCoord
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </div>
-                <span className="max-w-[120px] truncate">{selected}</span>
+                <span className="max-w-[120px] truncate">{isFiltered ? selected : t('search.allLocations')}</span>
             </button>
 
             {/* Tombol X — hanya muncul kalau ada filter aktif */}
             {isFiltered && (
                 <button
                     onClick={handleClear}
-                    title="Clear location filter"
+                    title={t('search.clearLocationFilter')}
                     className="w-7 h-7 flex items-center justify-center rounded-full bg-tertiary text-base hover:opacity-80 transition-opacity shadow-md flex-shrink-0"
                 >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -120,7 +122,7 @@ export default function FilterLocation({ selected, onChange, onLocationWithCoord
 
                         {/* Header */}
                         <div className="flex justify-between items-center p-5 border-b-2 border-gray-200/50 bg-background">
-                            <h2 className="text-2xl font-quicksand font-bold text-tertiary">Location</h2>
+                            <h2 className="text-2xl font-quicksand font-bold text-tertiary">{t('profile.location')}</h2>
                             <button
                                 onClick={() => setIsOpen(false)}
                                 className="bg-tertiary text-base rounded-lg p-1.5 hover:opacity-80 transition-opacity"
@@ -137,12 +139,12 @@ export default function FilterLocation({ selected, onChange, onLocationWithCoord
                             {/* Search — sama seperti Create Post */}
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-quicksand text-gray-text-field font-bold tracking-wide">
-                                    Search Location
+                                    {t('profile.searchLocation')}
                                 </label>
                                 <GooglePlacesInput
                                     value={inputValue}
                                     onSelect={handleLocationSelect}
-                                    placeholder="e.g. Aeon Mall, Magetan, Jakarta..."
+                                    placeholder={t('profile.searchLocationPlaceholder')}
                                     className="w-full bg-white text-tertiary rounded-md py-2.5 pr-3 font-quicksand text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all placeholder:text-gray-text-field border border-secondary/20"
                                 />
                             </div>
@@ -151,14 +153,14 @@ export default function FilterLocation({ selected, onChange, onLocationWithCoord
                             {selectedCoords && (
                                 <div className="text-xs text-secondary font-quicksand bg-highlight/20 px-3 py-2 rounded-lg flex items-center justify-between">
                                     <span>{selectedCoords.lat.toFixed(4)}, {selectedCoords.lng.toFixed(4)}</span>
-                                    <span className="text-tertiary font-bold">Radius: 5 km</span>
+                                    <span className="text-tertiary font-bold">{t('search.radius5km')}</span>
                                 </div>
                             )}
 
                             {/* Interactive Leaflet Map */}
                             <div className="flex flex-col gap-1">
                                 <label className="text-xs font-quicksand text-gray-text-field font-bold tracking-wide">
-                                    Or tap on the map
+                                    {t('profile.orTapMap')}
                                 </label>
                                 <LeafletMap
                                     center={selectedCoords ? [selectedCoords.lat, selectedCoords.lng] : [-6.5833, 106.8]}
@@ -176,14 +178,14 @@ export default function FilterLocation({ selected, onChange, onLocationWithCoord
                                     onClick={handleClear}
                                     className="flex-none px-4 py-3 rounded-xl border-2 border-tertiary/30 text-tertiary font-quicksand font-bold text-sm hover:bg-tertiary/10 transition-colors"
                                 >
-                                    Clear
+                                    {t('search.clear')}
                                 </button>
                             )}
                             <button
                                 onClick={handleApply}
                                 className="flex-1 bg-tertiary text-base rounded-xl py-3 font-quicksand font-bold text-base hover:opacity-90 transition-opacity shadow-md"
                             >
-                                Apply & Search
+                                {t('search.applyAndSearch')}
                             </button>
                         </div>
                     </div>

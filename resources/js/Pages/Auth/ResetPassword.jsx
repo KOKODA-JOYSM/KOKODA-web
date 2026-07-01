@@ -1,8 +1,10 @@
 import InputError from '@/Components/Auth/InputError';
 import TextInput from '@/Components/Auth/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ResetPassword({ token, email }) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors, reset } = useForm({
         token: token,
         email: email,
@@ -26,10 +28,10 @@ export default function ResetPassword({ token, email }) {
                 <div className="mb-8 flex flex-col items-center text-center">
                     <img src="/images/logo-kokoda-black.svg" alt="KOKODA logo" className="mb-4 h-14 w-auto" />
                     <h1 className="text-[2.3rem] font-bold leading-tight text-secondary" style={{ textShadow: '3.2px 3.2px 0.8px rgba(0, 0, 0, 0.5)' }}>
-                        Reset Password
+                        {t('auth.resetPassword')}
                     </h1>
                     <p className="mt-2 text-center text-base text-secondary/90">
-                        Choose a new password for your account.
+                        {t('auth.chooseNewPassword')}
                     </p>
                 </div>
 
@@ -57,7 +59,7 @@ export default function ResetPassword({ token, email }) {
                             className="block w-full rounded-lg border-secondary bg-base px-4 py-3 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                             autoComplete="new-password"
                             isFocused={true}
-                            placeholder="New password"
+                            placeholder={t('auth.newPassword')}
                             onChange={(e) => setData('password', e.target.value)}
                         />
                         <InputError message={errors.password} className="mt-2 text-label-lost" />
@@ -71,7 +73,7 @@ export default function ResetPassword({ token, email }) {
                             value={data.password_confirmation}
                             className="block w-full rounded-lg border-secondary bg-base px-4 py-3 font-medium text-tertiary placeholder-gray-text-field focus:border-tertiary/50 focus:ring-tertiary/50"
                             autoComplete="new-password"
-                            placeholder="Confirm new password"
+                            placeholder={t('auth.confirmNewPassword')}
                             onChange={(e) => setData('password_confirmation', e.target.value)}
                         />
                         <InputError message={errors.password_confirmation} className="mt-2 text-label-lost" />
@@ -82,14 +84,14 @@ export default function ResetPassword({ token, email }) {
                         disabled={processing}
                         className="mt-2 w-full rounded-lg bg-secondary px-4 py-3 text-base font-bold uppercase tracking-wide text-background transition hover:bg-tertiary hover:text-background disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                        {processing ? 'Resetting...' : 'Reset Password'}
+                        {processing ? t('auth.resetting') : t('auth.resetPassword')}
                     </button>
                 </form>
 
                 <p className="mt-7 text-center text-base text-tertiary">
-                    Back to{' '}
+                    {t('auth.backTo')}{' '}
                     <Link href={route('login')} className="font-semibold text-secondary underline underline-offset-2 hover:text-tertiary">
-                        Log in
+                        {t('auth.login')}
                     </Link>
                 </p>
             </div>

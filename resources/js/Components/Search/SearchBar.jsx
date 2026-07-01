@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function SearchBar({ value, onChange }) {
+    const { t } = useTranslation();
     return (
         <div className="relative w-full">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -10,7 +12,7 @@ export default function SearchBar({ value, onChange }) {
             </div>
             <input
                 type="text"
-                placeholder="Search"
+                placeholder={t('nav.search')}
                 className="w-full pl-12 pr-4 py-3 bg-base border-2 border-transparent rounded-full font-quicksand text-tertiary focus:outline-none shadow-md text-lg"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}

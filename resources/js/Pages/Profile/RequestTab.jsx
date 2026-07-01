@@ -4,28 +4,29 @@ import IncomingRequestModal from './IncomingRequestModal';
 import SentRequestModal from './SentRequestModal';
 import RateUserModal from './RateUserModal';
 import { useSeenClaims } from '@/hooks/useSeenClaims';
+import { useTranslation } from '@/hooks/useTranslation';
 
-const getLocation = (post) =>
-    (typeof post?.location === 'object' ? post?.location?.place_name : post?.location) || 'Unknown location';
+const getLocation = (post, t) =>
+    (typeof post?.location === 'object' ? post?.location?.place_name : post?.location) || t('profile.unknownLocation');
 
-const statusConfig = {
+const getStatusConfig = (t) => ({
     pending: {
-        label: 'Waiting...',
+        label: t('profile.statusWaiting'),
         className: 'bg-amber-100 text-amber-700 border border-amber-200',
     },
     accepted: {
-        label: 'Accepted',
+        label: t('profile.statusAccepted'),
         className: 'bg-green-100 text-green-700 border border-green-200',
     },
     rejected: {
-        label: 'Rejected',
+        label: t('profile.statusRejected'),
         className: 'bg-red-100 text-red-700 border border-red-200',
     },
     completed: {
-        label: 'Completed',
+        label: t('profile.completed'),
         className: 'bg-blue-100 text-blue-700 border border-blue-200',
     },
-};
+});
 
 // A found-post request the requester can now rate: the finder returned the item
 // (claim completed) but no rating has been left yet.
@@ -33,6 +34,8 @@ const needsRating = (claim) =>
     claim.post?.type === 'found' && claim.status === 'completed' && !claim.rating;
 
 function ClaimCard({ claim, mode, onClick, isNew, rateable }) {
+    const { t } = useTranslation();
+    const statusConfig = getStatusConfig(t);
     const post = claim.post;
     const imageUrl = post?.image_url
         || 'https://images.unsplash.com/photo-1559416523-140ddc3d238c?q=80&w=400&auto=format&fit=crop';
@@ -53,7 +56,7 @@ function ClaimCard({ claim, mode, onClick, isNew, rateable }) {
                         <svg className="w-3 h-3 fill-current shrink-0" viewBox="0 0 24 24">
                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                         </svg>
-                        <span className="truncate">{getLocation(post)}</span>
+                        <span className="truncate">{getLocation(post, t)}</span>
                     </div>
 
                     <p className="text-sm text-tertiary/80 line-clamp-2 mb-2 font-medium">
@@ -65,12 +68,12 @@ function ClaimCard({ claim, mode, onClick, isNew, rateable }) {
                         onClick={(e) => e.stopPropagation()}
                         className="text-xs text-secondary font-bold hover:underline"
                     >
-                        Read More
+                        {t('profile.readMore')}
                     </Link>
 
                     {mode === 'incoming' && claim.claimant && (
                         <p className="text-xs text-tertiary/50 mt-1.5 font-medium">
-                            Requested by @{claim.claimant.username || claim.claimant.name}
+                            {t('profile.requestedBy')} @{claim.claimant.username || claim.claimant.name}
                         </p>
                     )}
                 </div>
@@ -81,14 +84,14 @@ function ClaimCard({ claim, mode, onClick, isNew, rateable }) {
                         <span className={`text-sm font-bold px-5 py-1.5 rounded-lg shadow-sm text-base ${
                             post?.type === 'found' ? 'bg-label-found' : 'bg-label-lost'
                         }`}>
-                            {post?.type === 'found' ? 'Found Item' : 'Lost Item'}
+                            {post?.type === 'found' ? t('profile.foundItem') : t('profile.lostItem')}
                         </span>
                     ) : rateable ? (
                         <span className="flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-lg bg-highlight text-tertiary shadow-sm">
                             <svg className="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
                                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                             </svg>
-                            Beri Rating
+                            {t('profile.giveRating')}
                         </span>
                     ) : (
                         <span className={`text-xs font-bold px-4 py-1.5 rounded-lg ${
@@ -106,11 +109,11 @@ function ClaimCard({ claim, mode, onClick, isNew, rateable }) {
         <div className="relative">
             {rateable ? (
                 <span className="absolute -top-1.5 -right-1.5 z-10 bg-highlight text-tertiary text-[10px] font-bold px-2 py-0.5 rounded-full shadow pointer-events-none">
-                    ★ Rate
+                    ★ {t('profile.rate')}
                 </span>
             ) : isNew && (
                 <span className="absolute -top-1.5 -right-1.5 z-10 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow pointer-events-none">
-                    New
+                    {t('profile.new')}
                 </span>
             )}
             <button
@@ -140,6 +143,7 @@ function EmptyState({ message }) {
 }
 
 export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
+    const { t } = useTranslation();
     const [activeSubTab, setActiveSubTab] = useState('incoming');
     const [selectedClaim, setSelectedClaim] = useState(null);
     const [selectedSentClaim, setSelectedSentClaim] = useState(null);
@@ -185,7 +189,7 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
                     }`}
                 >
                     <span className="w-2 h-2 rounded-full bg-current inline-block shrink-0" />
-                    Incoming Request
+                    {t('profile.incomingRequest')}
                     {pendingIncoming > 0 && (
                         <span className="ml-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none">
                             {pendingIncoming}
@@ -202,7 +206,7 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
                     }`}
                 >
                     <span className="w-2 h-2 rounded-sm bg-current inline-block shrink-0" />
-                    Sent Request
+                    {t('profile.sentRequest')}
                     {pendingSent > 0 && (
                         <span className="ml-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none">
                             {pendingSent}
@@ -223,7 +227,7 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
                             onClick={() => { markAllSeen(allClaimIds); setSelectedClaim(claim); }}
                         />
                     ))
-                    : <EmptyState message="No incoming requests yet for your posts." />
+                    : <EmptyState message={t('profile.noIncomingRequests')} />
                 )
                 : (sentClaims.length > 0
                     ? sentClaims.map((claim) => (
@@ -236,7 +240,7 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
                             onClick={() => { markAllSeen(allClaimIds); setSelectedSentClaim(claim); }}
                         />
                     ))
-                    : <EmptyState message="You haven't sent any requests yet." />
+                    : <EmptyState message={t('profile.noSentRequests')} />
                 )
             }
 

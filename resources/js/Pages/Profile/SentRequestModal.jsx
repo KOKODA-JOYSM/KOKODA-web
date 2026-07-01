@@ -2,37 +2,43 @@ import React, { useEffect, useState } from 'react';
 import { router } from '@inertiajs/react';
 import { X, CheckCircle2, XCircle, Clock, MessageSquare } from 'lucide-react';
 import RateUserModal from './RateUserModal';
+import { useTranslation } from '@/hooks/useTranslation';
+
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
 
 const getLocation = (post) =>
     (typeof post?.location === 'object' ? post?.location?.place_name : post?.location) || 'Indonesia';
 
 // Maps a claim's backend status to the visual status pill from the SVG design.
-const statusPillConfig = {
+const getStatusPillConfig = (t) => ({
     completed: {
-        label: 'Request Completed',
+        label: t('profile.requestCompleted'),
         className: 'bg-secondary',
         Icon: CheckCircle2,
     },
     // The holder verified but the handshake isn't complete until the recipient
     // confirms receipt — so keep showing "waiting" until then.
     accepted: {
-        label: 'Waiting for Confirmation',
+        label: t('profile.waitingConfirmation'),
         className: 'bg-highlight text-tertiary',
         Icon: Clock,
     },
     rejected: {
-        label: 'Request Rejected',
+        label: t('profile.requestRejected'),
         className: 'bg-label-lost',
         Icon: XCircle,
     },
     pending: {
-        label: 'Waiting for Response',
+        label: t('profile.waitingResponse'),
         className: 'bg-highlight text-tertiary',
         Icon: Clock,
     },
-};
+});
 
 export default function SentRequestModal({ claim, onClose }) {
+    const { t, locale } = useTranslation();
+    const localeTag = LOCALE_TAGS[locale] || 'en-US';
+    const statusPillConfig = getStatusPillConfig(t);
     const post = claim.post;
     // Found-post requesters (the item recipient) rate the finder/owner once the
     // handshake is resolved. This covers the manual-resolve path where the owner
@@ -51,7 +57,7 @@ export default function SentRequestModal({ claim, onClose }) {
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(owner?.name || 'User')}&background=F4C799&color=311A05`;
 
     const requestDate = claim.created_at
-        ? new Date(claim.created_at).toLocaleDateString('id-ID', {
+        ? new Date(claim.created_at).toLocaleDateString(localeTag, {
             day: 'numeric', month: 'long', year: 'numeric',
           })
         : '-';
@@ -110,7 +116,7 @@ export default function SentRequestModal({ claim, onClose }) {
                         <span className={`text-xs font-quicksand font-bold px-3 py-1 rounded-full text-base ${
                             post?.type === 'lost' ? 'bg-label-lost' : 'bg-label-found'
                         }`}>
-                            {post?.type === 'lost' ? 'Lost Item' : 'Found Item'}
+                            {post?.type === 'lost' ? t('profile.lostItem') : t('profile.foundItem')}
                         </span>
                     </div>
                     <button
@@ -158,20 +164,20 @@ export default function SentRequestModal({ claim, onClose }) {
 
                         <div>
                             <p className="font-quicksand text-sm text-tertiary/80 leading-relaxed">
-                                <span className="font-bold text-tertiary">Request detail:</span>{' '}
-                                {claim.message || <span className="italic text-tertiary/50">No message provided.</span>}
+                                <span className="font-bold text-tertiary">{t('profile.requestDetail')}:</span>{' '}
+                                {claim.message || <span className="italic text-tertiary/50">{t('profile.noMessageProvided')}</span>}
                             </p>
                         </div>
 
                         <p className="font-quicksand text-sm text-tertiary mt-auto">
-                            <span className="font-bold">Waktu Ditemukan:</span>{' '}
+                            <span className="font-bold">{t('profile.requestedAt')}:</span>{' '}
                             {requestDate}
                         </p>
 
                         {/* Status */}
                         <div className="flex flex-col gap-3 pt-1">
                             <p className="font-quicksand font-bold text-tertiary text-center text-sm">
-                                Request Status
+                                {t('profile.requestStatus')}
                             </p>
 
                             <div className={`mx-auto w-full max-w-[380px] flex items-center justify-center gap-2 py-3 rounded-full text-base font-quicksand font-bold uppercase text-sm tracking-wide shadow-md ${pill.className}`}>
@@ -184,7 +190,7 @@ export default function SentRequestModal({ claim, onClose }) {
                                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-label-found text-base font-quicksand font-bold text-sm hover:opacity-90 transition-all shadow-md"
                             >
                                 <MessageSquare size={16} />
-                                Continue Chat
+                                {t('profile.continueChat')}
                             </button>
                         </div>
                     </div>

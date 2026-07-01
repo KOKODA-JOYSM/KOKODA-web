@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import PostDetailModal from '@/Components/Home/PostDetailModal';
+import { useTranslation } from '@/hooks/useTranslation';
+
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
 
 export default function HistoryTab({ posts = [] }) {
+    const { t, locale } = useTranslation();
+    const localeTag = LOCALE_TAGS[locale] || 'en-US';
     const [selectedPost, setSelectedPost] = useState(null);
 
     if (!posts || posts.length === 0) {
         return (
             <div className="text-center py-12 bg-secondary/10 rounded-2xl">
-                <p className="text-tertiary font-semibold text-lg mb-2">No resolved posts yet</p>
+                <p className="text-tertiary font-semibold text-lg mb-2">{t('profile.noResolvedPostsYet')}</p>
                 <p className="text-tertiary/60 text-sm">
-                    Posts you mark as <span className="font-semibold">Resolved</span> will show up here automatically.
+                    {t('profile.noResolvedPostsDesc')}
                 </p>
             </div>
         );
@@ -44,7 +49,7 @@ export default function HistoryTab({ posts = [] }) {
                                 />
                                 {/* Status badge resolved */}
                                 <span className="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full font-bold uppercase shadow bg-green-500 text-white">
-                                    Resolved
+                                    {t('profile.resolved')}
                                 </span>
                             </div>
 
@@ -61,7 +66,7 @@ export default function HistoryTab({ posts = [] }) {
                                                 ? 'bg-label-lost text-base'
                                                 : 'bg-label-found text-base'
                                         }`}>
-                                            {item.type}
+                                            {item.type === 'lost' ? t('home.lost') : t('home.found')}
                                         </span>
                                     </div>
 
@@ -81,11 +86,11 @@ export default function HistoryTab({ posts = [] }) {
                                 {/* Tanggal */}
                                 <div className="flex items-center justify-between mt-3">
                                     <span className="text-xs text-tertiary/50 font-medium">
-                                        {new Date(item.created_at).toLocaleDateString('en-US', {
+                                        {new Date(item.created_at).toLocaleDateString(localeTag, {
                                             day: 'numeric', month: 'long', year: 'numeric'
                                         })}
                                     </span>
-                                    <span className="text-xs text-green-600 font-bold">✓ Completed</span>
+                                    <span className="text-xs text-green-600 font-bold">✓ {t('profile.completed')}</span>
                                 </div>
                             </div>
                         </div>

@@ -3,12 +3,14 @@ import AppLayout from '@/Layouts/AppLayout';
 import { useForm } from '@inertiajs/react';
 import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
 import tailwindConfig from '../../../../tailwind.config.js';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const { colors } = tailwindConfig.theme.extend;
 const COLOR_PRIMARY = colors.primary;    // '#F4C799'
 const COLOR_SECONDARY = colors.secondary; // '#C0976C'
 
 export default function Create() {
+    const { t } = useTranslation();
     const [preview, setPreview] = useState(null);
     const { data, setData, post, processing, errors } = useForm({
         title: '',
@@ -106,7 +108,7 @@ export default function Create() {
                     color: '#311A05',
                     margin: '0 0 24px 0',
                 }}>
-                    Report a Lost or Found Item
+                    {t('post.reportLostOrFound')}
                 </h1>
 
                 <form onSubmit={handleSubmit}>
@@ -121,7 +123,7 @@ export default function Create() {
                             color: '#311A05',
                             marginBottom: '10px',
                         }}>
-                            Item Type <span style={{ color: '#D56666' }}>*</span>
+                            {t('post.itemType')} <span style={{ color: '#D56666' }}>*</span>
                         </label>
                         <div style={{ display: 'flex', gap: '12px' }}>
                             {['lost', 'found'].map(type => (
@@ -143,7 +145,7 @@ export default function Create() {
                                         fontSize: '14px',
                                         color: '#333',
                                     }}>
-                                        {type === 'lost' ? '❌ Lost Item' : '✅ Found Item'}
+                                        {type === 'lost' ? `❌ ${t('profile.lostItem')}` : `✅ ${t('profile.foundItem')}`}
                                     </span>
                                 </label>
                             ))}
@@ -160,11 +162,11 @@ export default function Create() {
                             color: '#311A05',
                             marginBottom: '8px',
                         }}>
-                            Title <span style={{ color: '#D56666' }}>*</span>
+                            {t('post.title')} <span style={{ color: '#D56666' }}>*</span>
                         </label>
                         <input
                             type="text"
-                            placeholder="E.g., Black Wallet Lost at Central Park"
+                            placeholder={t('post.titleExamplePlaceholder')}
                             value={data.title}
                             onChange={(e) => setData('title', e.target.value)}
                             onFocus={(e) => {
@@ -188,12 +190,12 @@ export default function Create() {
                             color: '#311A05',
                             marginBottom: '8px',
                         }}>
-                            Location <span style={{ color: '#D56666' }}>*</span>
+                            {t('profile.location')} <span style={{ color: '#D56666' }}>*</span>
                         </label>
                         <GooglePlacesInput
                             value={data.location_name}
                             onSelect={handleLocationSelect}
-                            placeholder="Search for lost/found location…"
+                            placeholder={t('post.searchLocationPlaceholder')}
                             inputStyle={{
                                 ...formFieldStyle,
                                 paddingLeft: '36px',
@@ -221,10 +223,10 @@ export default function Create() {
                             color: '#311A05',
                             marginBottom: '8px',
                         }}>
-                            Description <span style={{ color: '#D56666' }}>*</span>
+                            {t('post.description')} <span style={{ color: '#D56666' }}>*</span>
                         </label>
                         <textarea
-                            placeholder="Describe the item in detail (color, size, unique features, etc.)"
+                            placeholder={t('post.describeItemDetail')}
                             value={data.description}
                             onChange={(e) => setData('description', e.target.value)}
                             rows="5"
@@ -253,7 +255,7 @@ export default function Create() {
                             color: '#311A05',
                             marginBottom: '8px',
                         }}>
-                            Upload Image
+                            {t('post.uploadImage')}
                         </label>
                         <div style={{
                             border: `2px dashed ${COLOR_PRIMARY}`,
@@ -295,7 +297,7 @@ export default function Create() {
                                             color: '#666',
                                             margin: 0,
                                         }}>
-                                            Click to change image
+                                            {t('post.clickToChangeImage')}
                                         </p>
                                     </div>
                                 ) : (
@@ -311,7 +313,7 @@ export default function Create() {
                                             color: '#666',
                                             margin: 0,
                                         }}>
-                                            Click to upload or drag and drop
+                                            {t('post.clickToUploadDrag')}
                                         </p>
                                     </div>
                                 )}
@@ -349,7 +351,7 @@ export default function Create() {
                                 e.currentTarget.style.backgroundColor = '#E8E8E8';
                             }}
                         >
-                            Cancel
+                            {t('profile.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -379,7 +381,7 @@ export default function Create() {
                                 }
                             }}
                         >
-                            {processing ? 'Creating...' : 'Create Post'}
+                            {processing ? t('post.creating') : t('post.createPost')}
                         </button>
                     </div>
                 </form>
