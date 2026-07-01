@@ -5,6 +5,7 @@ import ConversationList from '@/Components/Chat/ConversationList';
 import ChatHeader from '@/Components/Chat/ChatHeader';
 import MessageList from '@/Components/Chat/MessageList';
 import MessageInput from '@/Components/Chat/MessageInput';
+import ChatClaimPopup from '@/Components/Chat/ChatClaimPopup';
 import { useEcho, createTypingThrottle } from '@/hooks/useEcho';
 import { avatarUrl } from '@/Components/Common/Avatar';
 import RateUserModal from '@/Pages/Profile/RateUserModal';
@@ -41,6 +42,30 @@ function formatDateLabel(isoString, localeTag = 'en-US', labels = { today: 'Toda
         day: 'numeric',
         month: 'long',
         year: 'numeric',
+    });
+}
+
+/**
+ * Collapse handshake cards to the LATEST one per (claim_id, template).
+ *
+ * A fresh card is posted server-side on every "continue by chat" / pop-up press
+ * so it re-surfaces at the bottom of the conversation. Without this, all the
+ * older copies would still render and stack up as duplicates — here we keep only
+ * the newest (highest id) card for each claim+template and drop the rest.
+ */
+function dedupeCards(messages) {
+    const latestId = new Map(); // `${claim_id}:${template}` -> max numeric id
+    for (const m of messages) {
+        if (m.type !== 'card' || m.meta?.claim_id == null) continue;
+        const key = `${m.meta.claim_id}:${m.meta.template}`;
+        const prev = latestId.get(key);
+        if (prev == null || m.id > prev) latestId.set(key, m.id);
+    }
+
+    return messages.filter((m) => {
+        if (m.type !== 'card' || m.meta?.claim_id == null) return true;
+        const key = `${m.meta.claim_id}:${m.meta.template}`;
+        return latestId.get(key) === m.id;
     });
 }
 
@@ -103,10 +128,14 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
     const [sendingMessage, setSendingMessage] = useState(false);
     const [otherLastReadAt, setOtherLastReadAt] = useState(null);
     const [ratingClaim, setRatingClaim] = useState(null);
+    const [activeClaim, setActiveClaim] = useState(null);
+    const [popupHidden, setPopupHidden] = useState(false);
 
     // Refs
     const typingThrottleRef = useRef(null);
     const currentConversationIdRef = useRef(null);
+    const currentOtherUserIdRef = useRef(null);
+    const activeClaimIdRef = useRef(null);
 
     // Echo hooks
     const {
@@ -207,6 +236,10 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
         const intervalId = setInterval(() => {
             // Refresh conversation list (unread counts, ordering, new chats)
             refreshConversations();
+
+            // Keep the transaction pop-up in sync: it disappears the moment the
+            // current request resolves, then surfaces the next active one (if any).
+            fetchActiveClaim(currentOtherUserIdRef.current);
 
             // Pull new messages for the open conversation and append only ids
             // we don't already have (skips optimistic "temp-" messages).
@@ -312,9 +345,18 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
 
             setSelectedConversation(conversation);
             currentConversationIdRef.current = conversation.id;
+            currentOtherUserIdRef.current = conversation.other_user?.id ?? null;
             setShowConversationList(false);
             setDraftMessage('');
             setTypingUsers({});
+
+            // Reset + refetch the transaction pop-up for this conversation. It
+            // reappears whenever a chat is (re)opened while mid-transaction.
+            // Clear first so a stale claim from the previous chat never flashes.
+            setActiveClaim(null);
+            activeClaimIdRef.current = null;
+            setPopupHidden(false);
+            fetchActiveClaim(conversation.other_user?.id);
 
             // Fetch messages
             await fetchMessages(conversation.id);
@@ -697,6 +739,50 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
             .catch(() => {});
     };
 
+    // Pull the most recent in-flight claim between the auth user and the other
+    // participant so the transaction pop-up can offer to (re)send the handshake
+    // card. Returns null once every request between them is settled.
+    const fetchActiveClaim = (otherUserId) => {
+        if (!otherUserId) {
+            setActiveClaim(null);
+            activeClaimIdRef.current = null;
+            return;
+        }
+        window.axios
+            .get(`/api/claims/active-with/${otherUserId}?_t=${Date.now()}`)
+            .then((res) => {
+                const claim = res.data.claim;
+                const newId = claim?.id ?? null;
+                // When a DIFFERENT request surfaces (the previous one resolved and
+                // the next active request took its place), re-show the pop-up even
+                // if the user had dismissed the earlier one.
+                if (newId !== activeClaimIdRef.current) {
+                    activeClaimIdRef.current = newId;
+                    if (newId) setPopupHidden(false);
+                }
+                setActiveClaim(claim);
+            })
+            .catch(() => setActiveClaim(null));
+    };
+
+    // Pop-up "send" — drops the handshake card(s) into the conversation, exactly
+    // like "Continue Chat" from the request tabs, then refreshes the messages so
+    // the card shows immediately. Hidden afterwards (reappears on reopen).
+    const handleSendClaimCard = async () => {
+        if (!activeClaim) return;
+        try {
+            await window.axios.post(`/api/claims/${activeClaim.id}/follow-up`);
+            if (currentConversationIdRef.current) {
+                await fetchMessages(currentConversationIdRef.current);
+            }
+            // Only hide once the card has actually been posted + loaded.
+            setPopupHidden(true);
+        } catch (e) {
+            // Keep the pop-up open on failure so the user can retry.
+            console.error('Failed to send handshake card:', e);
+        }
+    };
+
     function transformMessage(msg) {
         return {
             id: msg.id,
@@ -758,8 +844,8 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
         .filter(([, name]) => name)
         .map(([, name]) => name);
 
-    // Messages with day dividers
-    const messagesWithDividers = addDayDividers(messages, localeTag, dateLabels);
+    // Messages with day dividers (older duplicate cards collapsed away first)
+    const messagesWithDividers = addDayDividers(dedupeCards(messages), localeTag, dateLabels);
 
     return (
         <AppLayout title="Chat - KOKODA">
@@ -802,6 +888,14 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                                     onRequestRating={setRatingClaim}
                                     authUserId={authUser?.id}
                                 />
+
+                                {activeClaim && !popupHidden && (
+                                    <ChatClaimPopup
+                                        claim={activeClaim}
+                                        onSend={handleSendClaimCard}
+                                        onDismiss={() => setPopupHidden(true)}
+                                    />
+                                )}
 
                                 <MessageInput
                                     value={draftMessage}

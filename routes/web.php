@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
             ->get();
 
         $sentClaims = \App\Models\Claim::where('claimant_id', $user->id)
-            ->with(['post', 'post.location', 'post.user', 'owner'])
+            ->with(['post', 'post.location', 'post.user', 'owner', 'rating'])
             ->orderByDesc('created_at')
             ->get();
 
@@ -104,6 +104,7 @@ Route::middleware('auth')->group(function () {
     // ─────────────────────────────────────────────────────────────
     Route::post('/posts/{post}/claim', [ClaimController::class, 'store'])->name('claims.store');
     Route::get('/api/posts/{post}/claim-status', [ClaimController::class, 'getUserClaim'])->name('claims.status');
+    Route::get('/api/claims/active-with/{user}', [ClaimController::class, 'activeWith'])->name('claims.active');
     Route::patch('/api/claims/{claim}/resolve', [ClaimController::class, 'resolve'])->name('claims.resolve');
     Route::patch('/api/claims/{claim}/reject', [ClaimController::class, 'reject'])->name('claims.reject');
     Route::post('/api/claims/{claim}/follow-up', [ClaimController::class, 'followUp'])->name('claims.followup');

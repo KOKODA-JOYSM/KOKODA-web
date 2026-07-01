@@ -7,6 +7,7 @@ use App\Events\MessageSent;
 use App\Models\Claim;
 use App\Models\Conversation;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -93,6 +94,49 @@ class ClaimController extends Controller
     }
 
     /**
+     * The most recent still-in-flight claim (pending/accepted, post active)
+     * between the auth user and $user, in EITHER direction. Powers the little
+     * chat pop-up that lets a user re-surface their handshake card without
+     * leaving the chat. Returns null when the two aren't mid-transaction.
+     */
+    public function activeWith(Request $request, User $user): JsonResponse
+    {
+        $authId = $request->user()->id;
+
+        $claim = Claim::with('post')
+            ->where(function ($q) use ($authId, $user) {
+                $q->where(function ($qq) use ($authId, $user) {
+                    $qq->where('claimant_id', $authId)->where('owner_id', $user->id);
+                })->orWhere(function ($qq) use ($authId, $user) {
+                    $qq->where('owner_id', $authId)->where('claimant_id', $user->id);
+                });
+            })
+            ->whereIn('status', ['pending', 'accepted'])
+            ->whereHas('post', fn ($q) => $q->where('status', 'active'))
+            ->latest('id')
+            ->first();
+
+        if (! $claim) {
+            return response()->json(['claim' => null]);
+        }
+
+        return response()->json([
+            'claim' => [
+                'id' => $claim->id,
+                'status' => $claim->status,
+                // Which card THIS user would act on (verify vs receive).
+                'template' => $claim->templateFor($authId),
+                'post' => [
+                    'id' => $claim->post->id,
+                    'title' => $claim->post->title,
+                    'image_url' => $claim->post->image_url,
+                    'type' => $claim->post->type,
+                ],
+            ],
+        ]);
+    }
+
+    /**
      * Resolve a claim — mark as completed and post as resolved.
      * Only the post owner may call this.
      */
@@ -153,12 +197,16 @@ class ClaimController extends Controller
             $claim->update(['intro_message_sent' => true]);
         }
 
-        // Always drop a FRESH card matching the caller's role so it resurfaces
-        // at the bottom of the conversation (won't get buried in a long chat).
-        // Each party gets their own card type when they press chat from a post
-        // detail. Chatting directly (conversation list) doesn't hit this
-        // endpoint, so no card appears there.
-        $this->createCard($conversation, $claim, $claim->templateFor($user->id), $user->id);
+        // Surface BOTH handshake cards so each party has their OWN actionable
+        // card, regardless of who pressed "continue by chat" first: the holder's
+        // verification card and the recipient's received card, each authored by
+        // its actor so it aligns to that person's side. A fresh copy is posted
+        // each time so it re-surfaces at the bottom; the client renders only the
+        // latest per (claim, template), so this never shows as a double. Chatting
+        // directly from the conversation list doesn't hit this endpoint, so no
+        // card appears there.
+        $this->createCard($conversation, $claim, 'verification', $claim->holderId());
+        $this->createCard($conversation, $claim, 'received', $claim->recipientId());
 
         // Sender has obviously "read" their own card.
         $conversation->participants()
@@ -171,9 +219,14 @@ class ClaimController extends Controller
     }
 
     /**
-     * Create a fresh handshake card for a claim and broadcast it to the other
-     * participant. A new card is posted on every follow-up (by design) so it
-     * stays visible at the bottom of a long conversation.
+     * Post a handshake card for a claim and broadcast it to the other
+     * participant. Authored by the role that acts on it (holder → verification,
+     * recipient → received) so it aligns to that person's side of the chat.
+     *
+     * A fresh card is posted on every follow-up so it RE-SURFACES at the bottom
+     * of the conversation (that's the whole point of the chat pop-up / "continue
+     * by chat"). Duplicates are collapsed on the client — only the latest card
+     * per (claim, template) is rendered — so this never shows as a double.
      */
     private function createCard(Conversation $conversation, Claim $claim, string $template, int $authorId): void
     {
@@ -214,7 +267,10 @@ class ClaimController extends Controller
     }
 
     /**
-     * Holder verifies the item is genuine (handshake step 1).
+     * Holder verifies the item is genuine — one side of a TWO-WAY handshake.
+     * Independent of the recipient's "received" press and pressable in any
+     * order. The claim only completes (and the post resolves) once BOTH sides
+     * have confirmed.
      */
     public function verify(Request $request, Claim $claim): JsonResponse
     {
@@ -224,14 +280,17 @@ class ClaimController extends Controller
             return response()->json(['error' => 'Only the item holder can verify.'], 403);
         }
 
-        if ($claim->status !== 'pending') {
+        if (in_array($claim->status, ['rejected', 'completed'], true)) {
             return response()->json([
                 'error' => 'This request can no longer be verified.',
                 'claim' => $this->formatClaim($claim),
             ], 422);
         }
 
-        $claim->update(['status' => 'accepted']);
+        if (! $claim->verified_at) {
+            $claim->verified_at = now();
+            $this->settleHandshake($claim);
+        }
 
         return response()->json([
             'success' => true,
@@ -240,8 +299,10 @@ class ClaimController extends Controller
     }
 
     /**
-     * Recipient confirms they received the item (handshake step 2):
-     * completes the claim and resolves the post.
+     * Recipient confirms they received the item — the other side of the two-way
+     * handshake. Pressable directly (not gated on verification). The rating is
+     * returned ONLY when this press completes the handshake (the holder has
+     * already verified); otherwise it waits for the holder's verification.
      */
     public function receive(Request $request, Claim $claim): JsonResponse
     {
@@ -251,32 +312,58 @@ class ClaimController extends Controller
             return response()->json(['error' => 'Only the item recipient can confirm receipt.'], 403);
         }
 
-        if ($claim->status !== 'accepted') {
+        if (in_array($claim->status, ['rejected', 'completed'], true)) {
             return response()->json([
-                'error' => 'The item must be verified before it can be confirmed as received.',
+                'error' => 'This request can no longer be updated.',
                 'claim' => $this->formatClaim($claim),
             ], 422);
         }
 
-        $claim->update(['status' => 'completed']);
-        $claim->post->update(['status' => 'resolved']);
+        if (! $claim->received_at) {
+            $claim->received_at = now();
+            $this->settleHandshake($claim);
+        }
 
-        $claim->load([
-            'claimant:id,name,username,profile_icon',
-            'owner:id,name,username,profile_icon',
-        ]);
+        $payload = $this->formatClaim($claim);
 
-        // The recipient (caller) will rate the holder/finder of the item.
-        $holderId = $claim->holderId();
-        $ratee = $holderId === $claim->owner_id ? $claim->owner : $claim->claimant;
+        // Rating is triggered only once BOTH sides have confirmed (2-arah).
+        if ($claim->status === 'completed') {
+            $claim->load([
+                'claimant:id,name,username,profile_icon',
+                'owner:id,name,username,profile_icon',
+            ]);
+
+            $holderId = $claim->holderId();
+            $ratee = $holderId === $claim->owner_id ? $claim->owner : $claim->claimant;
+
+            $payload += ['ratee' => $ratee, 'claimant' => $claim->claimant];
+        }
 
         return response()->json([
             'success' => true,
-            'claim' => $this->formatClaim($claim) + [
-                'ratee' => $ratee,
-                'claimant' => $claim->claimant,
-            ],
+            'claim' => $payload,
         ]);
+    }
+
+    /**
+     * Advance a claim's status from its two handshake timestamps: 'completed'
+     * (both sides confirmed → resolve the post), 'accepted' (one side confirmed,
+     * in progress) or left as-is. Persists the claim; the caller supplies the
+     * freshly-set timestamp on $claim.
+     */
+    private function settleHandshake(Claim $claim): void
+    {
+        if ($claim->verified_at && $claim->received_at) {
+            $claim->status = 'completed';
+        } elseif ($claim->status === 'pending') {
+            $claim->status = 'accepted';
+        }
+
+        $claim->save();
+
+        if ($claim->status === 'completed') {
+            $claim->post->update(['status' => 'resolved']);
+        }
     }
 
     /**

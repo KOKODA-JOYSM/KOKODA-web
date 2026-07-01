@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle, ShieldCheck, PackageCheck, Clock, Loader2 } from 'lucide-react';
+import { CheckCircle, ShieldCheck, PackageCheck, Clock, Loader2, Star } from 'lucide-react';
 import { avatarUrl } from '@/Components/Common/Avatar';
 
 const FALLBACK_IMG =
@@ -17,26 +17,30 @@ function getSenderAvatar(message) {
 /**
  * E-commerce-style request card shown inside a conversation.
  *
- * Two templates form a two-step handshake on a claim:
- *  - "verification": the item holder confirms the item is genuine  → claim accepted
- *  - "received":     the recipient confirms they got it back        → claim completed
+ * A TWO-WAY handshake — each side presses independently, in any order:
+ *  - "verification": the item holder confirms the item is genuine
+ *  - "received":     the recipient confirms they got it back
  *
- * Actionability is ROLE-based (not authorship): the verification card is
- * actionable by the holder, the received card by the recipient. Both cards are
- * created together when either party follows up, so each side can act on theirs.
+ * The claim only completes (and the post resolves) once BOTH have confirmed;
+ * the rating is then given by the recipient to the holder/finder — for lost AND
+ * found alike. Each press first asks for a confirmation reminder. Actionability
+ * is ROLE-based (not authorship): the holder acts on the verification card, the
+ * recipient on the received card; the other party sees it as a status.
  */
 export default function RequestCardMessage({ message, onRequestRating, authUserId }) {
     const meta = message.meta || {};
     const post = meta.post || {};
     const template = meta.template; // 'verification' | 'received'
 
-    // Live status comes from the server (overlaid per-fetch); keep an optimistic
-    // override after the viewer acts so the card updates without a refetch.
-    const [acted, setActed] = useState(null);
-    const status = acted || meta.claim_status || 'pending';
-
+    // Optimistic override after the viewer acts, plus the live handshake flags
+    // overlaid by the server on each fetch.
+    const [acted, setActed] = useState(false);
+    const [confirming, setConfirming] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    const status = meta.claim_status || 'pending';
+    const rated = !!meta.rated;
 
     const imageUrl = post.image_url || FALLBACK_IMG;
     const isLost = post.type === 'lost';
@@ -45,76 +49,94 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
     const viewerIsHolder = authUserId != null && authUserId === meta.holder_id;
     const viewerIsRecipient = authUserId != null && authUserId === meta.recipient_id;
 
-    const handleAction = async () => {
+    // Each side's confirmation is independent; the claim only completes once BOTH
+    // are set. `acted` optimistically reflects the viewer's own just-made press.
+    const isVerified = (acted && template === 'verification') || meta.verified || status === 'completed';
+    const isReceived = (acted && template === 'received') || meta.received || status === 'completed';
+    const completed = status === 'completed';
+
+    // Run the actual verify/receive call once the reminder has been accepted.
+    const runAction = async () => {
+        setConfirming(false);
         setLoading(true);
         setError(null);
         const endpoint = template === 'verification' ? 'verify' : 'receive';
         try {
             const { data } = await window.axios.post(`/api/claims/${meta.claim_id}/${endpoint}`);
-            const newStatus = data?.claim?.status || (template === 'verification' ? 'accepted' : 'completed');
-            setActed(newStatus);
+            setActed(true);
 
-            // The recipient who just confirmed receipt rates the holder/finder.
-            if (template === 'received') {
+            // Rating is triggered ONLY when this press completes the two-way
+            // handshake — the server includes a `ratee` only when both sides have
+            // now confirmed. Otherwise it waits for the other side.
+            if (template === 'received' && data?.claim?.ratee) {
                 onRequestRating?.(data.claim);
             }
         } catch (e) {
             setError(e.response?.data?.error || 'Something went wrong. Please try again.');
-            const serverStatus = e.response?.data?.claim?.status;
-            if (serverStatus) setActed(serverStatus);
         } finally {
             setLoading(false);
         }
     };
 
-    // ── Resolve the button/info state for this template + status + viewer ──
-    let actionable = false;
+    // Open the rating modal for a completed handshake (recipient rates the finder).
+    const openRating = () => onRequestRating?.({ id: meta.claim_id, ratee: meta.ratee });
+
+    // ── Resolve the button/info state: mode = 'action' | 'rate' | 'status' ──
+    let mode = 'status';
     let label;
     let Icon = CheckCircle;
     let tone = 'bg-secondary text-base'; // primary action color
     let done = false;
+    let onClick = null;
 
     if (template === 'verification') {
-        if (status === 'pending') {
-            Icon = ShieldCheck;
-            if (viewerIsHolder) {
-                actionable = true;
-                label = 'Verify Item';
-            } else {
-                label = 'Waiting for verification';
-                Icon = Clock;
-                tone = 'bg-highlight text-tertiary';
-            }
-        } else {
+        if (isVerified) {
             label = 'Item Verified';
             Icon = ShieldCheck;
             tone = 'bg-label-found text-base';
             done = true;
+        } else if (viewerIsHolder) {
+            mode = 'action';
+            label = 'Verify Item';
+            Icon = ShieldCheck;
+            onClick = () => setConfirming(true);
+        } else {
+            // The other party sees the holder's card as a status only.
+            label = 'Awaiting verification';
+            Icon = Clock;
+            tone = 'bg-highlight text-tertiary';
         }
     } else {
         // received
-        if (status === 'completed') {
+        if (completed && viewerIsRecipient && !rated) {
+            // Both sides confirmed but the recipient hasn't rated yet.
+            mode = 'rate';
+            label = 'Give Rating';
+            Icon = Star;
+            tone = 'bg-highlight text-tertiary';
+            onClick = openRating;
+        } else if (isReceived) {
             label = 'Item Received';
             Icon = PackageCheck;
             tone = 'bg-label-found text-base';
             done = true;
-        } else if (status === 'accepted') {
+        } else if (viewerIsRecipient) {
+            mode = 'action';
+            label = 'Item Received';
             Icon = PackageCheck;
-            if (viewerIsRecipient) {
-                actionable = true;
-                label = 'Item Received';
-            } else {
-                label = 'Waiting for recipient';
-                Icon = Clock;
-                tone = 'bg-highlight text-tertiary';
-            }
+            onClick = () => setConfirming(true);
         } else {
-            // pending — item not verified yet
-            label = 'Waiting for verification';
+            // The other party sees the recipient's card as a status only.
+            label = 'Awaiting recipient';
             Icon = Clock;
             tone = 'bg-highlight text-tertiary';
         }
     }
+
+    // Reminder copy shown before the verify/receive action is committed.
+    const confirmPrompt = template === 'verification'
+        ? 'Verify this really is the genuine item? This confirms the handover.'
+        : 'Confirm you have actually received your item back?';
 
     return (
         <div className={`flex items-end gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
@@ -160,10 +182,36 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
                     )}
 
                     {/* Action / status */}
-                    {actionable ? (
+                    {confirming ? (
+                        // Reminder step — make the user really confirm before it counts.
+                        <div className="mt-1 flex flex-col gap-1.5 rounded-xl bg-highlight/40 p-2">
+                            <p className="text-center font-quicksand text-[11px] font-semibold leading-snug text-tertiary">
+                                {confirmPrompt}
+                            </p>
+                            <div className="flex gap-1.5">
+                                <button
+                                    type="button"
+                                    onClick={runAction}
+                                    disabled={loading}
+                                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-secondary py-1.5 font-quicksand text-xs font-bold text-base shadow-sm transition-all hover:opacity-90 disabled:opacity-60"
+                                >
+                                    {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
+                                    Yes, confirm
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setConfirming(false)}
+                                    disabled={loading}
+                                    className="flex-1 rounded-lg bg-base py-1.5 font-quicksand text-xs font-bold text-tertiary/70 shadow-sm transition-all hover:bg-gray-100 disabled:opacity-60"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    ) : mode !== 'status' ? (
                         <button
                             type="button"
-                            onClick={handleAction}
+                            onClick={onClick}
                             disabled={loading}
                             className={`mt-1 flex w-full items-center justify-center gap-1.5 rounded-xl ${tone} py-2 font-quicksand text-xs font-bold shadow-sm transition-all hover:opacity-90 disabled:opacity-60`}
                         >
