@@ -150,7 +150,7 @@ export default function Edit({ mustVerifyEmail }) {
                             onChange={handlePhotoChange}
                             className="hidden"
                         />
-                        <LanguageSwitcher className="w-full sm:w-auto" />
+                        <LanguageSwitcher variant="solid" className="w-full sm:w-auto shadow" />
                     </div>
 
 

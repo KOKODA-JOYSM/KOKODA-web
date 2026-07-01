@@ -72,3 +72,9 @@ textarea::placeholder {
     opacity: 1;
 }
 
+/* LanguageSwitcher "solid" variant sits on a dark background — the global
+   select color reset above would otherwise make its text invisible. */
+select.lang-switcher-solid {
+    color: #FEFEFE !important;
+}
+
