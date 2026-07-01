@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle, ShieldCheck, PackageCheck, Clock, Loader2, Star } from 'lucide-react';
+import { CheckCircle, ShieldCheck, PackageCheck, Clock, Loader2, Star, Lock } from 'lucide-react';
 import { avatarUrl } from '@/Components/Common/Avatar';
 
 const FALLBACK_IMG =
@@ -121,10 +121,19 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
             tone = 'bg-label-found text-base';
             done = true;
         } else if (viewerIsRecipient) {
-            mode = 'action';
-            label = 'Item Received';
-            Icon = PackageCheck;
-            onClick = () => setConfirming(true);
+            // Gate "Item Received" on the holder verifying the item first, so the
+            // recipient can't confirm receipt prematurely and isn't left confused.
+            if (!meta.verified) {
+                mode = 'locked';
+                label = 'Waiting for verification';
+                Icon = Lock;
+                tone = 'bg-gray-100 text-tertiary/50';
+            } else {
+                mode = 'action';
+                label = 'Item Received';
+                Icon = PackageCheck;
+                onClick = () => setConfirming(true);
+            }
         } else {
             // The other party sees the recipient's card as a status only.
             label = 'Awaiting recipient';
@@ -207,6 +216,20 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
                                     Cancel
                                 </button>
                             </div>
+                        </div>
+                    ) : mode === 'locked' ? (
+                        // Disabled until the item holder verifies, with a short note
+                        // so the recipient understands why they must wait.
+                        <div className="mt-1 flex flex-col gap-1">
+                            <div
+                                className={`flex w-full cursor-not-allowed items-center justify-center gap-1.5 rounded-xl ${tone} py-2 font-quicksand text-xs font-bold`}
+                            >
+                                <Lock size={14} />
+                                {label}
+                            </div>
+                            <p className="text-center font-roboto text-[10px] leading-snug text-tertiary/60">
+                                Waiting for the item holder to verify the item before you can confirm receipt.
+                            </p>
                         </div>
                     ) : mode !== 'status' ? (
                         <button

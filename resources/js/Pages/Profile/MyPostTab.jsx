@@ -11,7 +11,6 @@ export default function MyPostTab({ posts }) {
         return (
             <>
                 <div className="text-center py-12 bg-secondary/10 rounded-2xl">
-                    <div className="text-5xl mb-4">📋</div>
                     <p className="text-tertiary font-semibold text-lg mb-2">No posts yet</p>
                     <p className="text-tertiary/60 text-sm mb-6">Create your first post to report a lost or found item.</p>
                     <button
@@ -19,9 +18,6 @@ export default function MyPostTab({ posts }) {
                         onClick={() => setShowCreateModal(true)}
                         className="inline-flex items-center gap-2 bg-primary text-tertiary font-bold px-6 py-2.5 rounded-xl hover:bg-secondary transition-all duration-200 shadow-sm"
                     >
-                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                        </svg>
                         Create New Post
                     </button>
                 </div>

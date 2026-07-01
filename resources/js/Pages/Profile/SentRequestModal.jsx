@@ -7,27 +7,29 @@ const getLocation = (post) =>
     (typeof post?.location === 'object' ? post?.location?.place_name : post?.location) || 'Indonesia';
 
 // Maps a claim's backend status to the visual status pill from the SVG design.
+// Soft "badge" styling (muted fill, colored text, thin border, no shadow) so the
+// status reads as an informational label — not a tappable button.
 const statusPillConfig = {
     completed: {
         label: 'Request Completed',
-        className: 'bg-secondary',
+        className: 'bg-green-100 text-green-700 border-green-200',
         Icon: CheckCircle2,
     },
     // The holder verified but the handshake isn't complete until the recipient
     // confirms receipt — so keep showing "waiting" until then.
     accepted: {
         label: 'Waiting for Confirmation',
-        className: 'bg-highlight text-tertiary',
+        className: 'bg-amber-100 text-amber-700 border-amber-200',
         Icon: Clock,
     },
     rejected: {
         label: 'Request Rejected',
-        className: 'bg-label-lost',
+        className: 'bg-red-100 text-red-700 border-red-200',
         Icon: XCircle,
     },
     pending: {
         label: 'Waiting for Response',
-        className: 'bg-highlight text-tertiary',
+        className: 'bg-amber-100 text-amber-700 border-amber-200',
         Icon: Clock,
     },
 };
@@ -174,10 +176,10 @@ export default function SentRequestModal({ claim, onClose }) {
                                 Request Status
                             </p>
 
-                            <div className={`mx-auto w-full max-w-[380px] flex items-center justify-center gap-2 py-3 rounded-full text-base font-quicksand font-bold uppercase text-sm tracking-wide shadow-md ${pill.className}`}>
-                                <StatusIcon size={18} />
+                            <span className={`mx-auto inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-quicksand font-semibold ${pill.className}`}>
+                                <StatusIcon size={16} />
                                 {pill.label}
-                            </div>
+                            </span>
 
                             <button
                                 onClick={handleChat}
