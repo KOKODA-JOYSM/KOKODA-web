@@ -21,10 +21,18 @@ export default function Navbar() {
     const { url, props } = usePage();
     const user = props?.auth?.user || null;
     const pendingClaimIds = props?.pendingClaimIds || [];
+    const updatedSentClaimIds = props?.updatedSentClaimIds || [];
     const unreadConversationsCount = props?.unreadConversationsCount || 0;
 
     const { seenIds } = useSeenClaims();
-    const pendingClaimsCount = pendingClaimIds.filter(id => !seenIds.has(id)).length;
+    // Incoming pending requests + sent requests that were resolved and now need a
+    // rating. Sent ones use a "rate-" signature so they notify independently of a
+    // plain claim id that may already have been marked seen while it was pending.
+    const notifIds = [
+        ...pendingClaimIds,
+        ...updatedSentClaimIds.map(id => `rate-${id}`),
+    ];
+    const pendingClaimsCount = notifIds.filter(sig => !seenIds.has(sig)).length;
 
     const { t } = useTranslation();
 

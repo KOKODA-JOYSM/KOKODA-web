@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { usePage, router, Link } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, X, ExternalLink, MapPin, Pencil, Trash2 } from 'lucide-react';
 import PostActionButtons from '@/Components/Posts/PostActionButtons';
+import Avatar from '@/Components/Common/Avatar';
 
 export default function PostDetailModal({ post, onClose }) {
     const { auth } = usePage().props;
@@ -102,18 +103,14 @@ export default function PostDetailModal({ post, onClose }) {
                                     onClick={(e) => e.stopPropagation()}
                                     className="flex items-center gap-2 min-w-0 flex-1 group/profile"
                                 >
-                                    <div className="w-8 h-8 rounded-full bg-highlight flex items-center justify-center text-sm font-bold text-tertiary flex-shrink-0">
-                                        {post.user?.name?.charAt(0)?.toUpperCase() || '?'}
-                                    </div>
+                                    <Avatar user={post.user} size={32} className="w-8 h-8" />
                                     <span className="font-quicksand font-semibold text-xs text-tertiary truncate group-hover/profile:underline">
                                         {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'unknown'}`}
                                     </span>
                                 </Link>
                             ) : (
                                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                                    <div className="w-8 h-8 rounded-full bg-highlight flex items-center justify-center text-sm font-bold text-tertiary flex-shrink-0">
-                                        {post.user?.name?.charAt(0)?.toUpperCase() || '?'}
-                                    </div>
+                                    <Avatar user={post.user} size={32} className="w-8 h-8" />
                                     <span className="font-quicksand font-semibold text-xs text-tertiary truncate">
                                         {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'unknown'}`}
                                     </span>
