@@ -379,13 +379,15 @@ class ChatController extends Controller
     }
 
     /**
-     * For card messages, overlay the claim's CURRENT status so the card
-     * reflects live handshake progress instead of a creation-time snapshot.
-     * Cached per-request to avoid N+1 across a page of messages.
+     * For card messages, overlay the claim's CURRENT handshake state so the card
+     * reflects live progress instead of a creation-time snapshot: live status,
+     * each side's confirmation (verified/received), whether it's been rated, and
+     * the ratee (the finder the recipient rates). Cached per-request to avoid
+     * N+1 across a page of messages.
      *
-     * @var array<int,string|null>
+     * @var array<int,\App\Models\Claim|null>
      */
-    private array $cardClaimStatusCache = [];
+    private array $cardClaimCache = [];
 
     private function cardMetaWithLiveStatus(Message $message): ?array
     {
@@ -396,11 +398,40 @@ class ChatController extends Controller
         }
 
         $claimId = (int) $meta['claim_id'];
-        if (! array_key_exists($claimId, $this->cardClaimStatusCache)) {
-            $this->cardClaimStatusCache[$claimId] = \App\Models\Claim::whereKey($claimId)->value('status');
+        if (! array_key_exists($claimId, $this->cardClaimCache)) {
+            $this->cardClaimCache[$claimId] = \App\Models\Claim::with([
+                'owner:id,name,username,profile_icon',
+                'claimant:id,name,username,profile_icon',
+                'rating:id,claim_id',
+            ])->find($claimId);
         }
 
-        $meta['claim_status'] = $this->cardClaimStatusCache[$claimId] ?? ($meta['claim_status'] ?? 'pending');
+        $claim = $this->cardClaimCache[$claimId];
+
+        if (! $claim) {
+            $meta['claim_status'] = $meta['claim_status'] ?? 'pending';
+            return $meta;
+        }
+
+        $completed = $claim->status === 'completed';
+
+        $meta['claim_status'] = $claim->status;
+        $meta['verified'] = $claim->verified_at !== null || $completed;
+        $meta['received'] = $claim->received_at !== null || $completed;
+        $meta['rated'] = $claim->rating !== null;
+
+        // The recipient rates the holder/finder. holder_id was captured on the
+        // card at creation; resolve it to the matching loaded user.
+        $holderId = $meta['holder_id'] ?? null;
+        $ratee = $holderId === $claim->owner_id ? $claim->owner : $claim->claimant;
+        if ($ratee) {
+            $meta['ratee'] = [
+                'id' => $ratee->id,
+                'name' => $ratee->name,
+                'username' => $ratee->username,
+                'profile_icon' => $ratee->profile_icon,
+            ];
+        }
 
         return $meta;
     }

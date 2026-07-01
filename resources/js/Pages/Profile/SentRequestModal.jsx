@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { router } from '@inertiajs/react';
 import { X, CheckCircle2, XCircle, Clock, MessageSquare } from 'lucide-react';
+import RateUserModal from './RateUserModal';
 
 const getLocation = (post) =>
     (typeof post?.location === 'object' ? post?.location?.place_name : post?.location) || 'Indonesia';
@@ -8,15 +9,16 @@ const getLocation = (post) =>
 // Maps a claim's backend status to the visual status pill from the SVG design.
 const statusPillConfig = {
     completed: {
-        label: 'Request Accepted',
+        label: 'Request Completed',
         className: 'bg-secondary',
         Icon: CheckCircle2,
     },
-    // Set once the post owner has verified/received the item (handshake started).
+    // The holder verified but the handshake isn't complete until the recipient
+    // confirms receipt — so keep showing "waiting" until then.
     accepted: {
-        label: 'Request Accepted',
-        className: 'bg-secondary',
-        Icon: CheckCircle2,
+        label: 'Waiting for Confirmation',
+        className: 'bg-highlight text-tertiary',
+        Icon: Clock,
     },
     rejected: {
         label: 'Request Rejected',
@@ -32,6 +34,12 @@ const statusPillConfig = {
 
 export default function SentRequestModal({ claim, onClose }) {
     const post = claim.post;
+    // Found-post requesters (the item recipient) rate the finder/owner once the
+    // handshake is resolved. This covers the manual-resolve path where the owner
+    // resolved without a chat handshake, so the requester was never prompted.
+    const [showRating, setShowRating] = useState(
+        post?.type === 'found' && claim.status === 'completed' && !claim.rating
+    );
     const owner = post?.user || claim.owner;
     const location = getLocation(post);
 
@@ -182,6 +190,13 @@ export default function SentRequestModal({ claim, onClose }) {
                     </div>
                 </div>
             </div>
+
+            {showRating && (
+                <RateUserModal
+                    claim={{ ...claim, ratee: owner }}
+                    onClose={() => { setShowRating(false); onClose(); }}
+                />
+            )}
 
             <style>{`
                 @keyframes srFadeIn {

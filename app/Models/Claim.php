@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Claim extends Model
 {
@@ -14,10 +15,14 @@ class Claim extends Model
         'status',
         'message',
         'intro_message_sent',
+        'verified_at',
+        'received_at',
     ];
 
     protected $casts = [
         'intro_message_sent' => 'boolean',
+        'verified_at' => 'datetime',
+        'received_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -44,6 +49,14 @@ class Claim extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    /**
+     * The rating left for this claim (only the item recipient may rate).
+     */
+    public function rating(): HasOne
+    {
+        return $this->hasOne(Rating::class);
     }
 
     /**
