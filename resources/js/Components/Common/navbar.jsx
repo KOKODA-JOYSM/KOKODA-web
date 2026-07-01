@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import { useTranslation } from '@/hooks/useTranslation';
 import LanguageSwitcher from '@/Components/Common/LanguageSwitcher';
+import { useSeenClaims } from '@/hooks/useSeenClaims';
 
 // ─────────────────────────────────────────────
 //  NAV ITEMS (Translations will be handled inside component)
