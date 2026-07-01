@@ -244,11 +244,12 @@ class PostController extends Controller
         $posts = $query->orderBy('created_at', 'desc')->get();
 
         // Radius-based filtering and sorting (priority)
+        // When coordinates are provided, radius filter is STRICT — no fallback to name search.
         if ($request->has('latitude') && $request->has('longitude') && $request->has('radius')) {
             $userLat = floatval($request->latitude);
             $userLng = floatval($request->longitude);
-            // Gunakan radius dari request, minimum 5km agar lebih toleran
-            $radiusKm = max(floatval($request->radius), 5);
+            // Gunakan radius persis dari request (tanpa forced minimum)
+            $radiusKm = floatval($request->radius);
 
             // Filter and calculate distance for each post
             $filteredByRadius = $posts->filter(function ($post) use ($userLat, $userLng, $radiusKm) {
@@ -269,32 +270,9 @@ class PostController extends Controller
                 return $distance <= $radiusKm;
             });
 
-            if ($filteredByRadius->isNotEmpty()) {
-                // Sort by distance (closest first)
-                $posts = $filteredByRadius->sortBy('distance')->values();
-            } elseif ($request->has('location') && $request->location !== 'All Locations') {
-                // Fallback ke name search jika radius tidak dapat hasil
-                $locationName = $request->location;
-                $keywords = array_filter(preg_split('/\s+/', trim($locationName)));
-                $posts = $posts->filter(function ($post) use ($locationName, $keywords) {
-                    if (! $post->location) {
-                        return false;
-                    }
-                    $placeName = $post->location->place_name;
-                    if (stripos($placeName, $locationName) !== false) {
-                        return true;
-                    }
-                    foreach ($keywords as $keyword) {
-                        if (strlen($keyword) >= 3 && stripos($placeName, $keyword) !== false) {
-                            return true;
-                        }
-                    }
-
-                    return false;
-                })->values();
-            } else {
-                $posts = $filteredByRadius->values();
-            }
+            // Sort by distance (closest first). If empty, return empty — no fallback to name search
+            // when coordinates are available, radius must be strictly respected.
+            $posts = $filteredByRadius->sortBy('distance')->values();
         }
         // Fallback to location name filter if no coordinates provided
         elseif ($request->has('location') && $request->location !== 'All Locations') {
