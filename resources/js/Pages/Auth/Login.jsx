@@ -3,8 +3,10 @@ import InputError from '@/Components/Auth/InputError';
 import TextInput from '@/Components/Auth/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Login({ status, canResetPassword }) {
+    const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
@@ -112,7 +114,7 @@ export default function Login({ status, canResetPassword }) {
                                         href={route('password.request')}
                                         className="text-sm font-medium text-gray-text-field underline underline-offset-2 transition hover:text-tertiary"
                                     >
-                                        Forgot password
+                                        {t('auth.forgot')}
                                     </Link>
                                 )}
                             </div>
@@ -122,7 +124,7 @@ export default function Login({ status, canResetPassword }) {
                                 disabled={processing}
                                 className="mt-2 w-full rounded-lg bg-secondary px-4 py-3 text-base font-bold uppercase tracking-wide text-background transition hover:bg-tertiary hover:text-background disabled:cursor-not-allowed disabled:opacity-60"
                             >
-                                {processing ? 'Logging in...' : 'Log in'}
+                                {processing ? '...' : t('auth.login')}
                             </button>
                         </form>
 
@@ -138,9 +140,9 @@ export default function Login({ status, canResetPassword }) {
 
                         {canRegister && (
                             <p className="mt-7 text-center text-base text-tertiary">
-                                Don&apos;t have account?{' '}
+                                {t('auth.alreadyRegistered') === 'Already registered?' ? "Don't have account? " : "Belum punya akun? "}
                                 <Link href={route('register')} className="font-semibold text-secondary underline underline-offset-2 hover:text-tertiary">
-                                    Sign up
+                                    {t('auth.register')}
                                 </Link>
                             </p>
                         )}
