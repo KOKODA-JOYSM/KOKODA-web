@@ -12,6 +12,12 @@ class Message extends Model
         'user_id',
         'body',
         'type',
+        'meta',
+        'image_url',
+    ];
+
+    protected $casts = [
+        'meta' => 'array',
     ];
 
     /**

@@ -11,6 +11,8 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -117,6 +119,61 @@ class ChatController extends Controller
         ]))->toOthers();
 
         // Update last_read_at untuk sender (dia sudah baca karena dia yang kirim)
+        $conversation->participants()
+            ->updateExistingPivot($request->user()->id, [
+                'last_read_at' => now(),
+            ]);
+
+        return response()->json([
+            'message' => $this->formatMessage($message, $request->user()->id),
+        ], 201);
+    }
+
+    /**
+     * API: Upload dan kirim gambar ke conversation.
+     */
+    public function sendImage(Request $request, Conversation $conversation): JsonResponse
+    {
+        $this->authorizeParticipant($request->user(), $conversation);
+
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,jpg,png,gif,webp|max:5120',
+            'caption' => 'nullable|string|max:5000',
+        ]);
+
+        $caption = $request->input('caption', '');
+
+        // Simpan gambar ke disk public di folder chat-images/
+        // Gunakan relative path (/storage/...) agar bisa diakses di host/port manapun
+        $path = $request->file('image')->store('chat-images', 'public');
+        $imageUrl = '/storage/' . $path;
+
+        $message = $conversation->messages()->create([
+            'user_id' => $request->user()->id,
+            'body' => $caption ?: '📷 Image',
+            'type' => 'image',
+            'image_url' => $imageUrl,
+        ]);
+
+        $message->load('sender:id,name,username,profile_icon');
+
+        // Broadcast pesan ke semua participant di conversation channel
+        broadcast(new MessageSent($message))->toOthers();
+
+        // Broadcast update ke user channels (untuk update conversation list)
+        $conversation->load('participants');
+        $previewBody = $caption ? "📷 {$caption}" : '📷 Image';
+        broadcast(new ConversationUpdated($conversation, [
+            'id' => $message->id,
+            'body' => Str::limit($previewBody, 50),
+            'type' => $message->type,
+            'image_url' => $message->image_url,
+            'sender_id' => $message->user_id,
+            'sender_name' => $message->sender->name,
+            'created_at' => $message->created_at->toISOString(),
+        ]))->toOthers();
+
+        // Update last_read_at untuk sender
         $conversation->participants()
             ->updateExistingPivot($request->user()->id, [
                 'last_read_at' => now(),
@@ -307,6 +364,8 @@ class ChatController extends Controller
             'user_id' => $message->user_id,
             'body' => $message->body,
             'type' => $message->type,
+            'meta' => $this->cardMetaWithLiveStatus($message),
+            'image_url' => $message->image_url,
             'is_own' => $isOwn,
             'is_read' => $isRead,
             'created_at' => $message->created_at->toISOString(),
@@ -320,14 +379,42 @@ class ChatController extends Controller
     }
 
     /**
+     * For card messages, overlay the claim's CURRENT status so the card
+     * reflects live handshake progress instead of a creation-time snapshot.
+     * Cached per-request to avoid N+1 across a page of messages.
+     *
+     * @var array<int,string|null>
+     */
+    private array $cardClaimStatusCache = [];
+
+    private function cardMetaWithLiveStatus(Message $message): ?array
+    {
+        $meta = $message->meta;
+
+        if ($message->type !== 'card' || ! is_array($meta) || ! isset($meta['claim_id'])) {
+            return $meta;
+        }
+
+        $claimId = (int) $meta['claim_id'];
+        if (! array_key_exists($claimId, $this->cardClaimStatusCache)) {
+            $this->cardClaimStatusCache[$claimId] = \App\Models\Claim::whereKey($claimId)->value('status');
+        }
+
+        $meta['claim_status'] = $this->cardClaimStatusCache[$claimId] ?? ($meta['claim_status'] ?? 'pending');
+
+        return $meta;
+    }
+
+    /**
      * Format pesan untuk preview di conversation list.
      */
     private function formatMessagePreview(Message $message): array
     {
         return [
             'id' => $message->id,
-            'body' => $message->body,
+            'body' => $message->type === 'image' ? '📷 Image' : $message->body,
             'type' => $message->type,
+            'image_url' => $message->image_url,
             'sender_id' => $message->user_id,
             'sender_name' => $message->sender->name ?? 'Unknown',
             'created_at' => $message->created_at->toISOString(),

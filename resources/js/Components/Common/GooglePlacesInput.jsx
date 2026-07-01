@@ -60,7 +60,7 @@ export default function GooglePlacesInput({
         setIsLoading(true);
         try {
             const res = await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=6&addressdetails=1`,
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=10&addressdetails=1&countrycodes=id`,
                 {
                     headers: {
                         'Accept-Language': 'id,en',
@@ -69,8 +69,12 @@ export default function GooglePlacesInput({
                 }
             );
             const data = await res.json();
-            setSuggestions(data);
-            setShowDropdown(data.length > 0);
+            // Filter client-side: hanya tampilkan hasil dari Indonesia
+            const indonesiaOnly = data.filter(
+                (place) => place?.address?.country_code === 'id'
+            ).slice(0, 6);
+            setSuggestions(indonesiaOnly);
+            setShowDropdown(indonesiaOnly.length > 0);
             setActiveSuggestion(-1);
         } catch (err) {
             setSuggestions([]);

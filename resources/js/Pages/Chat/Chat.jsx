@@ -7,6 +7,7 @@ import MessageList from '@/Components/Chat/MessageList';
 import MessageInput from '@/Components/Chat/MessageInput';
 import { useEcho, createTypingThrottle } from '@/hooks/useEcho';
 import { avatarUrl } from '@/Components/Common/Avatar';
+import RateUserModal from '@/Pages/Profile/RateUserModal';
 
 /**
  * Format timestamp ISO ke jam:menit lokal (id-ID).
@@ -94,6 +95,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
     const [userSearchResults, setUserSearchResults] = useState([]);
     const [sendingMessage, setSendingMessage] = useState(false);
     const [otherLastReadAt, setOtherLastReadAt] = useState(null);
+    const [ratingClaim, setRatingClaim] = useState(null);
 
     // Refs
     const typingThrottleRef = useRef(null);
@@ -503,6 +505,110 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
     }, [draftMessage, selectedConversation, authUser, sendingMessage]);
 
     // ─────────────────────────────────────────────────────────────
+    // SEND IMAGE
+    // ─────────────────────────────────────────────────────────────
+
+    const handleSendImage = useCallback(async (file, caption = '') => {
+        if (!file || !selectedConversation || sendingMessage) return;
+
+        // Stop typing indicator
+        typingThrottleRef.current?.stop();
+
+        // Optimistic update: show preview via blob URL
+        const blobUrl = URL.createObjectURL(file);
+        const rawOptimistic = {
+            id: `temp-${Date.now()}`,
+            conversation_id: selectedConversation.id,
+            user_id: authUser.id,
+            body: caption || '📷 Image',
+            type: 'image',
+            image_url: blobUrl,
+            is_own: true,
+            created_at: new Date().toISOString(),
+            sender: {
+                id: authUser.id,
+                name: authUser.name,
+                username: authUser.username,
+                profile_icon: authUser.profile_icon,
+            },
+        };
+        const optimisticMessage = {
+            ...transformMessage(rawOptimistic),
+            _sending: true,
+        };
+
+        setMessages((prev) => [...prev, optimisticMessage]);
+        setSendingMessage(true);
+
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+            if (caption) {
+                formData.append('caption', caption);
+            }
+
+            const response = await window.axios.post(
+                `/chat/conversations/${selectedConversation.id}/image`,
+                formData,
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                }
+            );
+
+            // Replace optimistic message with real message from server
+            setMessages((prev) =>
+                prev.map((msg) =>
+                    msg.id === optimisticMessage.id ? transformMessage(response.data.message) : msg
+                )
+            );
+
+            // Revoke blob URL
+            URL.revokeObjectURL(blobUrl);
+
+            // Update conversation list
+            setConversations((prev) => {
+                const updated = prev.map((c) =>
+                    c.id === selectedConversation.id
+                        ? {
+                              ...c,
+                              last_message: {
+                                  id: response.data.message.id,
+                                  body: response.data.message.body,
+                                  type: 'image',
+                                  image_url: response.data.message.image_url,
+                                  sender_id: authUser.id,
+                                  sender_name: authUser.name,
+                                  created_at: response.data.message.created_at,
+                              },
+                          }
+                        : c
+                );
+
+                updated.sort((a, b) => {
+                    const aTime = a.last_message?.created_at || a.created_at;
+                    const bTime = b.last_message?.created_at || b.created_at;
+                    return new Date(bTime) - new Date(aTime);
+                });
+
+                return updated;
+            });
+        } catch (error) {
+            console.error('Failed to send image:', error);
+            // Remove optimistic message on failure
+            setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
+            URL.revokeObjectURL(blobUrl);
+
+            // Show user-friendly error
+            const errorMsg = error.response?.data?.errors?.image?.[0]
+                || error.response?.data?.message
+                || 'Gagal mengirim gambar. Coba lagi.';
+            alert(errorMsg);
+        } finally {
+            setSendingMessage(false);
+        }
+    }, [selectedConversation, authUser, sendingMessage]);
+
+    // ─────────────────────────────────────────────────────────────
     // TYPING INDICATOR
     // ─────────────────────────────────────────────────────────────
 
@@ -595,6 +701,8 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
             body: msg.body,
             text: msg.body,
             type: msg.type || 'text',
+            meta: msg.meta || null,
+            image_url: msg.image_url || null,
             timestamp: formatTime(msg.created_at),
             created_at: msg.created_at,
             isOwn: msg.is_own ?? msg.user_id === authUser?.id,
@@ -604,23 +712,34 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
     }
 
     // Transform conversations untuk komponen ConversationList
-    const transformedConversations = conversations.map((conv) => ({
-        id: conv.id,
-        name: conv.other_user?.name || 'Unknown User',
-        avatar: getAvatarUrl(conv.other_user),
-        lastMessage: conv.last_message
-            ? conv.last_message.body.length > 35
-                ? conv.last_message.body.substring(0, 35) + '...'
-                : conv.last_message.body
-            : 'Belum ada pesan',
-        timestamp: conv.last_message
-            ? formatTime(conv.last_message.created_at)
-            : '',
-        unreadCount: conv.unread_count || 0,
-        isOnline: conv.other_user ? onlineUserIds.has(conv.other_user.id) : false,
-        otherUser: conv.other_user,
-        _raw: conv,
-    }));
+    const transformedConversations = conversations.map((conv) => {
+        let lastMessage = 'Belum ada pesan';
+        if (conv.last_message) {
+            if (conv.last_message.type === 'image') {
+                const body = conv.last_message.body;
+                lastMessage = body && body !== '📷 Image' ? `📷 ${body}` : '📷 Image';
+                if (lastMessage.length > 35) lastMessage = lastMessage.substring(0, 35) + '...';
+            } else if (conv.last_message.body?.length > 35) {
+                lastMessage = conv.last_message.body.substring(0, 35) + '...';
+            } else {
+                lastMessage = conv.last_message.body;
+            }
+        }
+
+        return {
+            id: conv.id,
+            name: conv.other_user?.name || 'Unknown User',
+            avatar: getAvatarUrl(conv.other_user),
+            lastMessage,
+            timestamp: conv.last_message
+                ? formatTime(conv.last_message.created_at)
+                : '',
+            unreadCount: conv.unread_count || 0,
+            isOnline: conv.other_user ? onlineUserIds.has(conv.other_user.id) : false,
+            otherUser: conv.other_user,
+            _raw: conv,
+        };
+    });
 
     // Get selected conversation transformed
     const selectedTransformed = selectedConversation
@@ -673,12 +792,15 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                                     loading={loadingMessages}
                                     hasMore={hasMoreMessages}
                                     onLoadMore={handleLoadMore}
+                                    onRequestRating={setRatingClaim}
+                                    authUserId={authUser?.id}
                                 />
 
                                 <MessageInput
                                     value={draftMessage}
                                     onChange={handleDraftChange}
                                     onSend={handleSendMessage}
+                                    onSendImage={handleSendImage}
                                     disabled={sendingMessage}
                                 />
                             </>
@@ -712,6 +834,13 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                     </section>
                 </div>
             </div>
+
+            {ratingClaim && (
+                <RateUserModal
+                    claim={ratingClaim}
+                    onClose={() => setRatingClaim(null)}
+                />
+            )}
         </AppLayout>
     );
 }

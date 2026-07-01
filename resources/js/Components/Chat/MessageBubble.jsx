@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { avatarUrl } from '@/Components/Common/Avatar';
+import RequestCardMessage from '@/Components/Chat/RequestCardMessage';
 
 /**
  * Generate avatar URL dari data sender.
@@ -146,7 +147,114 @@ function BubbleTextContent({ message, isOwn, isSending }) {
     );
 }
 
-export default function MessageBubble({ message }) {
+/**
+ * Image content for chat bubbles — renders the uploaded image with
+ * a subtle border, rounded corners, and a lightbox on click.
+ */
+function BubbleImageContent({ message, isOwn, isSending }) {
+    const [showLightbox, setShowLightbox] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    const imageUrl = message.image_url || message.image;
+
+    return (
+        <>
+            <div className="relative">
+                {/* Image with border */}
+                <div
+                    className="cursor-pointer overflow-hidden rounded-xl border-[1.5px] border-secondary/50"
+                    onClick={() => setShowLightbox(true)}
+                >
+                    {/* Loading skeleton */}
+                    {!imageLoaded && (
+                        <div className="flex h-44 w-44 items-center justify-center bg-secondary/15 md:h-52 md:w-52">
+                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-secondary border-t-tertiary" />
+                        </div>
+                    )}
+                    <img
+                        src={imageUrl}
+                        alt="Chat image"
+                        className={`max-h-[280px] min-h-[120px] w-auto min-w-[140px] max-w-[240px] object-cover transition-opacity duration-300 md:max-h-[320px] md:max-w-[280px] ${
+                            imageLoaded ? 'opacity-100' : 'h-0 w-0 opacity-0'
+                        }`}
+                        onLoad={() => setImageLoaded(true)}
+                        onError={() => setImageLoaded(true)}
+                    />
+                </div>
+
+                {/* Caption text below image (WhatsApp style) */}
+                {message.body && message.body !== '📷 Image' ? (
+                    <div className="relative mt-1.5">
+                        <p
+                            className="font-roboto text-[13px] leading-snug text-tertiary md:text-[14px]"
+                            style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
+                        >
+                            {message.body}
+                            <span
+                                className="invisible inline-block h-0 select-none"
+                                style={{ width: isOwn ? '5em' : '3em' }}
+                                aria-hidden="true"
+                            >
+                                &nbsp;
+                            </span>
+                        </p>
+                        <span className="absolute bottom-[1px] right-0 flex items-center gap-[3px] whitespace-nowrap select-none">
+                            <span className="text-[10px] leading-none text-tertiary/50 md:text-[11px]">
+                                {message.timestamp}
+                            </span>
+                            {isOwn && <MessageStatus isSending={isSending} isRead={message.isRead} />}
+                        </span>
+                    </div>
+                ) : (
+                    <div className="mt-1 flex items-center justify-end gap-[3px]">
+                        <span className="text-[10px] leading-none text-tertiary/50 md:text-[11px]">
+                            {message.timestamp}
+                        </span>
+                        {isOwn && <MessageStatus isSending={isSending} isRead={message.isRead} />}
+                    </div>
+                )}
+            </div>
+
+            {/* Lightbox overlay */}
+            {showLightbox && (
+                <div
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+                    onClick={() => setShowLightbox(false)}
+                >
+                    {/* Close button */}
+                    <button
+                        type="button"
+                        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/30"
+                        onClick={() => setShowLightbox(false)}
+                        aria-label="Close"
+                    >
+                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <img
+                        src={imageUrl}
+                        alt="Full size"
+                        className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            )}
+        </>
+    );
+}
+
+export default function MessageBubble({ message, onRequestRating, authUserId }) {
+    if (message.type === 'card') {
+        return (
+            <RequestCardMessage
+                message={message}
+                onRequestRating={onRequestRating}
+                authUserId={authUserId}
+            />
+        );
+    }
+
     if (message.type === 'day-divider') {
         return (
             <div className="flex justify-center py-2">
@@ -158,6 +266,7 @@ export default function MessageBubble({ message }) {
     }
 
     const isSending = message._sending;
+    const isImage = message.type === 'image' || message.image_url || message.image;
 
     // ── Own message (right-aligned) ──────────────────────────────
     if (message.isOwn) {
@@ -165,25 +274,16 @@ export default function MessageBubble({ message }) {
             <div className="flex justify-end">
                 <div className="max-w-[78%] md:max-w-[460px]">
                     <div
-                        className={`rounded-lg border border-secondary/55 bg-base px-3 py-2 shadow-sm ${isSending ? 'opacity-60' : ''
-                            }`}
+                        className={`rounded-lg border border-secondary/55 bg-base px-3 py-2 shadow-sm ${
+                            isSending ? 'opacity-60' : ''
+                        }`}
                     >
-                        {message.image ? (
-                            <>
-                                <div className="overflow-hidden rounded-xl">
-                                    <img
-                                        src={message.image}
-                                        alt="attachment"
-                                        className="h-20 w-20 rounded-xl object-cover md:h-24 md:w-24"
-                                    />
-                                </div>
-                                <div className="mt-1 flex items-center justify-end gap-3">
-                                    <span className="text-[10px] leading-none text-tertiary/50 md:text-[12px]">
-                                        {message.timestamp}
-                                    </span>
-                                    <MessageStatus isSending={isSending} isRead={message.isRead} />
-                                </div>
-                            </>
+                        {isImage ? (
+                            <BubbleImageContent
+                                message={message}
+                                isOwn={true}
+                                isSending={isSending}
+                            />
                         ) : (
                             <BubbleTextContent
                                 message={message}
@@ -209,30 +309,25 @@ export default function MessageBubble({ message }) {
             </div>
 
             <div className="max-w-[78%] md:max-w-[460px]">
-                {message.image ? (
-                    <div className="overflow-hidden rounded-2xl border border-secondary/45 bg-primary p-2 shadow-sm">
-                        <img
-                            src={message.image}
-                            alt="attachment"
-                            className="h-20 w-20 rounded-xl object-cover md:h-24 md:w-24"
+                <div
+                    className={`inline-block rounded-lg border border-secondary/45 bg-primary shadow-sm ${
+                        isImage ? 'px-2 py-2' : 'px-3 py-2'
+                    }`}
+                >
+                    {isImage ? (
+                        <BubbleImageContent
+                            message={message}
+                            isOwn={false}
+                            isSending={false}
                         />
-                        <div className="mt-1 flex items-center justify-end gap-[3px]">
-                            <span className="text-[10px] leading-none text-tertiary/50 md:text-[11px]">
-                                {message.timestamp}
-                            </span>
-                        </div>
-                    </div>
-                ) : (
-                    <div
-                        className="inline-block rounded-lg border border-secondary/45 bg-primary px-3 py-2 shadow-sm"
-                    >
+                    ) : (
                         <BubbleTextContent
                             message={message}
                             isOwn={false}
                             isSending={false}
                         />
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );

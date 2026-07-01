@@ -33,8 +33,14 @@ jobs:
           node-version: '20'
           cache: npm
 
+      - name: Prepare .env
+        run: cp .env.example .env
+
       - name: Install PHP dependencies
         run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+
+      - name: Generate app key
+        run: php artisan key:generate
 
       - name: Install JS dependencies
         run: npm ci
@@ -42,10 +48,50 @@ jobs:
       - name: Build assets
         run: npm run build
 
-      - name: Prepare app key
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-
       - name: Run tests
         run: composer test
+
+  # Mirror the production build from main_kokoda.yml so that build-time failures
+  # (PHP syntax errors, package:discover crashes, --no-dev autoload issues) are
+  # caught at PR time instead of after merge, when only the CD pipeline runs them.
+  build-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, bcmath, pdo, pdo_mysql, redis
+          tools: composer:v2
+          coverage: none
+          cache: composer
+
+      - name: Lint PHP sources
+        run: find routes app config database -name '*.php' -print0 | xargs -0 -n1 -P4 php -l
+
+      - name: Prepare .env
+        run: cp .env.example .env
+
+      - name: Install dependencies (production mode)
+        run: composer install --prefer-dist --no-progress --no-dev --optimize-autoloader
+
+      - name: Generate app key
+        run: php artisan key:generate
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      # Use `npm install` (not `npm ci`) to mirror main_kokoda.yml exactly:
+      # build-check must predict the CD outcome, not enforce lock-file hygiene
+      # (that is the `ci` job's responsibility, which intentionally uses `npm ci`).
+      - name: Build frontend assets
+        run: |
+          npm install
+          npm run build

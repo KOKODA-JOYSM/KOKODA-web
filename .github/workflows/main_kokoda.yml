@@ -97,3 +97,47 @@ jobs:
               -H "Authorization: Bearer $TOKEN" -H "If-Match: *" \
               "$SCM/api/vfs/site/wwwroot/bootstrap/cache/$f" || true
           done
+
+      # Run database migrations INSIDE the app container. The Kudu /api/command
+      # endpoint runs in the SCM container, which has NO `php` on its PATH, so
+      # `php artisan migrate` there fails with exit 127 while Kudu still returns
+      # HTTP 200 — a silent false success that never actually migrates (verified
+      # 2026-06-30: the messages.meta / claims migrations stayed Pending after a
+      # "successful" deploy). Instead, drop a single-use, token-gated PHP runner
+      # into public/ via the Kudu VFS, invoke it over HTTPS so it executes in the
+      # APP container (with prod DB access), and FAIL the deploy unless it prints
+      # MIGRATE_OK. The runner deletes itself and invalidates its own opcache
+      # entry on the first hit, so it is unreachable immediately afterwards.
+      - name: Run Laravel migrations on App Service
+        run: |
+          set -euo pipefail
+          AAD=$(az account get-access-token --resource https://management.core.windows.net/ --query accessToken -o tsv)
+          SCM="https://kokoda-dyg6f8dhgghbang2.scm.southeastasia-01.azurewebsites.net"
+          HOST="https://kokoda-dyg6f8dhgghbang2.southeastasia-01.azurewebsites.net"
+          K=$(openssl rand -hex 16)
+          echo "::add-mask::$K"
+          NAME="_deploy_migrate_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}.php"
+          cat > runner.php <<PHP
+          <?php
+          if ((\$_GET['k'] ?? '') !== '$K') { http_response_code(403); exit('forbidden'); }
+          header('Content-Type: text/plain');
+          // Self-clean FIRST so even a fatal error during migrate removes the runner.
+          @unlink(__FILE__);
+          if (function_exists('opcache_invalidate')) { @opcache_invalidate(__FILE__, true); }
+          require __DIR__.'/../vendor/autoload.php';
+          \$app = require __DIR__.'/../bootstrap/app.php';
+          \$kernel = \$app->make(Illuminate\Contracts\Console\Kernel::class);
+          \$status = \$kernel->call('migrate', ['--force' => true]);
+          echo \$kernel->output();
+          echo (\$status === 0 ? "MIGRATE_OK\n" : "MIGRATE_FAIL status=\$status\n");
+          PHP
+          echo "Uploading single-use migration runner to public/$NAME"
+          curl -fsS -X PUT -H "Authorization: Bearer $AAD" -H "If-Match: *" \
+            --data-binary @runner.php "$SCM/api/vfs/site/wwwroot/public/$NAME" >/dev/null
+          echo "Invoking migrations in the app container..."
+          OUT=$(curl -fsS "$HOST/$NAME?k=$K")
+          echo "$OUT"
+          # Belt-and-suspenders: remove the runner from disk even if self-delete failed.
+          curl -sS -o /dev/null -X DELETE -H "Authorization: Bearer $AAD" -H "If-Match: *" \
+            "$SCM/api/vfs/site/wwwroot/public/$NAME" || true
+          echo "$OUT" | grep -q "MIGRATE_OK" || { echo "::error::Migration step failed"; exit 1; }

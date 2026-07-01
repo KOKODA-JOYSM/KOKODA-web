@@ -6,7 +6,7 @@ import RequestTab from './RequestTab';
 import MyPostTab from './MyPostTab';
 import HistoryTab from './HistoryTab';
 
-export default function Profile({ posts, status }) {
+export default function Profile({ posts, incomingClaims = [], sentClaims = [], status }) {
     // 1. Ambil data user yang sedang login langsung dari backend (database)
     const { auth } = usePage().props;
     const user = auth.user;
@@ -23,10 +23,11 @@ export default function Profile({ posts, status }) {
 
     // 2. Mengolah data postingan dari database
     // Backend mengirim array Collection langsung (sudah difilter user_id di controller)
-    const myPosts = Array.isArray(posts) ? posts : (posts?.data || []);
+    const allPosts = Array.isArray(posts) ? posts : (posts?.data || []);
 
-    // Resolved posts otomatis masuk ke tab History
-    const resolvedPosts = myPosts.filter((p) => p.status === 'resolved');
+    // Resolved posts otomatis pindah ke tab History dan tidak lagi tampil di My Post
+    const myPosts = allPosts.filter((p) => p.status !== 'resolved');
+    const resolvedPosts = allPosts.filter((p) => p.status === 'resolved');
 
     return (
         <AppLayout title="Profile - KOKODA">
@@ -125,7 +126,9 @@ export default function Profile({ posts, status }) {
                     <div className="flex flex-col gap-6">
 
                         {/* TAB 1: REQUESTS */}
-                        {activeTab === 'request' && <RequestTab posts={[]} />}
+                        {activeTab === 'request' && (
+                            <RequestTab incomingClaims={incomingClaims} sentClaims={sentClaims} />
+                        )}
 
                         {/* TAB 2: MY POST */}
                         {activeTab === 'my_post' && <MyPostTab posts={myPosts} />}

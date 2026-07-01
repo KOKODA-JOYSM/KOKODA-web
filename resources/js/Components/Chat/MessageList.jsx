@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import MessageBubble from '@/Components/Chat/MessageBubble';
 
-export default function MessageList({ messages, loading = false, hasMore = false, onLoadMore }) {
+export default function MessageList({ messages, loading = false, hasMore = false, onLoadMore, onRequestRating, authUserId }) {
     const endRef = useRef(null);
     const containerRef = useRef(null);
     const prevMessagesLengthRef = useRef(0);
@@ -67,7 +67,12 @@ export default function MessageList({ messages, loading = false, hasMore = false
 
                 {/* Messages */}
                 {messages.map((message) => (
-                    <MessageBubble key={message.id} message={message} />
+                    <MessageBubble
+                        key={message.id}
+                        message={message}
+                        onRequestRating={onRequestRating}
+                        authUserId={authUserId}
+                    />
                 ))}
 
                 <div ref={endRef} />

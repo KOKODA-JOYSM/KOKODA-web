@@ -6,6 +6,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RatingController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -27,11 +28,32 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     // 1. Menampilkan halaman utama profil custom kamu (Pages/Profile/Profile.jsx)
     Route::get('/profile', function () {
+        $user = auth()->user();
         $posts = app(PostController::class)->myPosts();
 
+        // Hanya klaim yang masih menunggu keputusan ditampilkan di Incoming Request.
+        // Setelah diresolve (completed) atau ditolak (rejected), klaim tidak lagi
+        // muncul di sini — post yang resolved akan muncul di tab History.
+        // Show requests that are still in flight (pending or mid-handshake
+        // 'accepted'). Once 'completed'/'rejected' (or the post is resolved)
+        // they drop off here and move to History.
+        $incomingClaims = \App\Models\Claim::where('owner_id', $user->id)
+            ->whereIn('status', ['pending', 'accepted'])
+            ->whereHas('post', fn ($q) => $q->where('status', 'active'))
+            ->with(['post', 'post.location', 'claimant'])
+            ->orderByDesc('created_at')
+            ->get();
+
+        $sentClaims = \App\Models\Claim::where('claimant_id', $user->id)
+            ->with(['post', 'post.location', 'post.user', 'owner'])
+            ->orderByDesc('created_at')
+            ->get();
+
         return Inertia::render('Profile/Profile', [
-            'posts' => $posts,
-            'status' => session('status'),
+            'posts'          => $posts,
+            'incomingClaims' => $incomingClaims,
+            'sentClaims'     => $sentClaims,
+            'status'         => session('status'),
         ]);
     })->name('profile');
 
@@ -82,6 +104,16 @@ Route::middleware('auth')->group(function () {
     // ─────────────────────────────────────────────────────────────
     Route::post('/posts/{post}/claim', [ClaimController::class, 'store'])->name('claims.store');
     Route::get('/api/posts/{post}/claim-status', [ClaimController::class, 'getUserClaim'])->name('claims.status');
+    Route::patch('/api/claims/{claim}/resolve', [ClaimController::class, 'resolve'])->name('claims.resolve');
+    Route::patch('/api/claims/{claim}/reject', [ClaimController::class, 'reject'])->name('claims.reject');
+    Route::post('/api/claims/{claim}/follow-up', [ClaimController::class, 'followUp'])->name('claims.followup');
+    Route::post('/api/claims/{claim}/verify', [ClaimController::class, 'verify'])->name('claims.verify');
+    Route::post('/api/claims/{claim}/receive', [ClaimController::class, 'receive'])->name('claims.receive');
+
+    // ─────────────────────────────────────────────────────────────
+    // RATING ROUTES
+    // ─────────────────────────────────────────────────────────────
+    Route::post('/api/ratings', [RatingController::class, 'store'])->name('ratings.store');
 
     // ─────────────────────────────────────────────────────────────
     // CHAT ROUTES
@@ -91,6 +123,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/conversations', [ChatController::class, 'startConversation'])->name('chat.start');
     Route::get('/chat/conversations/{conversation}/messages', [ChatController::class, 'messages'])->name('chat.messages');
     Route::post('/chat/conversations/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('chat.send');
+    Route::post('/chat/conversations/{conversation}/image', [ChatController::class, 'sendImage'])->name('chat.send.image');
     Route::post('/chat/conversations/{conversation}/read', [ChatController::class, 'markAsRead'])->name('chat.read');
     Route::post('/chat/conversations/{conversation}/typing', [ChatController::class, 'typing'])->name('chat.typing');
     Route::get('/chat/users/search', [ChatController::class, 'searchUsers'])->name('chat.users.search');

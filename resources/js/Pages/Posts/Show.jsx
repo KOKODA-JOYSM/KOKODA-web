@@ -16,14 +16,6 @@ export default function Show({ post, auth }) {
         <AppLayout title={`${post.title} - KOKODA`}>
             <div className="px-7 py-8 max-w-3xl mx-auto">
 
-                {/* Back Button */}
-                <button
-                    onClick={() => window.history.back()}
-                    className="px-4 py-2 mb-6 text-xs font-semibold text-primary border-2 border-primary rounded-lg font-quicksand transition-all duration-200 hover:bg-primary hover:text-white"
-                >
-                    ← Back
-                </button>
-
                 {/* Main Container */}
                 <div className="bg-base rounded-xl overflow-hidden shadow-md">
 

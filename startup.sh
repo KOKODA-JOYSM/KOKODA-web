@@ -49,7 +49,7 @@ EOF
 #    Zip deploy menghapus seluruh /home/site/wwwroot setiap deploy, sementara
 #    /home adalah Azure Files yang persistent. Tanpa ini, semua gambar post
 #    dan foto profil yang di-upload user hilang setiap kali deploy.
-mkdir -p /home/storage/app/public /home/storage/profile-icons
+mkdir -p /home/storage/app/public /home/storage/app/public/chat-images /home/storage/profile-icons
 rm -rf /home/site/wwwroot/storage/app/public
 ln -sfn /home/storage/app/public /home/site/wwwroot/storage/app/public
 rm -rf /home/site/wwwroot/public/images/profile-icons
@@ -66,11 +66,12 @@ php artisan storage:link --force
 #    tersimpan ke DB Azure (bukan ke file SQLite ephemeral bawaan repo).
 php artisan migrate --force
 
-# 6) Cache config & view untuk performa production. Startup script berjalan
-#    ulang setiap deploy/restart, jadi cache selalu segar setelah perubahan
-#    Application Settings di portal.
+# 6) Cache config, routes & view untuk performa production. Startup script
+#    berjalan ulang setiap deploy/restart, jadi cache selalu segar setelah
+#    perubahan Application Settings di portal.
 php artisan config:clear
 php artisan config:cache
+php artisan route:cache
 php artisan view:cache
 
 # 7) Start Laravel Reverb WebSocket server sebagai background process.

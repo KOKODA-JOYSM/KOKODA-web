@@ -44,6 +44,12 @@ class HandleInertiaRequests extends Middleware
                     ->where('status', 'pending')
                     ->count()
                 : 0,
+            'pendingClaimIds' => fn () => $request->user()
+                ? Claim::where('owner_id', $request->user()->id)
+                    ->where('status', 'pending')
+                    ->pluck('id')
+                    ->toArray()
+                : [],
         ];
     }
 }

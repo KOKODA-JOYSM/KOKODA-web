@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 /**
  * LeafletMap — interactive OpenStreetMap with click-to-select location.
+ * Map is restricted to Indonesia bounds only.
  *
  * Props:
  *  - center      : [lat, lng]   – initial map center
@@ -9,7 +10,19 @@ import React, { useEffect, useRef } from 'react';
  *  - onMapClick  : fn({ place_name, lat, lng }) – called when user clicks map
  *  - loading     : bool – show loading overlay saat reverse geocoding
  */
+
+// Bounding box Indonesia (sedikit diperlonggar)
+const INDONESIA_BOUNDS = [
+    [-11.5, 94.5],  // SW corner
+    [6.5,  141.5],  // NE corner
+];
+
+// Cek apakah koordinat berada dalam batas Indonesia
+function isInsideIndonesia(lat, lng) {
+    return lat >= -11.5 && lat <= 6.5 && lng >= 94.5 && lng <= 141.5;
+}
 export default function LeafletMap({ center, markerPos, onMapClick, loading }) {
+    const [outsideWarning, setOutsideWarning] = useState(false);
     const mapContainerRef = useRef(null);
     const mapInstanceRef   = useRef(null);
     const markerRef        = useRef(null);
@@ -77,11 +90,15 @@ export default function LeafletMap({ center, markerPos, onMapClick, loading }) {
             shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
         });
 
-        const initialCenter = center || [-6.5833, 106.8];
+        const initialCenter = center || [-2.5, 118.0]; // Center of Indonesia
         const map = L.map(mapContainerRef.current, {
             center: initialCenter,
-            zoom: 13,
+            zoom: 5,
+            minZoom: 5,
+            maxZoom: 19,
             zoomControl: true,
+            maxBounds: INDONESIA_BOUNDS,
+            maxBoundsViscosity: 1.0, // mencegah drag keluar batas
         });
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -95,9 +112,18 @@ export default function LeafletMap({ center, markerPos, onMapClick, loading }) {
             map.setView(markerPos, 14);
         }
 
-        // Klik di map → reverse geocode → auto fill
+        // Klik di map → reverse geocode → auto fill (hanya dalam wilayah Indonesia)
         map.on('click', async (e) => {
             const { lat, lng } = e.latlng;
+
+            // Tolak klik di luar Indonesia
+            if (!isInsideIndonesia(lat, lng)) {
+                setOutsideWarning(true);
+                setTimeout(() => setOutsideWarning(false), 2500);
+                return;
+            }
+
+            setOutsideWarning(false);
 
             // Pindahkan / buat marker
             if (markerRef.current) {
@@ -142,8 +168,20 @@ export default function LeafletMap({ center, markerPos, onMapClick, loading }) {
                 </div>
             )}
 
+            {/* Warning overlay — klik di luar Indonesia */}
+            {outsideWarning && (
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[500] pointer-events-none">
+                    <div className="bg-red-500 text-white text-xs font-quicksand font-semibold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                        </svg>
+                        Pilih lokasi di dalam wilayah Indonesia
+                    </div>
+                </div>
+            )}
+
             {/* Hint overlay — hanya muncul saat belum ada marker */}
-            {!markerPos && !loading && (
+            {!markerPos && !loading && !outsideWarning && (
                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-[500] pointer-events-none">
                     <div className="bg-white/90 text-tertiary text-xs font-quicksand font-semibold px-3 py-1.5 rounded-full shadow-md">
                         Tap on the map to select a location

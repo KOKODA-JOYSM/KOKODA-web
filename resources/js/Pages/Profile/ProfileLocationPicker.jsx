@@ -1,108 +1,38 @@
 import React, { useState, useEffect } from 'react';
+import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
+import LeafletMap from '@/Components/Common/LeafletMap';
 
 export default function ProfileLocationPicker({ selected, onChange }) {
     const [isOpen, setIsOpen] = useState(false);
     const [inputValue, setInputValue] = useState(selected || '');
-    const [locations, setLocations] = useState([]);
-    const [filteredLocations, setFilteredLocations] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [mapSearch, setMapSearch] = useState(selected || '');
-    const [geocodeError, setGeocodeError] = useState(null);
+    const [selectedCoords, setSelectedCoords] = useState(null);
+    const [mapLoading, setMapLoading] = useState(false);
 
     useEffect(() => {
+        if (!isOpen) return;
         setInputValue(selected || '');
-        setMapSearch(selected || '');
-    }, [selected]);
+        setSelectedCoords(null);
+    }, [isOpen]);
 
-    useEffect(() => {
-        fetch('/api/locations')
-            .then(res => res.json())
-            .then(data => {
-                setLocations(data);
-                setFilteredLocations(data);
-            })
-            .catch(() => {});
-    }, []);
-
-    const handleInputChange = (e) => {
-        const value = e.target.value;
-        setInputValue(value);
-        setMapSearch(value);
-        setGeocodeError(null);
-        if (value.trim()) {
-            setFilteredLocations(
-                locations.filter(loc =>
-                    loc.toLowerCase().includes(value.toLowerCase())
-                )
-            );
-        } else {
-            setFilteredLocations(locations);
-        }
+    const handleLocationSelect = ({ place_name, latitude, longitude }) => {
+        if (!place_name) return;
+        setInputValue(place_name);
+        setSelectedCoords(latitude && longitude ? { lat: latitude, lng: longitude } : null);
     };
 
-    const geocodePlace = async (placeName) => {
-        try {
-            let response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}&countrycodes=id&limit=3`);
-            let data = await response.json();
-
-            if (data && data.length > 0) {
-                setGeocodeError(null);
-                return data[0];
-            }
-
-            const words = placeName.trim().split(/\s+/);
-            if (words.length > 1) {
-                const fallback1 = words.slice(-2).join(' ');
-                response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fallback1)}&countrycodes=id&limit=3`);
-                data = await response.json();
-                if (data && data.length > 0) {
-                    setGeocodeError(null);
-                    return data[0];
-                }
-
-                const fallback2 = words[words.length - 1];
-                response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fallback2)}&countrycodes=id&limit=3`);
-                data = await response.json();
-                if (data && data.length > 0) {
-                    setGeocodeError(null);
-                    return data[0];
-                }
-            }
-
-            setGeocodeError(`Location "${placeName}" was not found on the map, but it will still be saved.`);
-        } catch {
-            setGeocodeError('Failed to load the map. Your location will still be saved.');
-        }
-        return null;
-    };
-
-    const handleSelectLocation = async (location) => {
-        setInputValue(location);
-        setLoading(true);
-        setGeocodeError(null);
-        const result = await geocodePlace(location);
-        if (result) {
-            setMapSearch(result.display_name || location);
-        }
-        onChange(location);
-        setLoading(false);
-        setIsOpen(false);
-    };
-
-    const handleSave = async () => {
-        if (!inputValue.trim()) {
-            onChange('');
-            setIsOpen(false);
+    const handleMapClick = ({ place_name, lat, lng, loading }) => {
+        if (loading) {
+            setMapLoading(true);
             return;
         }
-        setLoading(true);
-        setGeocodeError(null);
-        const result = await geocodePlace(inputValue);
-        if (result) {
-            setMapSearch(result.display_name || inputValue);
-        }
-        onChange(inputValue);
-        setLoading(false);
+        setMapLoading(false);
+        if (!place_name) return;
+        setInputValue(place_name);
+        setSelectedCoords({ lat, lng });
+    };
+
+    const handleSave = () => {
+        onChange(inputValue.trim() || '');
         setIsOpen(false);
     };
 
@@ -126,7 +56,8 @@ export default function ProfileLocationPicker({ selected, onChange }) {
             {/* Modal */}
             {isOpen && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-                    <div className="bg-base w-full max-w-md rounded-2xl shadow-xl flex flex-col overflow-hidden">
+                    <div className="bg-base w-full max-w-md rounded-2xl shadow-xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+
                         {/* Header */}
                         <div className="flex justify-between items-center p-5 border-b-2 border-gray-200/50 bg-background">
                             <h2 className="text-2xl font-quicksand font-bold text-tertiary">Choose Location</h2>
@@ -142,70 +73,30 @@ export default function ProfileLocationPicker({ selected, onChange }) {
                         </div>
 
                         {/* Body */}
-                        <div className="p-5 flex flex-col gap-4">
+                        <div className="p-5 flex flex-col gap-3 overflow-y-auto">
+
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-quicksand text-gray-text-field font-bold tracking-wide">Search Location</label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-tertiary">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    </div>
-                                    <input
-                                        type="text"
-                                        value={inputValue}
-                                        onChange={handleInputChange}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault();
-                                                handleSave();
-                                            }
-                                        }}
-                                        placeholder="e.g. Tangerang, Jakarta, Bandung"
-                                        className="w-full bg-white text-tertiary rounded-md py-2.5 pl-9 pr-3 font-quicksand text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all placeholder:text-gray-text-field border border-secondary/20"
-                                        autoFocus
-                                    />
-                                </div>
-
-                                {/* Dropdown suggestions */}
-                                {filteredLocations.length > 0 && (
-                                    <div className="mt-2 bg-white border border-secondary/20 rounded-md max-h-48 overflow-y-auto shadow-sm">
-                                        {filteredLocations.map((location, index) => (
-                                            <button
-                                                type="button"
-                                                key={index}
-                                                onClick={() => handleSelectLocation(location)}
-                                                className="w-full text-left px-3 py-2 text-sm font-quicksand text-tertiary hover:bg-highlight/30 transition-colors border-b border-secondary/10 last:border-b-0"
-                                            >
-                                                {location}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {loading && (
-                                    <div className="text-xs text-gray-text-field font-quicksand mt-1">Loading...</div>
-                                )}
-
-                                {geocodeError && (
-                                    <div className="text-xs text-label-lost font-quicksand mt-1 bg-red-100/50 p-2 rounded">
-                                        ⚠️ {geocodeError}
-                                    </div>
-                                )}
+                                <label className="text-xs font-quicksand text-gray-text-field font-bold tracking-wide">
+                                    Search Location
+                                </label>
+                                <GooglePlacesInput
+                                    value={inputValue}
+                                    onSelect={handleLocationSelect}
+                                    placeholder="e.g. Aeon Mall, Magetan, Jakarta..."
+                                    className="w-full bg-white text-tertiary rounded-md py-2.5 pr-3 font-quicksand text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all placeholder:text-gray-text-field border border-secondary/20"
+                                />
                             </div>
 
-                            {/* Map Preview */}
-                            <div className="w-full h-56 md:h-64 rounded-xl overflow-hidden border border-secondary/20 relative bg-gray-100">
-                                <iframe
-                                    width="100%"
-                                    height="100%"
-                                    style={{ border: 0 }}
-                                    loading="lazy"
-                                    allowFullScreen
-                                    referrerPolicy="no-referrer-when-downgrade"
-                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(mapSearch || 'Indonesia')}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
-                                ></iframe>
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs font-quicksand text-gray-text-field font-bold tracking-wide">
+                                    Or tap on the map
+                                </label>
+                                <LeafletMap
+                                    center={selectedCoords ? [selectedCoords.lat, selectedCoords.lng] : [-6.5833, 106.8]}
+                                    markerPos={selectedCoords ? [selectedCoords.lat, selectedCoords.lng] : null}
+                                    onMapClick={handleMapClick}
+                                    loading={mapLoading}
+                                />
                             </div>
                         </div>
 
@@ -214,10 +105,9 @@ export default function ProfileLocationPicker({ selected, onChange }) {
                             <button
                                 type="button"
                                 onClick={handleSave}
-                                className="w-full bg-tertiary text-base rounded-xl py-3 font-quicksand font-bold text-base hover:opacity-90 transition-opacity shadow-md disabled:opacity-50"
-                                disabled={loading}
+                                className="w-full bg-tertiary text-base rounded-xl py-3 font-quicksand font-bold text-base hover:opacity-90 transition-opacity shadow-md"
                             >
-                                {loading ? 'Saving...' : 'Save Location'}
+                                Save Location
                             </button>
                         </div>
                     </div>

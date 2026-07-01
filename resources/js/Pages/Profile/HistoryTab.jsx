@@ -7,7 +7,6 @@ export default function HistoryTab({ posts = [] }) {
     if (!posts || posts.length === 0) {
         return (
             <div className="text-center py-12 bg-secondary/10 rounded-2xl">
-                <div className="text-5xl mb-4">✅</div>
                 <p className="text-tertiary font-semibold text-lg mb-2">No resolved posts yet</p>
                 <p className="text-tertiary/60 text-sm">
                     Posts you mark as <span className="font-semibold">Resolved</span> will show up here automatically.
@@ -19,12 +18,6 @@ export default function HistoryTab({ posts = [] }) {
     return (
         <>
             <div className="flex flex-col gap-4">
-                {/* Header dengan jumlah post resolved */}
-                <div className="flex items-center justify-between">
-                    <p className="text-sm text-tertiary/70 font-medium">
-                        {posts.length} resolved {posts.length === 1 ? 'post' : 'posts'}
-                    </p>
-                </div>
 
                 {posts.map((item) => (
                     <div
@@ -74,11 +67,11 @@ export default function HistoryTab({ posts = [] }) {
 
                                     {/* Lokasi */}
                                     {item.location && (
-                                        <div className="inline-flex items-center gap-1.5 bg-tertiary/10 text-tertiary text-xs font-semibold px-3 py-1 rounded-full mb-2">
+                                        <div className="flex items-center gap-1.5 bg-tertiary/10 text-tertiary text-xs font-semibold px-3 py-1 rounded-full mb-2 max-w-full overflow-hidden">
                                             <svg className="w-3 h-3 fill-current shrink-0" viewBox="0 0 24 24">
                                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                                             </svg>
-                                            <span>{typeof item.location === 'object' ? item.location?.place_name : item.location}</span>
+                                            <span className="truncate">{typeof item.location === 'object' ? item.location?.place_name : item.location}</span>
                                         </div>
                                     )}
 
