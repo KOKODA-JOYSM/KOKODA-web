@@ -49,7 +49,7 @@ EOF
 #    Zip deploy menghapus seluruh /home/site/wwwroot setiap deploy, sementara
 #    /home adalah Azure Files yang persistent. Tanpa ini, semua gambar post
 #    dan foto profil yang di-upload user hilang setiap kali deploy.
-mkdir -p /home/storage/app/public /home/storage/profile-icons
+mkdir -p /home/storage/app/public /home/storage/app/public/chat-images /home/storage/profile-icons
 rm -rf /home/site/wwwroot/storage/app/public
 ln -sfn /home/storage/app/public /home/site/wwwroot/storage/app/public
 rm -rf /home/site/wwwroot/public/images/profile-icons
