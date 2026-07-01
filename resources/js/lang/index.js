@@ -35,6 +35,10 @@ export const translations = {
         'auth.confirmPassword': 'Confirm Password',
         'auth.alreadyRegistered': 'Already registered?',
         'auth.noAccount': "Don't have account?",
+
+        // Chat
+        'chat.today': 'Today',
+        'chat.yesterday': 'Yesterday',
     },
     id: {
         // Navbar
@@ -72,5 +76,50 @@ export const translations = {
         'auth.confirmPassword': 'Konfirmasi Kata Sandi',
         'auth.alreadyRegistered': 'Sudah punya akun?',
         'auth.noAccount': 'Belum punya akun?',
+
+        // Chat
+        'chat.today': 'Hari ini',
+        'chat.yesterday': 'Kemarin',
+    },
+    ja: {
+        // Navbar
+        'nav.home': 'ホーム',
+        'nav.leaderboard': 'ランキング',
+        'nav.search': '検索',
+        'nav.chat': 'チャット',
+        'nav.login': 'ログイン',
+        'nav.language': '言語',
+
+        // Welcome Page
+        'welcome.title': '失くした?見つけた?',
+        'welcome.subtitle': 'あなたをつなげます。',
+        'welcome.desc': 'KOKODAは、紛失物の報告と拾得物の返却を行うための信頼できるコミュニティプラットフォームです。みんなで、すべてを持ち主の元へ届けましょう。',
+        'welcome.explore': 'アイテムを探す',
+        'welcome.join': 'コミュニティに参加',
+        'welcome.goToApp': 'アプリを開く',
+        'welcome.signIn': 'サインイン',
+        'welcome.getStarted': '今すぐ始める',
+
+        // Home Page
+        'home.lost': '紛失',
+        'home.found': '発見',
+        'home.noItems': 'アイテムが見つかりません',
+        'home.beFirst': '最初に投稿しましょう!',
+
+        // Auth
+        'auth.email': 'メールアドレス',
+        'auth.password': 'パスワード',
+        'auth.remember': 'ログイン状態を保存',
+        'auth.forgot': 'パスワードをお忘れですか?',
+        'auth.login': 'ログイン',
+        'auth.register': '登録',
+        'auth.name': '名前',
+        'auth.confirmPassword': 'パスワード（確認）',
+        'auth.alreadyRegistered': 'すでに登録済みですか?',
+        'auth.noAccount': 'アカウントをお持ちでないですか?',
+
+        // Chat
+        'chat.today': '今日',
+        'chat.yesterday': '昨日',
     }
 };

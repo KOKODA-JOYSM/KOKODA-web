@@ -5,8 +5,8 @@ import LanguageSwitcher from '@/Components/Common/LanguageSwitcher';
 export default function GuestLayout({ children }) {
     return (
         <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0 relative">
-            <div className="absolute top-4 right-4 w-24">
-                <LanguageSwitcher />
+            <div className="absolute top-4 right-4 w-32">
+                <LanguageSwitcher className="w-full" />
             </div>
             
             <div>

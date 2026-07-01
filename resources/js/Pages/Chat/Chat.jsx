@@ -9,32 +9,36 @@ import ChatClaimPopup from '@/Components/Chat/ChatClaimPopup';
 import { useEcho, createTypingThrottle } from '@/hooks/useEcho';
 import { avatarUrl } from '@/Components/Common/Avatar';
 import RateUserModal from '@/Pages/Profile/RateUserModal';
+import { useTranslation } from '@/hooks/useTranslation';
+
+// Maps the app's dictionary locale to a BCP-47 tag for Intl date formatting.
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
 
 /**
- * Format timestamp ISO ke jam:menit lokal (id-ID).
+ * Format timestamp ISO ke jam:menit sesuai locale aktif.
  */
-function formatTime(isoString) {
+function formatTime(isoString, localeTag = 'en-US') {
     if (!isoString) return '';
-    return new Date(isoString).toLocaleTimeString('id-ID', {
+    return new Date(isoString).toLocaleTimeString(localeTag, {
         hour: '2-digit',
         minute: '2-digit',
     });
 }
 
 /**
- * Format timestamp ke label relatif (Hari ini / Kemarin / tanggal).
+ * Format timestamp ke label relatif (Hari ini / Kemarin / tanggal), sesuai locale aktif.
  */
-function formatDateLabel(isoString) {
+function formatDateLabel(isoString, localeTag = 'en-US', labels = { today: 'Today', yesterday: 'Yesterday' }) {
     if (!isoString) return '';
     const date = new Date(isoString);
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    if (date.toDateString() === today.toDateString()) return 'Today';
-    if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+    if (date.toDateString() === today.toDateString()) return labels.today;
+    if (date.toDateString() === yesterday.toDateString()) return labels.yesterday;
 
-    return date.toLocaleDateString('id-ID', {
+    return date.toLocaleDateString(localeTag, {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
@@ -68,7 +72,7 @@ function dedupeCards(messages) {
 /**
  * Tambahkan day dividers ke antara pesan-pesan.
  */
-function addDayDividers(messages) {
+function addDayDividers(messages, localeTag, labels) {
     const result = [];
     let lastDate = null;
 
@@ -78,7 +82,7 @@ function addDayDividers(messages) {
             result.push({
                 id: `divider-${msgDate}`,
                 type: 'day-divider',
-                label: formatDateLabel(msg.created_at),
+                label: formatDateLabel(msg.created_at, localeTag, labels),
             });
             lastDate = msgDate;
         }
@@ -105,6 +109,9 @@ function getAvatarUrl(user) {
 export default function ChatPage({ initialConversations = [], targetUserId = null }) {
     const { auth } = usePage().props;
     const authUser = auth.user;
+    const { locale, t } = useTranslation();
+    const localeTag = LOCALE_TAGS[locale] || 'en-US';
+    const dateLabels = { today: t('chat.today'), yesterday: t('chat.yesterday') };
 
     // State
     const [conversations, setConversations] = useState(initialConversations);
@@ -789,7 +796,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
             type: msg.type || 'text',
             meta: msg.meta || null,
             image_url: msg.image_url || null,
-            timestamp: formatTime(msg.created_at),
+            timestamp: formatTime(msg.created_at, localeTag),
             created_at: msg.created_at,
             isOwn: msg.is_own ?? msg.user_id === authUser?.id,
             isRead: msg.is_read ?? false,
@@ -818,7 +825,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
             avatar: getAvatarUrl(conv.other_user),
             lastMessage,
             timestamp: conv.last_message
-                ? formatTime(conv.last_message.created_at)
+                ? formatTime(conv.last_message.created_at, localeTag)
                 : '',
             unreadCount: conv.unread_count || 0,
             isOnline: conv.other_user ? onlineUserIds.has(conv.other_user.id) : false,
@@ -838,7 +845,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
         .map(([, name]) => name);
 
     // Messages with day dividers (older duplicate cards collapsed away first)
-    const messagesWithDividers = addDayDividers(dedupeCards(messages));
+    const messagesWithDividers = addDayDividers(dedupeCards(messages), localeTag, dateLabels);
 
     return (
         <AppLayout title="Chat - KOKODA">
