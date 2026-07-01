@@ -135,3 +135,11 @@ require __DIR__.'/auth.php';
 Route::fallback(function () {
     return redirect()->route('home');
 });
+
+// Language Switch Route
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'id'])) {
+        session()->put('locale', $locale);
+    }
+    return back();
+})->name('lang.switch');

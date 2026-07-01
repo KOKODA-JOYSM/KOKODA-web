@@ -1,8 +1,11 @@
 import { Head, Link } from '@inertiajs/react';
 import { Search, MapPin, Handshake, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
+import LanguageSwitcher from '@/Components/Common/LanguageSwitcher';
 
 export default function Welcome({ auth }) {
+    const { t } = useTranslation();
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -38,16 +41,19 @@ export default function Welcome({ auth }) {
                                             href={route('login')}
                                             className="text-sm font-bold text-gray-text-field transition-colors hover:text-tertiary"
                                         >
-                                            Sign In
+                                            {t('welcome.signIn')}
                                         </Link>
                                         <Link
                                             href={route('register')}
                                             className="hidden sm:block rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-tertiary shadow-md transition-all hover:-translate-y-0.5 hover:bg-highlight hover:shadow-lg"
                                         >
-                                            Get Started
+                                            {t('welcome.getStarted')}
                                         </Link>
                                     </>
                                 )}
+                                <div className="ml-4 w-24">
+                                    <LanguageSwitcher />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -59,28 +65,28 @@ export default function Welcome({ auth }) {
                         {/* Text Content */}
                         <div className="text-center lg:text-left flex-1 z-10">
                             <h1 className="text-5xl font-extrabold tracking-tight text-tertiary sm:text-6xl lg:text-7xl font-roboto">
-                                Lost it? Found it?<br />
+                                {t('welcome.title')}<br />
                                 <span className="relative inline-block mt-2">
-                                    <span className="relative z-10">We Connect You.</span>
+                                    <span className="relative z-10">{t('welcome.subtitle')}</span>
                                     <div className="absolute -bottom-2 left-0 h-4 w-full bg-highlight -z-10 rounded-sm"></div>
                                 </span>
                             </h1>
                             <p className="mt-6 text-lg leading-8 text-gray-text-field font-quicksand font-medium max-w-2xl mx-auto lg:mx-0">
-                                KOKODA is your reliable community platform to report lost items and return found treasures. Together, we make sure everything finds its way back home.
+                                {t('welcome.desc')}
                             </p>
                             <div className="mt-10 flex items-center justify-center lg:justify-start gap-x-6">
                                 <Link
                                     href={route('home')}
                                     className="group flex items-center gap-2 rounded-full bg-tertiary px-8 py-4 text-base font-bold text-base shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl hover:bg-tertiary/90"
                                 >
-                                    Explore Items
+                                    {t('welcome.explore')}
                                     <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                                 </Link>
                                 <Link
                                     href={route('register')}
                                     className="text-base font-bold leading-6 text-tertiary transition-colors hover:text-secondary flex items-center gap-2"
                                 >
-                                    Join Community <span>&rarr;</span>
+                                    {t('welcome.join')} <span>&rarr;</span>
                                 </Link>
                             </div>
                         </div>

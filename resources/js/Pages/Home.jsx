@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import PostCard from '@/Components/Home/PostCard';
 import CreatePostModal from '@/Components/Home/CreatePostModal';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Home({ posts }) {
+    const { t } = useTranslation();
     const [filterType, setFilterType] = useState('all'); // 'all', 'lost', 'found'
     const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -42,7 +44,7 @@ export default function Home({ posts }) {
                                         : 'bg-base'
                                         }`}
                                 >
-                                    {type === 'lost' ? 'Lost' : 'Found'}
+                                    {type === 'lost' ? t('home.lost') : t('home.found')}
                                 </button>
                             </div>
                         ))}
@@ -62,10 +64,10 @@ export default function Home({ posts }) {
                             🔍
                         </div>
                         <h2 className="text-lg font-semibold text-tertiary font-quicksand mb-2">
-                            No items found
+                            {t('home.noItems')}
                         </h2>
                         <p className="text-sm text-gray-600">
-                            Be the first to post!
+                            {t('home.beFirst')}
                         </p>
                     </div>
                 )}
