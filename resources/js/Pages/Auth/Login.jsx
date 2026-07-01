@@ -4,6 +4,7 @@ import TextInput from '@/Components/Auth/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import LanguageSwitcher from '@/Components/Common/LanguageSwitcher';
 
 export default function Login({ status, canResetPassword }) {
     const { t } = useTranslation();
@@ -25,8 +26,12 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-primary px-4 py-8 font-quicksand text-tertiary sm:px-6">
+        <div className="relative flex min-h-screen items-center justify-center bg-primary px-4 py-8 font-quicksand text-tertiary sm:px-6">
             <Head title="Log in" />
+
+            <div className="absolute top-4 right-4 w-24">
+                <LanguageSwitcher />
+            </div>
 
             <div className="w-full max-w-5xl overflow-hidden rounded-2xl bg-base shadow-xl lg:grid lg:min-h-[440px] lg:grid-cols-[2fr_3fr]">
                 <div className="relative hidden lg:block">
@@ -140,7 +145,7 @@ export default function Login({ status, canResetPassword }) {
 
                         {canRegister && (
                             <p className="mt-7 text-center text-base text-tertiary">
-                                {t('auth.alreadyRegistered') === 'Already registered?' ? "Don't have account? " : "Belum punya akun? "}
+                                {t('auth.noAccount')}{' '}
                                 <Link href={route('register')} className="font-semibold text-secondary underline underline-offset-2 hover:text-tertiary">
                                     {t('auth.register')}
                                 </Link>

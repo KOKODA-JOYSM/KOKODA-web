@@ -34,6 +34,7 @@ export const translations = {
         'auth.name': 'Name',
         'auth.confirmPassword': 'Confirm Password',
         'auth.alreadyRegistered': 'Already registered?',
+        'auth.noAccount': "Don't have account?",
     },
     id: {
         // Navbar
@@ -70,5 +71,6 @@ export const translations = {
         'auth.name': 'Nama',
         'auth.confirmPassword': 'Konfirmasi Kata Sandi',
         'auth.alreadyRegistered': 'Sudah punya akun?',
+        'auth.noAccount': 'Belum punya akun?',
     }
 };
