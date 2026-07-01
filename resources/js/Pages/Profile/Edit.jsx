@@ -2,6 +2,7 @@ import React from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import ProfileLocationPicker from '@/Pages/Profile/ProfileLocationPicker';
+import LanguageSwitcher from '@/Components/Common/LanguageSwitcher';
 
 export default function Edit({ mustVerifyEmail }) {
     // Mengambil data user yang sedang login dari props bawaan Inertia
@@ -141,7 +142,7 @@ export default function Edit({ mustVerifyEmail }) {
                             </div>
                         </div>
 
-                        {/* Kanan: Tombol Ganti Foto */}
+                        {/* Kanan: Dropdown Bahasa (menggantikan tombol Ganti Foto — klik foto di kiri untuk ganti) */}
                         <input
                             id="photo-input"
                             type="file"
@@ -149,12 +150,7 @@ export default function Edit({ mustVerifyEmail }) {
                             onChange={handlePhotoChange}
                             className="hidden"
                         />
-                        <label
-                            htmlFor="photo-input"
-                            className="w-full sm:w-auto px-6 py-3 bg-tertiary hover:bg-tertiary/90 text-base font-semibold text-sm rounded-full shadow transition-all duration-200 cursor-pointer text-center"
-                        >
-                            Change Photo
-                        </label>
+                        <LanguageSwitcher className="w-full sm:w-auto" />
                     </div>
 
 

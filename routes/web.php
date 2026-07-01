@@ -138,7 +138,7 @@ Route::fallback(function () {
 
 // Language Switch Route
 Route::get('/lang/{locale}', function ($locale) {
-    if (in_array($locale, ['en', 'id'])) {
+    if (in_array($locale, ['en', 'id', 'ja'])) {
         session()->put('locale', $locale);
     }
     return back();

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import { useTranslation } from '@/hooks/useTranslation';
-import LanguageSwitcher from '@/Components/Common/LanguageSwitcher';
+import { useSeenClaims } from '@/hooks/useSeenClaims';
 
 // ─────────────────────────────────────────────
 //  NAV ITEMS (Translations will be handled inside component)
@@ -127,14 +127,6 @@ export default function Navbar() {
                         })}
                     </ul>
                 </nav>
-
-                {/* LANGUAGE SWITCH */}
-                <div className="flex-shrink-0 pt-3">
-                    <div className="flex items-center justify-between mb-1">
-                        <span className="text-white/80 text-xs font-quicksand font-bold px-2 uppercase tracking-wider">{t('nav.language')}</span>
-                    </div>
-                    <LanguageSwitcher />
-                </div>
 
                 {/* PROFILE LINK (Bisa diklik & Data Dinamis) */}
                 <div className="flex-shrink-0 pt-3">

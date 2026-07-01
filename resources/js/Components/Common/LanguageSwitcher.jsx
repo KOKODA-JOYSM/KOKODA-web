@@ -1,33 +1,30 @@
 import React from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 
+const LANGUAGES = [
+    { value: 'en', label: 'English' },
+    { value: 'id', label: 'Indonesia' },
+    { value: 'ja', label: '日本語' },
+];
+
 export default function LanguageSwitcher({ className = '' }) {
     const { locale } = useTranslation();
 
+    const handleChange = (e) => {
+        window.location.href = `/lang/${e.target.value}`;
+    };
+
     return (
-        <div className={`flex justify-between items-center bg-secondary/30 p-2 rounded-xl border border-transparent hover:border-secondary transition-colors duration-200 ${className}`}>
-            <div className="flex bg-primary rounded-lg p-1 w-full justify-center">
-                <a
-                    href="/lang/en"
-                    className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
-                        locale === 'en'
-                            ? 'bg-secondary text-white'
-                            : 'text-white/60 hover:text-white'
-                    }`}
-                >
-                    EN
-                </a>
-                <a
-                    href="/lang/id"
-                    className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
-                        locale === 'id'
-                            ? 'bg-secondary text-white'
-                            : 'text-white/60 hover:text-white'
-                    }`}
-                >
-                    ID
-                </a>
-            </div>
-        </div>
+        <select
+            value={locale}
+            onChange={handleChange}
+            className={`bg-secondary/30 hover:border-secondary border border-transparent text-white text-xs font-bold rounded-xl px-3 py-2 transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary ${className}`}
+        >
+            {LANGUAGES.map((lang) => (
+                <option key={lang.value} value={lang.value} className="text-tertiary bg-base">
+                    {lang.label}
+                </option>
+            ))}
+        </select>
     );
 }

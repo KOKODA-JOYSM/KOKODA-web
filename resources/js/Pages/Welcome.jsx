@@ -2,9 +2,8 @@ import { Head, Link } from '@inertiajs/react';
 import { Search, MapPin, Handshake, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
-import LanguageSwitcher from '@/Components/Common/LanguageSwitcher';
 
-export default function Welcome({ auth }) {
+export default function Welcome() {
     const { t } = useTranslation();
     const [scrolled, setScrolled] = useState(false);
 
@@ -28,32 +27,18 @@ export default function Welcome({ auth }) {
                                 <img src="/images/logo-kokoda.svg" alt="KOKODA Logo" className="h-10 w-auto" />
                             </div>
                             <div className="flex items-center gap-4">
-                                {auth?.user ? (
-                                    <Link
-                                        href={route('home')}
-                                        className="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-tertiary shadow-md transition-all hover:-translate-y-0.5 hover:bg-highlight hover:shadow-lg"
-                                    >
-                                        Go to App
-                                    </Link>
-                                ) : (
-                                    <>
-                                        <Link
-                                            href={route('login')}
-                                            className="text-sm font-bold text-gray-text-field transition-colors hover:text-tertiary"
-                                        >
-                                            {t('welcome.signIn')}
-                                        </Link>
-                                        <Link
-                                            href={route('register')}
-                                            className="hidden sm:block rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-tertiary shadow-md transition-all hover:-translate-y-0.5 hover:bg-highlight hover:shadow-lg"
-                                        >
-                                            {t('welcome.getStarted')}
-                                        </Link>
-                                    </>
-                                )}
-                                <div className="ml-4 w-24">
-                                    <LanguageSwitcher />
-                                </div>
+                                <Link
+                                    href={route('login')}
+                                    className="text-sm font-bold text-gray-text-field transition-colors hover:text-tertiary"
+                                >
+                                    {t('welcome.signIn')}
+                                </Link>
+                                <Link
+                                    href={route('register')}
+                                    className="hidden sm:block rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-tertiary shadow-md transition-all hover:-translate-y-0.5 hover:bg-highlight hover:shadow-lg"
+                                >
+                                    {t('welcome.getStarted')}
+                                </Link>
                             </div>
                         </div>
                     </div>
