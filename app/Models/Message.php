@@ -13,6 +13,7 @@ class Message extends Model
         'body',
         'type',
         'meta',
+        'image_url',
     ];
 
     protected $casts = [
