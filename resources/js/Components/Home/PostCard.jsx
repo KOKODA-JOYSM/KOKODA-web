@@ -3,6 +3,7 @@ import { usePage, Link } from '@inertiajs/react';
 import PostDetailModal from './PostDetailModal';
 import PostCommentsView from './PostCommentsView';
 import Avatar from '../Common/Avatar';
+import { useSeenComments } from '@/hooks/useSeenComments';
 import { MessageCircle, MapPin } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -13,6 +14,17 @@ export default function PostCard({ post }) {
 
     const [showDetail,   setShowDetail]   = useState(false);
     const [showComments, setShowComments] = useState(false);
+
+    /* ─── New-comment notification (post owner only) ─── */
+    const { seenCount, markSeen } = useSeenComments();
+    const commentsCount = post.comments_count ?? 0;
+    const isOwner = currentUser && post.user_id === currentUser.id;
+    const hasNewComments = isOwner && commentsCount > seenCount(post.id);
+
+    const openComments = () => {
+        markSeen(post.id, commentsCount);
+        setShowComments(true);
+    };
 
     /* ─── Comment state ─── */
     const [comments,    setComments]    = useState([]);
@@ -185,16 +197,23 @@ export default function PostCard({ post }) {
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setShowComments(true);
+                                    openComments();
                                 }}
-                                className="flex items-center gap-1.5 p-2 rounded-full text-gray-text-field hover:text-background hover:bg-primary transition-all duration-200"
+                                className="relative flex items-center gap-1.5 p-2 rounded-full text-gray-text-field hover:text-background hover:bg-primary transition-all duration-200"
                                 aria-label={t('post.viewComments')}
                             >
                                 <MessageCircle size={22} />
-                                {post.comments_count > 0 && (
+                                {commentsCount > 0 && (
                                     <span className="text-xs font-quicksand font-semibold leading-none">
-                                        {post.comments_count}
+                                        {commentsCount}
                                     </span>
+                                )}
+                                {/* New-comment notification dot for the post owner */}
+                                {hasNewComments && (
+                                    <span
+                                        className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-label-lost ring-2 ring-base animate-pulse"
+                                        aria-label={t('post.newComments')}
+                                    />
                                 )}
                             </button>
 

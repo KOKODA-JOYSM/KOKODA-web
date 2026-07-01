@@ -50,6 +50,18 @@ class HandleInertiaRequests extends Middleware
                     ->pluck('id')
                     ->toArray()
                 : [],
+            // Sent requests that need the requester's attention: a found-item
+            // owner resolved directly (no chat handshake), so the requester was
+            // never prompted to rate. These drive a notification on the Sent
+            // Request tab + profile bubble and clear once opened.
+            'updatedSentClaimIds' => fn () => $request->user()
+                ? Claim::where('claimant_id', $request->user()->id)
+                    ->where('status', 'completed')
+                    ->whereDoesntHave('rating')
+                    ->whereHas('post', fn ($q) => $q->where('type', 'found'))
+                    ->pluck('id')
+                    ->toArray()
+                : [],
         ];
     }
 }

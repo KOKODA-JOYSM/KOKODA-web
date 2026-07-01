@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import IncomingRequestModal from './IncomingRequestModal';
 import SentRequestModal from './SentRequestModal';
 import RateUserModal from './RateUserModal';
@@ -150,17 +150,27 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
     const [resolvingClaim, setResolvingClaim] = useState(null); // claim to rate after resolve
     const { seenIds, markAllSeen } = useSeenClaims();
 
-    const allClaimIds = [
+    // Notification signatures cleared when the user opens any request. Incoming +
+    // sent use their plain claim id (the "seen" markers for pending cards); sent
+    // requests that now need a rating add a distinct "rate-" signature so a
+    // resolved-item update notifies even if the id was already seen while pending.
+    const seenSignatures = [
         ...incomingClaims.map(c => c.id),
         ...sentClaims.map(c => c.id),
+        ...sentClaims.filter(needsRating).map(c => `rate-${c.id}`),
     ];
 
     const handleResolve = (claim) => {
         setSelectedClaim(null);
         // Only the item recipient rates the finder. The owner is the recipient
-        // only for lost posts; for found posts the claimant rates via chat.
+        // only for lost posts; for found posts the claimant rates later from
+        // their Sent Request. So for lost we open the rating modal (it reloads on
+        // close); for found we reload right away so the resolved post moves to
+        // History immediately, with no delay.
         if (claim?.post?.type === 'lost') {
             setResolvingClaim(claim);
+        } else {
+            router.reload();
         }
     };
 
@@ -168,11 +178,14 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
         // Modal will close, page reloads via router.reload() in IncomingRequestModal
     };
 
+    // A rateable sent request counts as an unseen update until the user opens it.
+    const isSentUpdated = (claim) => needsRating(claim) && !seenIds.has(`rate-${claim.id}`);
+
     const pendingIncoming = incomingClaims.filter(c => c.status === 'pending' && !seenIds.has(c.id)).length;
     // Sent-tab badge counts requests still waiting AND found-post requests that
-    // are now rateable, so the user is nudged to open them and leave a rating.
+    // were just resolved and now need a rating — both clear once opened.
     const pendingSent = sentClaims.filter(
-        c => (c.status === 'pending' && !seenIds.has(c.id)) || needsRating(c)
+        c => (c.status === 'pending' && !seenIds.has(c.id)) || isSentUpdated(c)
     ).length;
 
     return (
@@ -224,7 +237,7 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
                             claim={claim}
                             mode="incoming"
                             isNew={claim.status === 'pending' && !seenIds.has(claim.id)}
-                            onClick={() => { markAllSeen(allClaimIds); setSelectedClaim(claim); }}
+                            onClick={() => { markAllSeen(seenSignatures); setSelectedClaim(claim); }}
                         />
                     ))
                     : <EmptyState message={t('profile.noIncomingRequests')} />
@@ -235,9 +248,12 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
                             key={claim.id}
                             claim={claim}
                             mode="sent"
-                            isNew={claim.status === 'pending' && !seenIds.has(claim.id)}
+                            isNew={
+                                (claim.status === 'pending' && !seenIds.has(claim.id))
+                                || isSentUpdated(claim)
+                            }
                             rateable={needsRating(claim)}
-                            onClick={() => { markAllSeen(allClaimIds); setSelectedSentClaim(claim); }}
+                            onClick={() => { markAllSeen(seenSignatures); setSelectedSentClaim(claim); }}
                         />
                     ))
                     : <EmptyState message={t('profile.noSentRequests')} />
