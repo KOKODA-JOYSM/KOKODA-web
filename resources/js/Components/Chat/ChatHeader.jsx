@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronLeft } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 /**
  * Animated typing dots — smooth pulsing opacity like iMessage / WhatsApp.
@@ -38,11 +39,12 @@ function TypingDots() {
  * cross-fade transitions so the text doesn't jump.
  */
 function StatusLine({ isTyping, isOnline, typingUsers }) {
+    const { t } = useTranslation();
     // Build typing label
     const typingLabel =
         typingUsers.length === 1
-            ? 'typing'
-            : `${typingUsers.length} people typing`;
+            ? t('chat.typing')
+            : `${typingUsers.length} ${t('chat.peopleTyping')}`;
 
     return (
         <div className="relative h-4 overflow-hidden">
@@ -71,7 +73,7 @@ function StatusLine({ isTyping, isOnline, typingUsers }) {
                 }}
             >
                 <span className="text-online-color">●</span>
-                <span className="text-[11px] text-tertiary/65 md:text-[12px]">Online</span>
+                <span className="text-[11px] text-tertiary/65 md:text-[12px]">{t('chat.online')}</span>
             </div>
 
             {/* ── Offline state ────────────────────────────── */}
@@ -83,13 +85,14 @@ function StatusLine({ isTyping, isOnline, typingUsers }) {
                     pointerEvents: !isTyping && !isOnline ? 'auto' : 'none',
                 }}
             >
-                <span className="text-[11px] text-tertiary/40 md:text-[12px]">Offline</span>
+                <span className="text-[11px] text-tertiary/40 md:text-[12px]">{t('chat.offline')}</span>
             </div>
         </div>
     );
 }
 
 export default function ChatHeader({ conversation, onShowConversations, typingUsers = [] }) {
+    const { t } = useTranslation();
     const isTyping = typingUsers.length > 0;
 
     return (
@@ -99,7 +102,7 @@ export default function ChatHeader({ conversation, onShowConversations, typingUs
                     type="button"
                     onClick={onShowConversations}
                     className="inline-flex h-10 w-10 mr-2 items-center justify-center rounded-full bg-primary text-base shadow-sm sm:hidden"
-                    aria-label="Show conversations"
+                    aria-label={t('chat.showConversations')}
                 >
                     <ChevronLeft className="h-5 w-5" />
                 </button>

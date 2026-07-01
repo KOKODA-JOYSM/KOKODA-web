@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import { X, CheckCircle, MessageSquare, XCircle, Loader2 } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
+
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
 
 const getLocation = (post) =>
     (typeof post?.location === 'object' ? post?.location?.place_name : post?.location) || 'Indonesia';
 
 export default function IncomingRequestModal({ claim, onClose, onResolve, onReject }) {
+    const { t, locale } = useTranslation();
+    const localeTag = LOCALE_TAGS[locale] || 'en-US';
     const [loading, setLoading] = useState(null); // null | 'resolve' | 'reject'
     const [error, setError] = useState(null);
 
@@ -21,7 +26,7 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(claimant?.name || 'User')}&background=F4C799&color=311A05`;
 
     const requestDate = claim.created_at
-        ? new Date(claim.created_at).toLocaleDateString('id-ID', {
+        ? new Date(claim.created_at).toLocaleDateString(localeTag, {
             day: 'numeric', month: 'long', year: 'numeric',
           })
         : '-';
@@ -39,7 +44,7 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
             await window.axios.patch(`/api/claims/${claim.id}/resolve`);
             onResolve(claim);
         } catch (e) {
-            setError(e.response?.data?.error || 'Failed to resolve. Please try again.');
+            setError(e.response?.data?.error || t('profile.failedResolve'));
             setLoading(null);
         }
     };
@@ -53,7 +58,7 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
             onClose();
             router.reload();
         } catch (e) {
-            setError(e.response?.data?.error || 'Failed to reject. Please try again.');
+            setError(e.response?.data?.error || t('profile.failedReject'));
             setLoading(null);
         }
     };
@@ -103,7 +108,7 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
                         <span className={`text-xs font-quicksand font-bold px-3 py-1 rounded-full text-base ${
                             post?.type === 'lost' ? 'bg-label-lost' : 'bg-label-found'
                         }`}>
-                            {post?.type === 'lost' ? 'Lost Item' : 'Found Item'}
+                            {post?.type === 'lost' ? t('profile.lostItem') : t('profile.foundItem')}
                         </span>
                     </div>
                     <button
@@ -151,13 +156,13 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
 
                         <div>
                             <p className="font-quicksand text-sm text-tertiary/80 leading-relaxed">
-                                <span className="font-bold text-tertiary">Request detail:</span>{' '}
-                                {claim.message || <span className="italic text-tertiary/50">No message provided.</span>}
+                                <span className="font-bold text-tertiary">{t('profile.requestDetail')}:</span>{' '}
+                                {claim.message || <span className="italic text-tertiary/50">{t('profile.noMessageProvided')}</span>}
                             </p>
                         </div>
 
                         <p className="font-quicksand text-sm text-tertiary mt-auto">
-                            <span className="font-bold">Waktu Ditemukan:</span>{' '}
+                            <span className="font-bold">{t('profile.requestedAt')}:</span>{' '}
                             {requestDate}
                         </p>
 
@@ -179,7 +184,7 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
                                     ? <Loader2 size={18} className="animate-spin" />
                                     : <CheckCircle size={18} />
                                 }
-                                Resolve
+                                {t('profile.resolve')}
                             </button>
 
                             {/* Chat + Reject */}
@@ -190,7 +195,7 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
                                     className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-label-found text-base font-quicksand font-bold text-sm hover:opacity-90 transition-all shadow-md disabled:opacity-60"
                                 >
                                     <MessageSquare size={16} />
-                                    Continue Chat
+                                    {t('profile.continueChat')}
                                 </button>
                                 <button
                                     onClick={handleReject}
@@ -201,7 +206,7 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
                                         ? <Loader2 size={16} className="animate-spin" />
                                         : <XCircle size={16} />
                                     }
-                                    Reject Request
+                                    {t('profile.rejectRequest')}
                                 </button>
                             </div>
                         </div>

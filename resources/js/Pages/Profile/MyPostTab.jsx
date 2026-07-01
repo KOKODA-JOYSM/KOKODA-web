@@ -2,8 +2,13 @@ import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
 import PostDetailModal from '@/Components/Home/PostDetailModal';
 import CreatePostModal from '@/Components/Home/CreatePostModal';
+import { useTranslation } from '@/hooks/useTranslation';
+
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
 
 export default function MyPostTab({ posts }) {
+    const { t, locale } = useTranslation();
+    const localeTag = LOCALE_TAGS[locale] || 'en-US';
     const [selectedPost, setSelectedPost] = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -11,14 +16,14 @@ export default function MyPostTab({ posts }) {
         return (
             <>
                 <div className="text-center py-12 bg-secondary/10 rounded-2xl">
-                    <p className="text-tertiary font-semibold text-lg mb-2">No posts yet</p>
-                    <p className="text-tertiary/60 text-sm mb-6">Create your first post to report a lost or found item.</p>
+                    <p className="text-tertiary font-semibold text-lg mb-2">{t('profile.noPostsYet')}</p>
+                    <p className="text-tertiary/60 text-sm mb-6">{t('profile.createFirstPost')}</p>
                     <button
                         type="button"
                         onClick={() => setShowCreateModal(true)}
                         className="inline-flex items-center gap-2 bg-primary text-tertiary font-bold px-6 py-2.5 rounded-xl hover:bg-secondary transition-all duration-200 shadow-sm"
                     >
-                        Create New Post
+                        {t('profile.createNewPost')}
                     </button>
                 </div>
 
@@ -30,7 +35,7 @@ export default function MyPostTab({ posts }) {
     }
 
     const handleDelete = (post) => {
-        if (!confirm(`Delete post "${post.title}"?\n\nThis action cannot be undone.`)) {
+        if (!confirm(`${t('profile.deletePostConfirm')} "${post.title}"?\n\n${t('profile.deletePostWarning')}`)) {
             return;
         }
         router.delete(`/posts/${post.id}`, {
@@ -76,7 +81,7 @@ export default function MyPostTab({ posts }) {
                                     ? 'bg-green-500 text-white'
                                     : 'bg-yellow-400 text-tertiary'
                             }`}>
-                                {item.status === 'resolved' ? 'Resolved' : 'Active'}
+                                {item.status === 'resolved' ? t('profile.resolved') : t('profile.active')}
                             </span>
                         </div>
 
@@ -93,7 +98,7 @@ export default function MyPostTab({ posts }) {
                                             ? 'bg-label-lost text-base'
                                             : 'bg-label-found text-base'
                                     }`}>
-                                        {item.type}
+                                        {item.type === 'lost' ? t('home.lost') : t('home.found')}
                                     </span>
                                 </div>
 
@@ -120,7 +125,7 @@ export default function MyPostTab({ posts }) {
                             {/* Tanggal + Tombol Aksi */}
                             <div className="flex items-center justify-between mt-3">
                                 <span className="text-xs text-tertiary/50 font-medium">
-                                    {new Date(item.created_at).toLocaleDateString('en-US', {
+                                    {new Date(item.created_at).toLocaleDateString(localeTag, {
                                         day: 'numeric', month: 'long', year: 'numeric'
                                     })}
                                 </span>
@@ -131,7 +136,7 @@ export default function MyPostTab({ posts }) {
                                         onClick={(e) => e.stopPropagation()}
                                         className="bg-highlight text-tertiary hover:bg-yellow-400 text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all duration-200"
                                     >
-                                        Edit
+                                        {t('profile.edit')}
                                     </Link>
                                     <button
                                         onClick={(e) => {
@@ -140,7 +145,7 @@ export default function MyPostTab({ posts }) {
                                         }}
                                         className="bg-label-lost/80 hover:bg-label-lost text-base text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all duration-200 cursor-pointer"
                                     >
-                                        Delete
+                                        {t('profile.delete')}
                                     </button>
                                 </div>
                             </div>

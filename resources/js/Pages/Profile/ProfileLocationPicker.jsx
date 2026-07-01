@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
 import LeafletMap from '@/Components/Common/LeafletMap';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ProfileLocationPicker({ selected, onChange }) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [inputValue, setInputValue] = useState(selected || '');
     const [selectedCoords, setSelectedCoords] = useState(null);
@@ -49,7 +51,7 @@ export default function ProfileLocationPicker({ selected, onChange }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <span className={selected ? 'text-tertiary' : 'text-gray-400'}>
-                    {selected || 'Choose your location...'}
+                    {selected || t('profile.chooseLocation')}
                 </span>
             </button>
 
@@ -60,7 +62,7 @@ export default function ProfileLocationPicker({ selected, onChange }) {
 
                         {/* Header */}
                         <div className="flex justify-between items-center p-5 border-b-2 border-gray-200/50 bg-background">
-                            <h2 className="text-2xl font-quicksand font-bold text-tertiary">Choose Location</h2>
+                            <h2 className="text-2xl font-quicksand font-bold text-tertiary">{t('profile.chooseLocationTitle')}</h2>
                             <button
                                 type="button"
                                 onClick={() => setIsOpen(false)}
@@ -77,19 +79,19 @@ export default function ProfileLocationPicker({ selected, onChange }) {
 
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-xs font-quicksand text-gray-text-field font-bold tracking-wide">
-                                    Search Location
+                                    {t('profile.searchLocation')}
                                 </label>
                                 <GooglePlacesInput
                                     value={inputValue}
                                     onSelect={handleLocationSelect}
-                                    placeholder="e.g. Aeon Mall, Magetan, Jakarta..."
+                                    placeholder={t('profile.searchLocationPlaceholder')}
                                     className="w-full bg-white text-tertiary rounded-md py-2.5 pr-3 font-quicksand text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all placeholder:text-gray-text-field border border-secondary/20"
                                 />
                             </div>
 
                             <div className="flex flex-col gap-1">
                                 <label className="text-xs font-quicksand text-gray-text-field font-bold tracking-wide">
-                                    Or tap on the map
+                                    {t('profile.orTapMap')}
                                 </label>
                                 <LeafletMap
                                     center={selectedCoords ? [selectedCoords.lat, selectedCoords.lng] : [-6.5833, 106.8]}
@@ -107,7 +109,7 @@ export default function ProfileLocationPicker({ selected, onChange }) {
                                 onClick={handleSave}
                                 className="w-full bg-tertiary text-base rounded-xl py-3 font-quicksand font-bold text-base hover:opacity-90 transition-opacity shadow-md"
                             >
-                                Save Location
+                                {t('profile.saveLocation')}
                             </button>
                         </div>
                     </div>

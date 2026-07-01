@@ -3,8 +3,10 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import ProfileLocationPicker from '@/Pages/Profile/ProfileLocationPicker';
 import LanguageSwitcher from '@/Components/Common/LanguageSwitcher';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Edit({ mustVerifyEmail }) {
+    const { t } = useTranslation();
     // Mengambil data user yang sedang login dari props bawaan Inertia
     const user = usePage().props.auth.user;
     const [previewUrl, setPreviewUrl] = React.useState(null);
@@ -89,7 +91,7 @@ export default function Edit({ mustVerifyEmail }) {
                     {/* Error Alert */}
                     {Object.keys(errors).length > 0 && (
                         <div className="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg text-sm">
-                            <p className="font-semibold">Please check your input:</p>
+                            <p className="font-semibold">{t('profile.checkInput')}</p>
                             <ul className="mt-2">
                                 {Object.entries(errors).map(([field, message]) => (
                                     <li key={field}>• {message}</li>
@@ -137,7 +139,7 @@ export default function Edit({ mustVerifyEmail }) {
                                     <span>{user.email}</span>
                                 </div>
                                 {previewUrl && (
-                                    <p className="text-xs opacity-70 mt-2">New photo selected — click Save Change to save</p>
+                                    <p className="text-xs opacity-70 mt-2">{t('profile.newPhotoSelected')}</p>
                                 )}
                             </div>
                         </div>
@@ -150,7 +152,7 @@ export default function Edit({ mustVerifyEmail }) {
                             onChange={handlePhotoChange}
                             className="hidden"
                         />
-                        <LanguageSwitcher className="w-full sm:w-auto" />
+                        <LanguageSwitcher variant="solid" className="w-full sm:w-auto shadow" />
                     </div>
 
 
@@ -162,7 +164,7 @@ export default function Edit({ mustVerifyEmail }) {
                             {/* Input Username */}
                             <div className="flex flex-col gap-2">
                                 <label htmlFor="name" className="font-semibold text-base">
-                                    Username
+                                    {t('profile.username')}
                                 </label>
                                 <input
                                     id="name"
@@ -178,7 +180,7 @@ export default function Edit({ mustVerifyEmail }) {
                             {/* Input Email Address */}
                             <div className="flex flex-col gap-2">
                                 <label htmlFor="email" className="font-semibold text-base">
-                                    Email Address
+                                    {t('profile.emailAddress')}
                                 </label>
                                 <input
                                     id="email"
@@ -195,7 +197,7 @@ export default function Edit({ mustVerifyEmail }) {
                         {/* Input Location */}
                         <div className="flex flex-col gap-2">
                             <label className="font-semibold text-base">
-                                Location
+                                {t('profile.location')}
                             </label>
                             <ProfileLocationPicker
                                 selected={data.location}
@@ -213,7 +215,7 @@ export default function Edit({ mustVerifyEmail }) {
                             href={route('profile')}
                             className="px-8 py-3 bg-base text-tertiary font-semibold rounded-full border border-tertiary text-sm hover:bg-gray-100 transition-all duration-200 text-center"
                         >
-                            Cancel
+                            {t('profile.cancel')}
                         </Link>
 
                         {/* Tombol Save Change: Submit Form */}
@@ -222,7 +224,7 @@ export default function Edit({ mustVerifyEmail }) {
                             disabled={processing}
                             className="px-8 py-3 bg-tertiary text-base font-semibold rounded-full text-sm hover:bg-tertiary/90 transition-all duration-200 shadow disabled:opacity-50"
                         >
-                            Save Change
+                            {t('profile.saveChange')}
                         </button>
                     </div>
 

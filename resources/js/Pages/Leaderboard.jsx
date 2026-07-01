@@ -2,8 +2,10 @@ import AppLayout from '@/Layouts/AppLayout';
 import TopRankings from '@/Components/Leaderboard/TopRankings';
 import RankingsList from '@/Components/Leaderboard/RankingsList';
 import CurrentUserCard from '@/Components/Leaderboard/CurrentUserCard';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Leaderboard({ leaderboard = [], currentUser = null }) {
+    const { t } = useTranslation();
     const topThree = leaderboard.slice(0, 3);
     const restRanking = leaderboard.slice(3, 10);
 
@@ -13,8 +15,8 @@ export default function Leaderboard({ leaderboard = [], currentUser = null }) {
                 {/* Title */}
                 <div className="mb-16">
                     <h1 className="font-quicksand text-3xl md:text-6xl font-bold text-secondary text-center drop-shadow-md">
-                        Leaderboard
-                    </h1>   
+                        {t('nav.leaderboard')}
+                    </h1>
                 </div>
 
                 {/* Top 3 Rankings Component */}

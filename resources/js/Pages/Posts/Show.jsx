@@ -3,11 +3,16 @@ import AppLayout from '@/Layouts/AppLayout';
 import { useForm, router } from '@inertiajs/react';
 import { MapPin } from 'lucide-react';
 import PostActionButtons from '@/Components/Posts/PostActionButtons';
+import { useTranslation } from '@/hooks/useTranslation';
+
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
 
 export default function Show({ post, auth }) {
+    const { t, locale } = useTranslation();
+    const localeTag = LOCALE_TAGS[locale] || 'en-US';
     const isFounded = post.type === 'found';
     const labelColor = isFounded ? 'bg-label-found' : 'bg-label-lost';
-    const labelText = isFounded ? 'FOUND' : 'LOST';
+    const labelText = isFounded ? t('home.found').toUpperCase() : t('home.lost').toUpperCase();
     const isOwnPost = auth.user.id === post.user_id;
 
     const imageUrl = post.image_url || '/images/default.img.webp';
@@ -45,7 +50,7 @@ export default function Show({ post, auth }) {
                                     {typeof post.location === 'object' ? post.location?.place_name : post.location}
                                 </span>
                                 <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/20 text-tertiary text-xs font-semibold tracking-wide">
-                                    {new Date(post.created_at).toLocaleDateString('en-US', {
+                                    {new Date(post.created_at).toLocaleDateString(localeTag, {
                                         day: 'numeric', month: 'long', year: 'numeric'
                                     })}
                                 </span>
@@ -55,10 +60,10 @@ export default function Show({ post, auth }) {
                         {/* User Info */}
                         <div className="bg-gray-100 px-4 py-4 rounded-lg mb-6 border-l-4 border-label-lost">
                             <div className="font-semibold text-tertiary mb-1">
-                                Posted by: @{post.user.name}
+                                {t('post.postedBy')}: @{post.user.name}
                             </div>
                             <div className="text-xs text-gray-600">
-                                Member since {new Date(post.user.created_at).toLocaleDateString()}
+                                {t('post.memberSince')} {new Date(post.user.created_at).toLocaleDateString(localeTag)}
                             </div>
                         </div>
 
@@ -66,7 +71,7 @@ export default function Show({ post, auth }) {
                         {post.category && (
                             <div className="mb-6">
                                 <div className="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
-                                    Category
+                                    {t('post.category')}
                                 </div>
                                 <div className="inline-block bg-primary text-white px-4 py-2 rounded-2xl text-xs font-medium font-quicksand">
                                     {post.category}
@@ -77,7 +82,7 @@ export default function Show({ post, auth }) {
                         {/* Description */}
                         <div className="mb-8">
                             <div className="text-xs font-semibold text-gray-600 mb-3 uppercase tracking-wide">
-                                Description
+                                {t('post.description')}
                             </div>
                             <p className="text-base text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
                                 {post.description}
@@ -86,12 +91,12 @@ export default function Show({ post, auth }) {
 
                         {/* Status */}
                         <div className="bg-gray-100 px-4 py-3 rounded-lg mb-6 text-xs text-gray-600">
-                            <span className="font-semibold mr-2">Status:</span>
+                            <span className="font-semibold mr-2">{t('post.status')}:</span>
                             <span className={`inline-block px-2.5 py-1 rounded text-xs font-semibold uppercase ${post.status === 'active'
                                     ? 'bg-green-100 text-green-800'
                                     : 'bg-red-100 text-red-800'
                                 }`}>
-                                {post.status}
+                                {post.status === 'active' ? t('profile.active') : t('profile.resolved')}
                             </span>
                         </div>
 
@@ -103,13 +108,13 @@ export default function Show({ post, auth }) {
                                     onClick={() => router.visit('/profile')}
                                     className="flex-1 px-5 py-3 bg-primary text-white text-sm font-semibold rounded-lg font-quicksand transition-all duration-200 hover:bg-secondary cursor-pointer"
                                 >
-                                    OK
+                                    {t('post.ok')}
                                 </button>
                                 <button
                                     onClick={() => router.visit(`/posts/${post.id}/edit`)}
                                     className="flex-1 px-5 py-3 border-2 border-primary text-tertiary text-sm font-semibold rounded-lg font-quicksand transition-all duration-200 hover:bg-primary hover:text-white cursor-pointer"
                                 >
-                                    Edit Post
+                                    {t('post.editPost')}
                                 </button>
                             </div>
                         ) : (

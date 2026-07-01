@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, ShieldCheck, PackageCheck, Loader2 } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const FALLBACK_IMG =
     'https://images.unsplash.com/photo-1559416523-140ddc3d238c?q=80&w=200&auto=format&fit=crop';
@@ -20,6 +21,7 @@ const FALLBACK_IMG =
  *  - onDismiss: () => void — hide for now (reappears on reopening the chat)
  */
 export default function ChatClaimPopup({ claim, onSend, onDismiss }) {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const post = claim.post || {};
     const isVerify = claim.template === 'verification';
@@ -44,7 +46,7 @@ export default function ChatClaimPopup({ claim, onSend, onDismiss }) {
                 <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-gray-200">
                     <img
                         src={post.image_url || FALLBACK_IMG}
-                        alt={post.title || 'Item'}
+                        alt={post.title || t('chat.item')}
                         className="h-full w-full object-cover"
                     />
                 </div>
@@ -52,10 +54,10 @@ export default function ChatClaimPopup({ claim, onSend, onDismiss }) {
                 {/* Text */}
                 <div className="min-w-0 flex-1">
                     <p className="font-quicksand text-[10px] font-bold uppercase tracking-wide text-secondary">
-                        {isVerify ? 'Item Verification' : 'Item Handover'}
+                        {isVerify ? t('chat.itemVerification') : t('chat.itemHandover')}
                     </p>
                     <p className="truncate font-quicksand text-[13px] font-bold leading-tight text-tertiary">
-                        {post.title || 'Item'}
+                        {post.title || t('chat.item')}
                     </p>
                 </div>
 
@@ -67,7 +69,7 @@ export default function ChatClaimPopup({ claim, onSend, onDismiss }) {
                     className="flex shrink-0 items-center gap-1.5 rounded-xl bg-secondary px-3 py-2 font-quicksand text-xs font-bold text-base shadow-sm transition-all hover:opacity-90 disabled:opacity-60"
                 >
                     {loading ? <Loader2 size={14} className="animate-spin" /> : <Icon size={14} />}
-                    {isVerify ? 'Verify Card' : 'Send Card'}
+                    {isVerify ? t('chat.verifyCard') : t('chat.sendCard')}
                 </button>
 
                 {/* Dismiss */}
@@ -75,7 +77,7 @@ export default function ChatClaimPopup({ claim, onSend, onDismiss }) {
                     type="button"
                     onClick={onDismiss}
                     className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-tertiary/40 transition-colors hover:bg-gray-100 hover:text-secondary"
-                    aria-label="Dismiss"
+                    aria-label={t('chat.dismiss')}
                 >
                     <X size={16} />
                 </button>

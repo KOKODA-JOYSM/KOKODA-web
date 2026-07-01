@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function FilterLostFound({ selected, onChange }) {
+    const { t } = useTranslation();
     const filters = [
-        { id: 'lost', label: 'Lost' },
-        { id: 'found', label: 'Found' },
+        { id: 'lost', label: t('home.lost') },
+        { id: 'found', label: t('home.found') },
     ];
 
     return (

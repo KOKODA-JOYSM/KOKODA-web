@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import { MessageSquare, HandHelping, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import RequestModal from './RequestModal';
+import { useTranslation } from '@/hooks/useTranslation';
 
 /**
  * PostActionButtons — Reusable "Request Item" & "Chat Owner" buttons.
@@ -13,6 +14,7 @@ import RequestModal from './RequestModal';
  * - variant: 'default' | 'compact' — controls button size
  */
 export default function PostActionButtons({ post, variant = 'default' }) {
+    const { t } = useTranslation();
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [claimStatus, setClaimStatus] = useState(null); // null | 'pending' | 'accepted' | 'rejected' | 'completed'
     const [claimId, setClaimId] = useState(null);
@@ -75,8 +77,8 @@ export default function PostActionButtons({ post, variant = 'default' }) {
     const statusConfig = {
         pending: {
             icon: Clock,
-            label: 'Request Sent',
-            sublabel: 'Waiting for owner\'s response',
+            label: t('post.requestSent'),
+            sublabel: t('post.waitingOwnerResponse'),
             bgColor: 'bg-amber-50',
             borderColor: 'border-amber-200',
             textColor: 'text-amber-700',
@@ -84,8 +86,8 @@ export default function PostActionButtons({ post, variant = 'default' }) {
         },
         accepted: {
             icon: CheckCircle,
-            label: 'Request Accepted!',
-            sublabel: 'Please contact the owner via chat',
+            label: t('post.requestAccepted'),
+            sublabel: t('post.contactOwnerViaChat'),
             bgColor: 'bg-green-50',
             borderColor: 'border-green-200',
             textColor: 'text-green-700',
@@ -93,8 +95,8 @@ export default function PostActionButtons({ post, variant = 'default' }) {
         },
         rejected: {
             icon: XCircle,
-            label: 'Request Rejected',
-            sublabel: 'The owner has rejected your request',
+            label: t('profile.requestRejected'),
+            sublabel: t('post.ownerRejectedRequest'),
             bgColor: 'bg-red-50',
             borderColor: 'border-red-200',
             textColor: 'text-red-700',
@@ -102,8 +104,8 @@ export default function PostActionButtons({ post, variant = 'default' }) {
         },
         completed: {
             icon: CheckCircle,
-            label: 'Completed',
-            sublabel: 'Item has been returned',
+            label: t('profile.completed'),
+            sublabel: t('post.itemHasBeenReturned'),
             bgColor: 'bg-blue-50',
             borderColor: 'border-blue-200',
             textColor: 'text-blue-700',
@@ -165,12 +167,12 @@ export default function PostActionButtons({ post, variant = 'default' }) {
                         )}
                         <span>
                             {postResolved
-                                ? 'Already Resolved'
+                                ? t('post.alreadyResolved')
                                 : activeClaim
-                                    ? 'Already Requested'
+                                    ? t('post.alreadyRequested')
                                     : isFounded
-                                        ? 'This is Mine'
-                                        : 'I Found This'}
+                                        ? t('post.thisIsMine')
+                                        : t('post.iFoundThis')}
                         </span>
                     </button>
 
@@ -194,7 +196,7 @@ export default function PostActionButtons({ post, variant = 'default' }) {
                         ) : (
                             <MessageSquare size={isCompact ? 16 : 18} />
                         )}
-                        <span>Chat Now</span>
+                        <span>{t('post.chatNow')}</span>
                     </button>
                 </div>
             </div>

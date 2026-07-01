@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import { X, Star, ArrowRight, Loader2 } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function RateUserModal({ claim, onClose }) {
+    const { t } = useTranslation();
     const [score, setScore] = useState(0);
     const [hovered, setHovered] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -25,7 +27,7 @@ export default function RateUserModal({ claim, onClose }) {
 
     const handleSubmit = async () => {
         if (score === 0) {
-            setError('Please select a rating before submitting.');
+            setError(t('profile.selectRatingFirst'));
             return;
         }
         setLoading(true);
@@ -38,7 +40,7 @@ export default function RateUserModal({ claim, onClose }) {
             onClose();
             router.reload();
         } catch (e) {
-            setError(e.response?.data?.error || 'Failed to submit rating. Please try again.');
+            setError(e.response?.data?.error || t('profile.failedSubmitRating'));
             setLoading(false);
         }
     };
@@ -98,10 +100,10 @@ export default function RateUserModal({ claim, onClose }) {
 
                 {/* Title */}
                 <h3 className="font-quicksand font-bold text-tertiary text-xl mb-1">
-                    Rate this user
+                    {t('profile.rateThisUser')}
                 </h3>
                 <p className="font-quicksand text-sm text-gray-500 mb-6">
-                    How was your experience with{' '}
+                    {t('profile.howWasExperience')}{' '}
                     <span className="font-semibold text-tertiary">@{username}</span>?
                 </p>
 
@@ -141,7 +143,7 @@ export default function RateUserModal({ claim, onClose }) {
                 >
                     {loading
                         ? <Loader2 size={18} className="animate-spin" />
-                        : <>Submit Rating <ArrowRight size={16} /></>
+                        : <>{t('profile.submitRating')} <ArrowRight size={16} /></>
                     }
                 </button>
 
@@ -151,7 +153,7 @@ export default function RateUserModal({ claim, onClose }) {
                     disabled={loading}
                     className="font-quicksand text-sm text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
                 >
-                    Skip for now
+                    {t('profile.skipForNow')}
                 </button>
             </div>
 

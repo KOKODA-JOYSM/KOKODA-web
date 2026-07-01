@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle, ShieldCheck, PackageCheck, Clock, Loader2, Star, Lock } from 'lucide-react';
 import { avatarUrl } from '@/Components/Common/Avatar';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const FALLBACK_IMG =
     'https://images.unsplash.com/photo-1559416523-140ddc3d238c?q=80&w=400&auto=format&fit=crop';
@@ -28,6 +29,7 @@ function getSenderAvatar(message) {
  * recipient on the received card; the other party sees it as a status.
  */
 export default function RequestCardMessage({ message, onRequestRating, authUserId }) {
+    const { t } = useTranslation();
     const meta = message.meta || {};
     const post = meta.post || {};
     const template = meta.template; // 'verification' | 'received'
@@ -72,7 +74,7 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
                 onRequestRating?.(data.claim);
             }
         } catch (e) {
-            setError(e.response?.data?.error || 'Something went wrong. Please try again.');
+            setError(e.response?.data?.error || t('chat.somethingWentWrong'));
         } finally {
             setLoading(false);
         }
@@ -91,18 +93,18 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
 
     if (template === 'verification') {
         if (isVerified) {
-            label = 'Item Verified';
+            label = t('chat.itemVerified');
             Icon = ShieldCheck;
             tone = 'bg-label-found text-base';
             done = true;
         } else if (viewerIsHolder) {
             mode = 'action';
-            label = 'Verify Item';
+            label = t('chat.verifyItem');
             Icon = ShieldCheck;
             onClick = () => setConfirming(true);
         } else {
             // The other party sees the holder's card as a status only.
-            label = 'Awaiting verification';
+            label = t('chat.awaitingVerification');
             Icon = Clock;
             tone = 'bg-highlight text-tertiary';
         }
@@ -111,12 +113,12 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
         if (completed && viewerIsRecipient && !rated) {
             // Both sides confirmed but the recipient hasn't rated yet.
             mode = 'rate';
-            label = 'Give Rating';
+            label = t('profile.giveRating');
             Icon = Star;
             tone = 'bg-highlight text-tertiary';
             onClick = openRating;
         } else if (isReceived) {
-            label = 'Item Received';
+            label = t('chat.itemReceived');
             Icon = PackageCheck;
             tone = 'bg-label-found text-base';
             done = true;
@@ -125,18 +127,18 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
             // recipient can't confirm receipt prematurely and isn't left confused.
             if (!meta.verified) {
                 mode = 'locked';
-                label = 'Waiting for verification';
+                label = t('chat.waitingForVerification');
                 Icon = Lock;
                 tone = 'bg-gray-100 text-tertiary/50';
             } else {
                 mode = 'action';
-                label = 'Item Received';
+                label = t('chat.itemReceived');
                 Icon = PackageCheck;
                 onClick = () => setConfirming(true);
             }
         } else {
             // The other party sees the recipient's card as a status only.
-            label = 'Awaiting recipient';
+            label = t('chat.awaitingRecipient');
             Icon = Clock;
             tone = 'bg-highlight text-tertiary';
         }
@@ -144,8 +146,8 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
 
     // Reminder copy shown before the verify/receive action is committed.
     const confirmPrompt = template === 'verification'
-        ? 'Verify this really is the genuine item? This confirms the handover.'
-        : 'Confirm you have actually received your item back?';
+        ? t('chat.verifyGenuineItemPrompt')
+        : t('chat.confirmReceivedPrompt');
 
     return (
         <div className={`flex items-end gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
@@ -153,7 +155,7 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
                 <div className="mb-1 h-8 w-8 shrink-0 overflow-hidden rounded-full bg-base ring-2 ring-[#F7D8B0] md:h-9 md:w-9">
                     <img
                         src={getSenderAvatar(message)}
-                        alt={message.senderName || 'User'}
+                        alt={message.senderName || t('chat.userFallback')}
                         className="h-full w-full object-cover"
                     />
                 </div>
@@ -167,23 +169,23 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
                             isLost ? 'bg-label-lost' : 'bg-label-found'
                         }`}
                     >
-                        {isLost ? 'Lost Item' : 'Found Item'}
+                        {isLost ? t('profile.lostItem') : t('profile.foundItem')}
                     </span>
                 </div>
 
                 {/* Body */}
                 <div className="flex flex-col gap-2 p-3">
                     <p className="font-quicksand text-[11px] font-bold uppercase tracking-wide text-secondary">
-                        {template === 'verification' ? 'Item Verification' : 'Item Handover'}
+                        {template === 'verification' ? t('chat.itemVerification') : t('chat.itemHandover')}
                     </p>
                     <h4 className="line-clamp-2 font-quicksand text-sm font-bold leading-tight text-tertiary">
-                        {post.title || 'Item'}
+                        {post.title || t('chat.item')}
                     </h4>
 
                     <p className="font-roboto text-[11px] leading-snug text-tertiary/70">
                         {template === 'verification'
-                            ? 'Confirm this is the genuine owner’s item to start the handover.'
-                            : 'Confirm once you have received your item back.'}
+                            ? t('chat.confirmGenuineOwnerItem')
+                            : t('chat.confirmReceivedBack')}
                     </p>
 
                     {error && (
@@ -205,7 +207,7 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
                                     className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-secondary py-1.5 font-quicksand text-xs font-bold text-base shadow-sm transition-all hover:opacity-90 disabled:opacity-60"
                                 >
                                     {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
-                                    Yes, confirm
+                                    {t('chat.yesConfirm')}
                                 </button>
                                 <button
                                     type="button"
@@ -213,7 +215,7 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
                                     disabled={loading}
                                     className="flex-1 rounded-lg bg-base py-1.5 font-quicksand text-xs font-bold text-tertiary/70 shadow-sm transition-all hover:bg-gray-100 disabled:opacity-60"
                                 >
-                                    Cancel
+                                    {t('profile.cancel')}
                                 </button>
                             </div>
                         </div>
@@ -228,7 +230,7 @@ export default function RequestCardMessage({ message, onRequestRating, authUserI
                                 {label}
                             </div>
                             <p className="text-center font-roboto text-[10px] leading-snug text-tertiary/60">
-                                Waiting for the item holder to verify the item before you can confirm receipt.
+                                {t('chat.waitingHolderVerify')}
                             </p>
                         </div>
                     ) : mode !== 'status' ? (

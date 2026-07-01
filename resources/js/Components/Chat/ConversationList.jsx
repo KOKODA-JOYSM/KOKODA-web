@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { Search, UserPlus } from 'lucide-react';
 import ConversationItem from '@/Components/Chat/ConversationItem';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ConversationList({
     conversations,
@@ -12,6 +13,7 @@ export default function ConversationList({
     searchingUsers = false,
     onStartConversation,
 }) {
+    const { t } = useTranslation();
     const [query, setQuery] = useState('');
     const [isSearchingNewUser, setIsSearchingNewUser] = useState(false);
 
@@ -76,7 +78,7 @@ export default function ConversationList({
                         <button
                             type="button"
                             onClick={() => document.getElementById('hamburger-btn')?.click()}
-                            aria-label="Open menu"
+                            aria-label={t('chat.openMenu')}
                             className="flex lg:hidden flex-col items-center justify-center gap-1.5 p-0 bg-primary hover:bg-secondary border-none rounded-xl w-10 h-10 sm:w-11 sm:h-11 transition-colors duration-200 ease-in cursor-pointer shrink-0"
                         >
                             <span className="block w-6 h-0.5 bg-base rounded-sm transition-all duration-300 ease-in-out" />
@@ -85,7 +87,7 @@ export default function ConversationList({
                         </button>
 
                         <h1 className="font-quicksand text-[34px] font-bold tracking-tight text-tertiary md:text-[38px] lg:text-[40px]">
-                            Messages
+                            {t('chat.messages')}
                         </h1>
 
                         <button
@@ -95,8 +97,8 @@ export default function ConversationList({
                                 ? 'bg-tertiary text-base'
                                 : 'bg-base text-tertiary/70 hover:bg-secondary/50'
                                 }`}
-                            aria-label={isSearchingNewUser ? 'Back to messages list' : 'Find a new user'}
-                            title={isSearchingNewUser ? 'Back to messages list' : 'Start a new chat'}
+                            aria-label={isSearchingNewUser ? t('chat.backToMessagesList') : t('chat.findNewUser')}
+                            title={isSearchingNewUser ? t('chat.backToMessagesList') : t('chat.startNewChat')}
                         >
                             <UserPlus className="h-4.5 w-4.5" />
                         </button>
@@ -108,7 +110,7 @@ export default function ConversationList({
                             type="text"
                             value={query}
                             onChange={handleQueryChange}
-                            placeholder={isSearchingNewUser ? 'Find a new user...' : 'Search'}
+                            placeholder={isSearchingNewUser ? t('chat.findNewUserPlaceholder') : t('nav.search')}
                             className="ml-3 w-full border-0 bg-transparent p-0 font-roboto text-[16px] text-tertiary placeholder:text-tertiary/80 focus:outline-none focus:ring-0"
                         />
                     </div>
@@ -127,7 +129,7 @@ export default function ConversationList({
                             {!searchingUsers && query.length >= 2 && userSearchResults.length === 0 && (
                                 <div className="py-8 text-center">
                                     <p className="font-roboto text-sm text-tertiary/60">
-                                        User Not Found
+                                        {t('chat.userNotFound')}
                                     </p>
                                 </div>
                             )}
@@ -135,7 +137,7 @@ export default function ConversationList({
                             {!searchingUsers && query.length < 2 && (
                                 <div className="py-8 text-center">
                                     <p className="font-roboto text-sm text-tertiary/60">
-                                        Type at least 2 characters to search
+                                        {t('chat.typeAtLeast2Chars')}
                                     </p>
                                 </div>
                             )}
@@ -179,10 +181,10 @@ export default function ConversationList({
                             {conversations.length === 0 && (
                                 <div className="py-8 text-center">
                                     <p className="font-roboto text-sm text-tertiary/60">
-                                        No conversations yet
+                                        {t('chat.noConversationsYet')}
                                     </p>
                                     <p className="mt-1 font-roboto text-xs text-tertiary/40">
-                                        Click <UserPlus className="inline h-3.5 w-3.5" /> to start a new chat
+                                        {t('chat.clickToStartNewChatPrefix')} <UserPlus className="inline h-3.5 w-3.5" /> {t('chat.clickToStartNewChatSuffix')}
                                     </p>
                                 </div>
                             )}

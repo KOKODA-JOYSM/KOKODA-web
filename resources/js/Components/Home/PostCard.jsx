@@ -5,8 +5,10 @@ import PostCommentsView from './PostCommentsView';
 import Avatar from '../Common/Avatar';
 import { useSeenComments } from '@/hooks/useSeenComments';
 import { MessageCircle, MapPin } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function PostCard({ post }) {
+    const { t } = useTranslation();
     const { auth } = usePage().props;
     const currentUser = auth?.user ?? null;
 
@@ -146,14 +148,14 @@ export default function PostCard({ post }) {
                             >
                                 <Avatar user={post.user} size={36} className="w-9 h-9" />
                                 <span className="font-quicksand text-sm font-semibold text-tertiary truncate group-hover/profile:underline">
-                                    {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'Unknown'}`}
+                                    {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || t('profile.unknown')}`}
                                 </span>
                             </Link>
                         ) : (
                             <div className="flex items-center gap-3 min-w-0">
                                 <Avatar user={post.user} size={36} className="w-9 h-9" />
                                 <span className="font-quicksand text-sm font-semibold text-tertiary truncate">
-                                    {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || 'Unknown'}`}
+                                    {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || t('profile.unknown')}`}
                                 </span>
                             </div>
                         )}
@@ -198,7 +200,7 @@ export default function PostCard({ post }) {
                                     openComments();
                                 }}
                                 className="relative flex items-center gap-1.5 p-2 rounded-full text-gray-text-field hover:text-background hover:bg-primary transition-all duration-200"
-                                aria-label="View comments"
+                                aria-label={t('post.viewComments')}
                             >
                                 <MessageCircle size={22} />
                                 {commentsCount > 0 && (
@@ -210,13 +212,13 @@ export default function PostCard({ post }) {
                                 {hasNewComments && (
                                     <span
                                         className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-label-lost ring-2 ring-base animate-pulse"
-                                        aria-label="New comments"
+                                        aria-label={t('post.newComments')}
                                     />
                                 )}
                             </button>
 
                             <div className={`${labelColor} text-xs font-bold font-quicksand px-3 py-1 rounded-full whitespace-nowrap`}>
-                                {isFounded ? 'FOUND' : 'LOST'}
+                                {isFounded ? t('home.found').toUpperCase() : t('home.lost').toUpperCase()}
                             </div>
                         </div>
 
