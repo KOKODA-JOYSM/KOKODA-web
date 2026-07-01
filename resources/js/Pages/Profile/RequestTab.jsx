@@ -27,7 +27,12 @@ const statusConfig = {
     },
 };
 
-function ClaimCard({ claim, mode, onClick, isNew }) {
+// A found-post request the requester can now rate: the finder returned the item
+// (claim completed) but no rating has been left yet.
+const needsRating = (claim) =>
+    claim.post?.type === 'found' && claim.status === 'completed' && !claim.rating;
+
+function ClaimCard({ claim, mode, onClick, isNew, rateable }) {
     const post = claim.post;
     const imageUrl = post?.image_url
         || 'https://images.unsplash.com/photo-1559416523-140ddc3d238c?q=80&w=400&auto=format&fit=crop';
@@ -78,6 +83,13 @@ function ClaimCard({ claim, mode, onClick, isNew }) {
                         }`}>
                             {post?.type === 'found' ? 'Found Item' : 'Lost Item'}
                         </span>
+                    ) : rateable ? (
+                        <span className="flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-lg bg-highlight text-tertiary shadow-sm">
+                            <svg className="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                            </svg>
+                            Beri Rating
+                        </span>
                     ) : (
                         <span className={`text-xs font-bold px-4 py-1.5 rounded-lg ${
                             statusConfig[claim.status]?.className ?? 'bg-gray-100 text-gray-500'
@@ -92,7 +104,11 @@ function ClaimCard({ claim, mode, onClick, isNew }) {
 
     return (
         <div className="relative">
-            {isNew && (
+            {rateable ? (
+                <span className="absolute -top-1.5 -right-1.5 z-10 bg-highlight text-tertiary text-[10px] font-bold px-2 py-0.5 rounded-full shadow pointer-events-none">
+                    ★ Rate
+                </span>
+            ) : isNew && (
                 <span className="absolute -top-1.5 -right-1.5 z-10 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow pointer-events-none">
                     New
                 </span>
@@ -149,7 +165,11 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
     };
 
     const pendingIncoming = incomingClaims.filter(c => c.status === 'pending' && !seenIds.has(c.id)).length;
-    const pendingSent = sentClaims.filter(c => c.status === 'pending' && !seenIds.has(c.id)).length;
+    // Sent-tab badge counts requests still waiting AND found-post requests that
+    // are now rateable, so the user is nudged to open them and leave a rating.
+    const pendingSent = sentClaims.filter(
+        c => (c.status === 'pending' && !seenIds.has(c.id)) || needsRating(c)
+    ).length;
 
     return (
         <div className="flex flex-col gap-4">
@@ -212,6 +232,7 @@ export default function RequestTab({ incomingClaims = [], sentClaims = [] }) {
                             claim={claim}
                             mode="sent"
                             isNew={claim.status === 'pending' && !seenIds.has(claim.id)}
+                            rateable={needsRating(claim)}
                             onClick={() => { markAllSeen(allClaimIds); setSelectedSentClaim(claim); }}
                         />
                     ))
