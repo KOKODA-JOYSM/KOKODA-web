@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 
 // ─────────────────────────────────────────────
-//  NAV ITEMS 
+//  NAV ITEMS (Translations will be handled inside component)
 // ─────────────────────────────────────────────
-const NAV_ITEMS = [
-    { label: 'Home',        href: '/home',        icon: '/images/icon-home.svg'        },
-    { label: 'Leaderboard', href: '/leaderboard', icon: '/images/icon-leaderboard.svg' },
-    { label: 'Search',      href: '/search',      icon: '/images/icon-search.svg'      },
+const getNavItems = (locale) => [
+    { label: locale === 'id' ? 'Beranda' : 'Home',        href: '/home',        icon: '/images/icon-home.svg'        },
+    { label: locale === 'id' ? 'Papan Peringkat' : 'Leaderboard', href: '/leaderboard', icon: '/images/icon-leaderboard.svg' },
+    { label: locale === 'id' ? 'Cari' : 'Search',      href: '/search',      icon: '/images/icon-search.svg'      },
     { label: 'Chat',        href: '/chat',        icon: '/images/icon-chat.svg'        },
 ];
 
@@ -82,7 +82,7 @@ export default function Navbar() {
                 {/* NAV LINKS */}
                 <nav className="w-full flex-1 overflow-y-auto no-scrollbar min-h-0">
                     <ul className="list-none m-0 p-0 flex flex-col gap-1 sm:gap-1.5 w-full">
-                        {NAV_ITEMS.map((item) => {
+                        {getNavItems(props?.locale || 'en').map((item) => {
                             // Chat requires authentication
                             const requiresAuth = item.label === 'Chat';
                             const needsLogin = requiresAuth && !user;
@@ -120,6 +120,35 @@ export default function Navbar() {
                         })}
                     </ul>
                 </nav>
+
+                {/* LANGUAGE SWITCH */}
+                <div className="flex-shrink-0 pt-3">
+                    <div className="flex justify-between items-center bg-secondary/30 p-2 rounded-xl border border-transparent hover:border-secondary transition-colors duration-200">
+                        <span className="text-white text-sm font-quicksand font-semibold px-2">Language</span>
+                        <div className="flex bg-primary rounded-lg p-1">
+                            <a
+                                href="/lang/en"
+                                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
+                                    props?.locale === 'en' || !props?.locale
+                                        ? 'bg-secondary text-white'
+                                        : 'text-white/60 hover:text-white'
+                                }`}
+                            >
+                                EN
+                            </a>
+                            <a
+                                href="/lang/id"
+                                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
+                                    props?.locale === 'id'
+                                        ? 'bg-secondary text-white'
+                                        : 'text-white/60 hover:text-white'
+                                }`}
+                            >
+                                ID
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
                 {/* PROFILE LINK (Bisa diklik & Data Dinamis) */}
                 <div className="flex-shrink-0 pt-3">
