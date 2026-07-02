@@ -18,6 +18,7 @@ class Message extends Model
 
     protected $casts = [
         'meta' => 'array',
+        'body' => 'encrypted',
     ];
 
     /**
