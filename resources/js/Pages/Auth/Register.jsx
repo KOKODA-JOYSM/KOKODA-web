@@ -3,6 +3,7 @@ import TextInput from '@/Components/Auth/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import LanguageSwitcher from '@/Components/Common/LanguageSwitcher';
 
 export default function Register({ previousName = '', previousEmail = '' }) {
     const { t } = useTranslation();
@@ -25,8 +26,12 @@ export default function Register({ previousName = '', previousEmail = '' }) {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-primary px-4 py-8 font-quicksand text-tertiary sm:px-6">
+        <div className="relative flex min-h-screen items-center justify-center bg-primary px-4 py-8 font-quicksand text-tertiary sm:px-6">
             <Head title="Register" />
+
+            <div className="absolute top-4 right-4 w-32">
+                <LanguageSwitcher className="w-full" />
+            </div>
 
             <div className="w-full max-w-5xl overflow-hidden rounded-2xl bg-base shadow-xl lg:grid lg:min-h-[440px] lg:grid-cols-[2fr_3fr]">
                 <div className="relative hidden lg:block">
