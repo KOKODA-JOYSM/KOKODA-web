@@ -61,6 +61,13 @@ class ClaimController extends Controller
             'message' => $validated['message'] ?? null,
         ]);
 
+        // Open the conversation right away with the claimant's request note
+        // (or a default intro) so the chat already exists in both users'
+        // conversation lists without needing a "chat" press on the post first.
+        $claim->setRelation('post', $post);
+        $this->postActionMessage($claim, $user->id, $this->introMessageBody($claim));
+        $claim->update(['intro_message_sent' => true]);
+
         return response()->json([
             'success' => true,
             'message' => 'Request sent successfully!',

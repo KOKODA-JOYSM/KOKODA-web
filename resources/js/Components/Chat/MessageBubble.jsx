@@ -119,8 +119,8 @@ function TimestampMeta({ timestamp, isOwn, isSending, isRead }) {
  * relative` so the timestamp anchors to its bottom-right corner.
  */
 function BubbleTextContent({ message, isOwn, isSending }) {
-    // Width of the spacer — enough for "09:01" + check icon + gaps
-    const spacerWidth = isOwn ? '5em' : '3em';
+    // Width of the spacer — enough for "12:09 PM" (+ check icon for own messages)
+    const spacerWidth = isOwn ? '6em' : '4.5em';
 
     return (
         <div className="relative">
@@ -194,7 +194,7 @@ function BubbleImageContent({ message, isOwn, isSending }) {
                             {message.body}
                             <span
                                 className="invisible inline-block h-0 select-none"
-                                style={{ width: isOwn ? '5em' : '3em' }}
+                                style={{ width: isOwn ? '6em' : '4.5em' }}
                                 aria-hidden="true"
                             >
                                 &nbsp;

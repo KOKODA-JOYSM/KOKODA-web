@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSeenClaims } from '@/hooks/useSeenClaims';
+import { useEcho } from '@/hooks/useEcho';
 
 // ─────────────────────────────────────────────
 //  NAV ITEMS (Translations will be handled inside component)
@@ -35,6 +36,32 @@ export default function Navbar() {
     const pendingClaimsCount = notifIds.filter(sig => !seenIds.has(sig)).length;
 
     const { t } = useTranslation();
+
+    // Real-time: dengarkan channel privat user di SEMUA halaman. Saat ada
+    // pesan/request baru (ConversationUpdated dibroadcast oleh ChatController
+    // dan ClaimController), refresh shared props supaya badge chat di sidebar
+    // dan bubble incoming request di profile langsung menyala tanpa reload.
+    const { subscribeToUserChannel } = useEcho();
+    useEffect(() => {
+        if (!user?.id) return;
+        subscribeToUserChannel(user.id, {
+            onConversationUpdated: () => {
+                // Di halaman profile ikut refresh incomingClaims/sentClaims agar
+                // badge "Incoming Request" dan list-nya langsung ter-update.
+                if (window.location.pathname.startsWith('/profile')) {
+                    router.reload();
+                    return;
+                }
+                router.reload({
+                    only: [
+                        'unreadConversationsCount',
+                        'pendingClaimIds',
+                        'updatedSentClaimIds',
+                    ],
+                });
+            },
+        });
+    }, [user?.id, subscribeToUserChannel]);
 
     // Pastikan state isOpen ini ADA (ini yang bikin error tadi)
     const [isOpen, setIsOpen] = useState(false);
