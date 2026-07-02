@@ -34,7 +34,7 @@ export default function Welcome() {
                                     {t('welcome.signIn')}
                                 </Link>
                                 <Link
-                                    href={route('register')}
+                                    href={route('home')}
                                     className="hidden sm:block rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-tertiary shadow-md transition-all hover:-translate-y-0.5 hover:bg-highlight hover:shadow-lg"
                                 >
                                     {t('welcome.getStarted')}
