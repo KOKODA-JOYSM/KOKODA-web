@@ -28,7 +28,39 @@ export default {
                 'label-lost': '#D56666',
                 'gray-text-field': '#777777',
                 'online-color': '#008000',
-            }
+            },
+            animation: {
+                marquee: 'marquee var(--duration) linear infinite',
+                'marquee-vertical': 'marquee-vertical var(--duration) linear infinite',
+                'beam-orbit': 'beam-orbit calc(var(--duration)*1s) infinite linear',
+                'gradient-flow': 'gradient-flow 8s linear infinite',
+                shimmer: 'shimmer 2.5s linear infinite',
+            },
+            keyframes: {
+                marquee: {
+                    from: { transform: 'translateX(0)' },
+                    to: { transform: 'translateX(calc(-100% - var(--gap)))' },
+                },
+                'marquee-vertical': {
+                    from: { transform: 'translateY(0)' },
+                    to: { transform: 'translateY(calc(-100% - var(--gap)))' },
+                },
+                'beam-orbit': {
+                    '0%': { top: '0%', left: '0%' },
+                    '25%': { top: '0%', left: '100%' },
+                    '50%': { top: '100%', left: '100%' },
+                    '75%': { top: '100%', left: '0%' },
+                    '100%': { top: '0%', left: '0%' },
+                },
+                'gradient-flow': {
+                    '0%, 100%': { backgroundPosition: '0% 50%' },
+                    '50%': { backgroundPosition: '100% 50%' },
+                },
+                shimmer: {
+                    '0%': { backgroundPosition: '0% 0%' },
+                    '100%': { backgroundPosition: '-200% 0%' },
+                },
+            },
         },
     },
 

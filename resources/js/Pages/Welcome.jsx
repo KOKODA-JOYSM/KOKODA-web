@@ -1,11 +1,34 @@
 import { Head, Link } from '@inertiajs/react';
-import { Search, MapPin, Handshake, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Search, MapPin, Handshake, ChevronRight, CheckCircle2, Sparkles, Quote, ClipboardList, Bell, ShieldCheck, Zap, Users, Lock, Award } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useSectionGlow } from '@/hooks/useSectionGlow';
+import { DotPattern } from '@/Components/magicui/dot-pattern';
+import { AnimatedGradientText } from '@/Components/magicui/animated-gradient-text';
+import { BorderBeam } from '@/Components/magicui/border-beam';
+import { ShimmerButton } from '@/Components/magicui/shimmer-button';
+import { NumberTicker } from '@/Components/magicui/number-ticker';
+import { MagicCard } from '@/Components/magicui/magic-card';
+import { Marquee } from '@/Components/magicui/marquee';
+import { FadeIn } from '@/Components/magicui/fade-in';
+import { MouseGlow } from '@/Components/magicui/mouse-glow';
+import { StaggerGroup, StaggerItem } from '@/Components/magicui/stagger';
+import { Tilt3DCard } from '@/Components/magicui/tilt-3d-card';
+import { ScrollParallaxImg } from '@/Components/magicui/scroll-parallax-img';
+
+const MotionLink = motion.create(Link);
 
 export default function Welcome() {
     const { t } = useTranslation();
     const [scrolled, setScrolled] = useState(false);
+
+    const heroGlow = useSectionGlow();
+    const featuresGlow = useSectionGlow();
+    const howItWorksGlow = useSectionGlow();
+    const whyUsGlow = useSectionGlow();
+    const statsGlow = useSectionGlow();
+    const testimonialsGlow = useSectionGlow();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -33,12 +56,14 @@ export default function Welcome() {
                                 >
                                     {t('welcome.signIn')}
                                 </Link>
-                                <Link
+                                <MotionLink
                                     href={route('home')}
-                                    className="hidden sm:block rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-tertiary shadow-md transition-all hover:-translate-y-0.5 hover:bg-highlight hover:shadow-lg"
+                                    whileHover={{ y: -3, backgroundColor: '#FFE7A3', boxShadow: '0 10px 20px -6px rgba(49,26,5,0.25)' }}
+                                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                                    className="hidden sm:block rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-tertiary shadow-md"
                                 >
                                     {t('welcome.getStarted')}
-                                </Link>
+                                </MotionLink>
                             </div>
                         </div>
                     </div>
@@ -46,9 +71,30 @@ export default function Welcome() {
 
                 {/* Hero Section */}
                 <main>
-                    <div className="relative overflow-hidden pt-32 pb-20 lg:pt-48 lg:pb-32 flex flex-col lg:flex-row items-center justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 gap-12">
+                    <div
+                        ref={heroGlow.ref}
+                        onMouseMove={heroGlow.onMouseMove}
+                        className="group relative overflow-hidden pt-32 pb-20 lg:pt-48 lg:pb-32 flex flex-col lg:flex-row items-center justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 gap-12"
+                    >
+                        <MouseGlow color="244,199,153" />
+                        <DotPattern
+                            width={24}
+                            height={24}
+                            cr={1.5}
+                            className="-z-10 [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,#000_60%,transparent_100%)]"
+                        />
+
                         {/* Text Content */}
-                        <div className="text-center lg:text-left flex-1 z-10">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="text-center lg:text-left flex-1 z-10"
+                        >
+                            <AnimatedGradientText className="mb-6">
+                                <Sparkles className="h-4 w-4 text-secondary" />
+                                <span className="ml-2 text-tertiary">{t('welcome.badge')}</span>
+                            </AnimatedGradientText>
                             <h1 className="text-5xl font-extrabold tracking-tight text-tertiary sm:text-6xl lg:text-7xl font-roboto">
                                 {t('welcome.title')}<br />
                                 <span className="relative inline-block mt-2">
@@ -60,13 +106,10 @@ export default function Welcome() {
                                 {t('welcome.desc')}
                             </p>
                             <div className="mt-10 flex items-center justify-center lg:justify-start gap-x-6">
-                                <Link
-                                    href={route('home')}
-                                    className="group flex items-center gap-2 rounded-full bg-tertiary px-8 py-4 text-base font-bold text-base shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl hover:bg-tertiary/90"
-                                >
+                                <ShimmerButton as={Link} href={route('home')} shimmerColor="#FFE7A3" background="#311A05">
                                     {t('welcome.explore')}
                                     <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                                </Link>
+                                </ShimmerButton>
                                 <Link
                                     href={route('register')}
                                     className="text-base font-bold leading-6 text-tertiary transition-colors hover:text-secondary flex items-center gap-2"
@@ -74,21 +117,31 @@ export default function Welcome() {
                                     {t('welcome.join')} <span>&rarr;</span>
                                 </Link>
                             </div>
-                        </div>
+                        </motion.div>
 
                         {/* Image Content */}
-                        <div className="flex-1 relative z-10 w-full max-w-lg lg:max-w-none">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.6, delay: 0.15 }}
+                            className="flex-1 relative z-10 w-full max-w-lg lg:max-w-none"
+                        >
                             <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-tertiary/20 aspect-[4/3]">
-                                <img 
-                                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" 
-                                    alt="Students studying together" 
+                                <img
+                                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80"
+                                    alt="Students studying together"
                                     className="absolute inset-0 w-full h-full object-cover"
                                 />
                                 <div className="absolute inset-0 bg-secondary/10 mix-blend-multiply"></div>
+                                <BorderBeam size={180} duration={7} colorFrom="#FFE7A3" colorTo="#311A05" />
                             </div>
-                            
+
                             {/* Decorative Floating Card */}
-                            <div className="absolute -bottom-8 -left-8 bg-base p-6 rounded-2xl shadow-xl shadow-tertiary/10 flex items-center gap-4 animate-bounce" style={{ animationDuration: '3s' }}>
+                            <motion.div
+                                className="absolute -bottom-8 -left-8 bg-base p-6 rounded-2xl shadow-xl shadow-tertiary/10 flex items-center gap-4"
+                                animate={{ y: [0, -10, 0] }}
+                                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                            >
                                 <div className="bg-label-found text-base p-3 rounded-full">
                                     <CheckCircle2 className="w-6 h-6" />
                                 </div>
@@ -96,13 +149,18 @@ export default function Welcome() {
                                     <p className="text-sm font-bold text-tertiary">{t('welcome.walletFound')}</p>
                                     <p className="text-xs text-gray-text-field">{t('welcome.returnedToOwner')}</p>
                                 </div>
-                            </div>
-                        </div>
+                            </motion.div>
+                        </motion.div>
                     </div>
 
                     {/* Features Section */}
-                    <div className="bg-base py-24 sm:py-32 border-y border-primary/30">
-                        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <div
+                        ref={featuresGlow.ref}
+                        onMouseMove={featuresGlow.onMouseMove}
+                        className="group relative bg-base py-24 sm:py-32 border-y border-primary/30"
+                    >
+                        <MouseGlow color="192,151,108" />
+                        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
                             <div className="mx-auto max-w-2xl text-center">
                                 <h2 className="text-base font-bold leading-7 text-secondary tracking-widest uppercase">{t('welcome.fasterRecovery')}</h2>
                                 <p className="mt-2 text-3xl font-extrabold tracking-tight text-tertiary sm:text-4xl font-roboto">
@@ -110,72 +168,143 @@ export default function Welcome() {
                                 </p>
                             </div>
                             <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-                                <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-                                    {/* Feature 1 */}
-                                    <div className="group flex flex-col rounded-3xl bg-background p-8 shadow-sm ring-1 ring-primary/50 transition-all hover:shadow-xl hover:shadow-secondary/20 hover:-translate-y-2">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                                            alt="Search concept" 
-                                            className="w-full h-48 object-cover rounded-2xl mb-6 shadow-md"
-                                        />
-                                        <dt className="flex items-center gap-x-4 text-xl font-bold leading-7 text-tertiary font-roboto">
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-highlight text-tertiary">
-                                                <Search className="h-6 w-6" />
-                                            </div>
-                                            {t('welcome.smartSearch')}
-                                        </dt>
-                                        <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-text-field">
-                                            <p className="flex-auto">{t('welcome.smartSearchDesc')}</p>
-                                        </dd>
-                                    </div>
-                                    {/* Feature 2 */}
-                                    <div className="group flex flex-col rounded-3xl bg-background p-8 shadow-sm ring-1 ring-primary/50 transition-all hover:shadow-xl hover:shadow-secondary/20 hover:-translate-y-2">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                                            alt="Map concept" 
-                                            className="w-full h-48 object-cover rounded-2xl mb-6 shadow-md"
-                                        />
-                                        <dt className="flex items-center gap-x-4 text-xl font-bold leading-7 text-tertiary font-roboto">
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-highlight text-tertiary">
-                                                <MapPin className="h-6 w-6" />
-                                            </div>
-                                            {t('welcome.locationBased')}
-                                        </dt>
-                                        <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-text-field">
-                                            <p className="flex-auto">{t('welcome.locationBasedDesc')}</p>
-                                        </dd>
-                                    </div>
-                                    {/* Feature 3 */}
-                                    <div className="group flex flex-col rounded-3xl bg-background p-8 shadow-sm ring-1 ring-primary/50 transition-all hover:shadow-xl hover:shadow-secondary/20 hover:-translate-y-2">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                                            alt="Handshake concept" 
-                                            className="w-full h-48 object-cover rounded-2xl mb-6 shadow-md"
-                                        />
-                                        <dt className="flex items-center gap-x-4 text-xl font-bold leading-7 text-tertiary font-roboto">
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-highlight text-tertiary">
-                                                <Handshake className="h-6 w-6" />
-                                            </div>
-                                            {t('welcome.secureClaiming')}
-                                        </dt>
-                                        <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-text-field">
-                                            <p className="flex-auto">{t('welcome.secureClaimingDesc')}</p>
-                                        </dd>
-                                    </div>
-                                </dl>
+                                <StaggerGroup as="dl" className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+                                    {[
+                                        {
+                                            Icon: Search,
+                                            img: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                                            alt: 'Search concept',
+                                            title: t('welcome.smartSearch'),
+                                            desc: t('welcome.smartSearchDesc'),
+                                        },
+                                        {
+                                            Icon: MapPin,
+                                            img: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                                            alt: 'Map concept',
+                                            title: t('welcome.locationBased'),
+                                            desc: t('welcome.locationBasedDesc'),
+                                        },
+                                        {
+                                            Icon: Handshake,
+                                            img: 'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                                            alt: 'Handshake concept',
+                                            title: t('welcome.secureClaiming'),
+                                            desc: t('welcome.secureClaimingDesc'),
+                                        },
+                                    ].map(({ Icon, img, alt, title, desc }) => (
+                                        <StaggerItem key={title}>
+                                            <MagicCard className="flex h-full flex-col rounded-3xl bg-background p-8 shadow-sm ring-1 ring-primary/50">
+                                                <div className="relative h-48 w-full overflow-hidden rounded-2xl mb-6 shadow-md">
+                                                    <img src={img} alt={alt} className="h-full w-full object-cover" />
+                                                </div>
+                                                <dt className="flex items-center gap-x-4 text-xl font-bold leading-7 text-tertiary font-roboto">
+                                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-highlight text-tertiary">
+                                                        <Icon className="h-6 w-6" />
+                                                    </div>
+                                                    {title}
+                                                </dt>
+                                                <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-text-field">
+                                                    <p className="flex-auto">{desc}</p>
+                                                </dd>
+                                            </MagicCard>
+                                        </StaggerItem>
+                                    ))}
+                                </StaggerGroup>
                             </div>
                         </div>
                     </div>
 
+                    {/* How It Works Section */}
+                    <div
+                        ref={howItWorksGlow.ref}
+                        onMouseMove={howItWorksGlow.onMouseMove}
+                        className="group relative overflow-hidden bg-background py-24 sm:py-32"
+                    >
+                        <MouseGlow color="255,231,163" />
+                        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+                            <div className="mx-auto max-w-2xl text-center">
+                                <h2 className="text-base font-bold leading-7 text-secondary tracking-widest uppercase">{t('welcome.simpleProcess')}</h2>
+                                <p className="mt-2 text-3xl font-extrabold tracking-tight text-tertiary sm:text-4xl font-roboto">
+                                    {t('welcome.howItWorksHeading')}
+                                </p>
+                                <p className="mt-4 text-lg leading-8 text-gray-text-field font-quicksand font-medium">
+                                    {t('welcome.howItWorksSubheading')}
+                                </p>
+                            </div>
+                            <StaggerGroup className="mx-auto mt-16 grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 sm:mt-20 lg:max-w-none lg:grid-cols-3">
+                                {[
+                                    { Icon: ClipboardList, title: t('welcome.step1Title'), desc: t('welcome.step1Desc') },
+                                    { Icon: Bell, title: t('welcome.step2Title'), desc: t('welcome.step2Desc') },
+                                    { Icon: ShieldCheck, title: t('welcome.step3Title'), desc: t('welcome.step3Desc') },
+                                ].map(({ Icon, title, desc }, i) => (
+                                    <StaggerItem key={title} className="relative text-center">
+                                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-tertiary text-highlight shadow-lg">
+                                            <Icon className="h-7 w-7" />
+                                        </div>
+                                        <span className="mt-4 block text-sm font-bold text-secondary tracking-widest">
+                                            {String(i + 1).padStart(2, '0')}
+                                        </span>
+                                        <h3 className="mt-2 text-xl font-bold text-tertiary font-roboto">{title}</h3>
+                                        <p className="mt-3 text-base leading-7 text-gray-text-field">{desc}</p>
+                                    </StaggerItem>
+                                ))}
+                            </StaggerGroup>
+                        </div>
+                    </div>
+
+                    {/* Why Us Section — 3D tilt showcase */}
+                    <div
+                        ref={whyUsGlow.ref}
+                        onMouseMove={whyUsGlow.onMouseMove}
+                        className="group relative overflow-hidden bg-base py-24 sm:py-32 border-y border-primary/30"
+                    >
+                        <MouseGlow color="93,140,173" />
+                        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+                            <div className="mx-auto max-w-2xl text-center">
+                                <h2 className="text-base font-bold leading-7 text-secondary tracking-widest uppercase">{t('welcome.whyUsEyebrow')}</h2>
+                                <p className="mt-2 text-3xl font-extrabold tracking-tight text-tertiary sm:text-4xl font-roboto">
+                                    {t('welcome.whyUsHeading')}
+                                </p>
+                                <p className="mt-4 text-lg leading-8 text-gray-text-field font-quicksand font-medium">
+                                    {t('welcome.whyUsSubheading')}
+                                </p>
+                            </div>
+                            <StaggerGroup className="mx-auto mt-16 grid max-w-xl grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
+                                {[
+                                    { Icon: Zap, title: t('welcome.whyUs1Title'), desc: t('welcome.whyUs1Desc') },
+                                    { Icon: Users, title: t('welcome.whyUs2Title'), desc: t('welcome.whyUs2Desc') },
+                                    { Icon: Lock, title: t('welcome.whyUs3Title'), desc: t('welcome.whyUs3Desc') },
+                                    { Icon: Award, title: t('welcome.whyUs4Title'), desc: t('welcome.whyUs4Desc') },
+                                ].map(({ Icon, title, desc }) => (
+                                    <StaggerItem key={title}>
+                                        <Tilt3DCard className="h-full rounded-3xl bg-background p-8 shadow-sm ring-1 ring-primary/50">
+                                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-tertiary text-highlight shadow-md">
+                                                <Icon className="h-6 w-6" />
+                                            </div>
+                                            <h3 className="mt-5 text-lg font-bold text-tertiary font-roboto">{title}</h3>
+                                            <p className="mt-3 text-sm leading-6 text-gray-text-field">{desc}</p>
+                                        </Tilt3DCard>
+                                    </StaggerItem>
+                                ))}
+                            </StaggerGroup>
+                        </div>
+                    </div>
+
                     {/* Stats Section */}
-                    <div className="relative isolate overflow-hidden bg-tertiary py-24 sm:py-32">
-                        <img 
-                            src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2850&q=80" 
-                            alt="University Campus" 
-                            className="absolute inset-0 -z-10 h-full w-full object-cover opacity-20" 
+                    <div
+                        ref={statsGlow.ref}
+                        onMouseMove={statsGlow.onMouseMove}
+                        className="group relative isolate overflow-hidden bg-tertiary py-24 sm:py-32"
+                    >
+                        <ScrollParallaxImg
+                            src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2850&q=80"
+                            alt="University Campus"
+                            range={[-60, 60]}
+                            className="absolute inset-0 -z-10 h-full w-full object-cover opacity-20"
                         />
                         <div className="absolute inset-0 -z-10 bg-tertiary/60"></div>
-                        
+                        <MouseGlow color="255,231,163" size={550} />
+
                         <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
                             <div className="mx-auto max-w-2xl lg:mx-0">
                                 <h2 className="text-4xl font-extrabold tracking-tight text-base sm:text-5xl font-roboto">{t('welcome.trustedByCommunity')}</h2>
@@ -187,23 +316,60 @@ export default function Welcome() {
                                 <dl className="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
                                     <div className="flex flex-col-reverse gap-y-2">
                                         <dt className="text-base leading-7 text-background/80">{t('welcome.itemsReturned')}</dt>
-                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">10,000+</dd>
+                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">
+                                            <NumberTicker value={10000} suffix="+" />
+                                        </dd>
                                     </div>
                                     <div className="flex flex-col-reverse gap-y-2">
                                         <dt className="text-base leading-7 text-background/80">{t('welcome.activeUsers')}</dt>
-                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">5,000+</dd>
+                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">
+                                            <NumberTicker value={5000} suffix="+" />
+                                        </dd>
                                     </div>
                                     <div className="flex flex-col-reverse gap-y-2">
                                         <dt className="text-base leading-7 text-background/80">{t('welcome.campuses')}</dt>
-                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">12</dd>
+                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">
+                                            <NumberTicker value={12} />
+                                        </dd>
                                     </div>
                                     <div className="flex flex-col-reverse gap-y-2">
                                         <dt className="text-base leading-7 text-background/80">{t('welcome.successRate')}</dt>
-                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">94%</dd>
+                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">
+                                            <NumberTicker value={94} suffix="%" />
+                                        </dd>
                                     </div>
                                 </dl>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Testimonials Section */}
+                    <div
+                        ref={testimonialsGlow.ref}
+                        onMouseMove={testimonialsGlow.onMouseMove}
+                        className="group relative bg-base py-24 sm:py-32 overflow-hidden"
+                    >
+                        <MouseGlow color="93,140,173" />
+                        <div className="relative mx-auto max-w-2xl text-center px-6">
+                            <h2 className="text-3xl font-extrabold tracking-tight text-tertiary sm:text-4xl font-roboto">
+                                {t('welcome.testimonialsHeading')}
+                            </h2>
+                            <p className="mt-4 text-lg leading-8 text-gray-text-field font-quicksand font-medium">
+                                {t('welcome.testimonialsSubheading')}
+                            </p>
+                        </div>
+                        <FadeIn delay={0.1} className="relative mt-16 space-y-6">
+                            <Marquee pauseOnHover className="[--duration:35s]">
+                                {[1, 2, 3, 4].map((i) => (
+                                    <TestimonialCard key={i} t={t} i={i} />
+                                ))}
+                            </Marquee>
+                            <Marquee reverse pauseOnHover className="[--duration:38s]">
+                                {[5, 6, 7, 8].map((i) => (
+                                    <TestimonialCard key={i} t={t} i={i} />
+                                ))}
+                            </Marquee>
+                        </FadeIn>
                     </div>
                 </main>
 
@@ -227,5 +393,20 @@ export default function Welcome() {
                 </footer>
             </div>
         </>
+    );
+}
+
+function TestimonialCard({ t, i }) {
+    return (
+        <figure className="marquee-item relative w-80 shrink-0 rounded-2xl bg-background p-6 ring-1 ring-primary/40 shadow-sm">
+            <Quote className="h-6 w-6 text-secondary/50" />
+            <blockquote className="mt-3 text-sm leading-6 text-tertiary">
+                {t(`welcome.testimonial${i}Quote`)}
+            </blockquote>
+            <figcaption className="mt-4 text-sm font-bold text-tertiary">
+                {t(`welcome.testimonial${i}Name`)}
+                <span className="ml-2 font-medium text-gray-text-field">{t(`welcome.testimonial${i}Role`)}</span>
+            </figcaption>
+        </figure>
     );
 }
