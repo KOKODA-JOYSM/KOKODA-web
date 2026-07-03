@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import PostCard from '@/Components/Home/PostCard';
 import CreatePostModal from '@/Components/Home/CreatePostModal';
@@ -8,6 +9,38 @@ export default function Home({ posts }) {
     const { t } = useTranslation();
     const [filterType, setFilterType] = useState('all'); // 'all', 'lost', 'found'
     const [showCreateModal, setShowCreateModal] = useState(false);
+
+    // Initial render always ranks by the default (Jakarta) location — the server
+    // has no way to know the real position yet. Once the browser grants geolocation,
+    // silently re-rank the feed against the user's actual coordinates.
+    useEffect(() => {
+        if (!navigator.geolocation) return;
+
+        // getCurrentPosition can resolve well after the permission prompt closes —
+        // if the user has already navigated away from Home, drop the result instead
+        // of reloading a 'posts' prop against whatever page they're on now.
+        let ignore = false;
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                if (ignore) return;
+                router.reload({
+                    data: {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                    },
+                    only: ['posts'],
+                });
+            },
+            () => {
+                // Denied or unavailable — keep the default Jakarta-ranked feed.
+            }
+        );
+
+        return () => {
+            ignore = true;
+        };
+    }, []);
 
     // Ambil data posts dari database via backend (PostController::index())
     // posts = Paginator object => posts.data = array of posts

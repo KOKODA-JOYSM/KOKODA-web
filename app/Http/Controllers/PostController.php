@@ -6,6 +6,7 @@ use App\Models\Location;
 use App\Models\Post;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -14,22 +15,94 @@ class PostController extends Controller
 {
     use AuthorizesRequests;
 
+    // Used when the browser hasn't granted geolocation yet (or a fresh visit before the JS runs).
+    private const DEFAULT_LATITUDE = -6.2088;
+
+    private const DEFAULT_LONGITUDE = 106.8456;
+
+    // Ranking weights: how much distance vs. recency matters. Tune here, no hard radius cutoff.
+    private const DISTANCE_WEIGHT = 0.5;
+
+    private const RECENCY_WEIGHT = 0.5;
+
+    private const DISTANCE_DECAY_KM = 50.0; // score halves-ish every ~35km further away
+
+    private const RECENCY_DECAY_HOURS = 72.0; // score halves-ish every ~50h older
+
     /**
-     * Display a listing of posts (for mainpage/home)
+     * Display a listing of posts (for mainpage/home), ranked by a combined
+     * proximity + recency score. No hard distance cutoff — far posts just sink.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $userLat = $this->parseCoordinate($request->input('latitude'), -90, 90, self::DEFAULT_LATITUDE);
+        $userLng = $this->parseCoordinate($request->input('longitude'), -180, 180, self::DEFAULT_LONGITUDE);
+
         $posts = Post::with(['user', 'location'])
             ->withCount('comments')
             ->where('status', 'active')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->get()
+            ->each(function ($post) use ($userLat, $userLng) {
+                $post->score = $this->calculateScore($post, $userLat, $userLng);
+            })
+            ->sortByDesc('score')
+            ->values();
+
+        $perPage = 10;
+        $page = (int) $request->input('page', 1);
+
+        $paginated = new LengthAwarePaginator(
+            $posts->forPage($page, $perPage)->values(),
+            $posts->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
         // image_url is resolved to a full public URL by the Post model accessor.
 
         return Inertia::render('Home', [
-            'posts' => $posts,
+            'posts' => $paginated,
         ]);
+    }
+
+    /**
+     * Parse a query-string coordinate, falling back to $default when missing,
+     * non-numeric, or out of range (e.g. ?latitude=abc or ?latitude=9999)
+     * rather than silently ranking against a garbage value like 0.0.
+     */
+    private function parseCoordinate($value, float $min, float $max, float $default): float
+    {
+        if ($value === null || $value === '' || ! is_numeric($value)) {
+            return $default;
+        }
+
+        $float = (float) $value;
+
+        if ($float < $min || $float > $max) {
+            return $default;
+        }
+
+        return $float;
+    }
+
+    /**
+     * Combined proximity + recency ranking score (higher = higher on the feed).
+     * Posts without location data are treated as very far, so they sink instead
+     * of being hard-excluded.
+     */
+    private function calculateScore(Post $post, float $userLat, float $userLng): float
+    {
+        $distanceKm = ($post->location && $post->location->latitude !== null && $post->location->longitude !== null)
+            ? $this->calculateDistance($userLat, $userLng, $post->location->latitude, $post->location->longitude)
+            : 20000.0;
+
+        $hoursSincePosted = max(0, $post->created_at->diffInHours(now()));
+
+        $proximityScore = exp(-$distanceKm / self::DISTANCE_DECAY_KM);
+        $recencyScore = exp(-$hoursSincePosted / self::RECENCY_DECAY_HOURS);
+
+        return self::DISTANCE_WEIGHT * $proximityScore + self::RECENCY_WEIGHT * $recencyScore;
     }
 
     /**
