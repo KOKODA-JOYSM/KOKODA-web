@@ -374,20 +374,84 @@ export default function Welcome() {
                 </main>
 
                 {/* Footer */}
-                <footer className="bg-background border-t border-primary/20">
-                    <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
-                        <div className="flex justify-center space-x-6 md:order-2">
-                            <span className="text-sm font-bold leading-5 text-gray-text-field hover:text-secondary cursor-pointer transition-colors">{t('welcome.privacyPolicy')}</span>
-                            <span className="text-sm font-bold leading-5 text-gray-text-field hover:text-secondary cursor-pointer transition-colors">{t('welcome.termsOfService')}</span>
-                            <span className="text-sm font-bold leading-5 text-gray-text-field hover:text-secondary cursor-pointer transition-colors">{t('welcome.contactSupport')}</span>
-                        </div>
-                        <div className="mt-8 md:order-1 md:mt-0 flex items-center justify-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-tertiary">
-                                <MapPin className="h-4 w-4" />
+                <footer className="bg-base border-t border-primary/20">
+                    <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
+                            {/* Brand */}
+                            <div className="col-span-2 lg:col-span-2">
+                                <img src="/images/logo-kokoda.svg" alt="KOKODA Logo" className="h-9 w-auto" />
+                                <p className="mt-4 max-w-xs text-sm font-medium leading-6 text-gray-text-field">
+                                    {t('welcome.footerTagline')}
+                                </p>
                             </div>
-                            <p className="text-center text-sm font-bold leading-5 text-tertiary">
-                                &copy; {new Date().getFullYear()} KOKODA {t('welcome.allRightsReserved')}
-                            </p>
+
+                            {/* Platform links */}
+                            <div>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-tertiary">{t('welcome.footerPlatform')}</h3>
+                                <ul className="mt-4 space-y-3">
+                                    <li>
+                                        <Link href={route('home')} className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary">
+                                            {t('welcome.explore')}
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('leaderboard')} className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary">
+                                            {t('nav.leaderboard')}
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('posts.create')} className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary">
+                                            {t('welcome.footerPostItem')}
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('login')} className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary">
+                                            {t('welcome.signIn')}
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Support links */}
+                            <div>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-tertiary">{t('welcome.footerSupport')}</h3>
+                                <ul className="mt-4 space-y-3">
+                                    <li>
+                                        <span className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary cursor-pointer">{t('welcome.contactSupport')}</span>
+                                    </li>
+                                    <li>
+                                        <span className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary cursor-pointer">{t('welcome.privacyPolicy')}</span>
+                                    </li>
+                                    <li>
+                                        <span className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary cursor-pointer">{t('welcome.termsOfService')}</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Get in touch / CTA */}
+                            <div className="col-span-2 lg:col-span-1">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-tertiary">{t('welcome.footerGetInTouch')}</h3>
+                                <p className="mt-4 text-sm font-medium leading-6 text-gray-text-field">
+                                    {t('welcome.footerGetInTouchDesc')}
+                                </p>
+                                <Link
+                                    href={route('register')}
+                                    className="mt-4 inline-flex items-center gap-1 text-sm font-bold leading-5 text-tertiary transition-colors hover:text-secondary"
+                                >
+                                    {t('welcome.getStarted')} <ChevronRight className="h-4 w-4" />
+                                </Link>
+                            </div>
+                        </div>
+
+                        <div className="mt-16 flex flex-col-reverse items-center justify-between gap-6 border-t border-primary/20 pt-8 md:flex-row">
+                            <div className="flex items-center gap-2">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-tertiary">
+                                    <MapPin className="h-4 w-4" />
+                                </div>
+                                <p className="text-center text-sm font-bold leading-5 text-tertiary">
+                                    &copy; {new Date().getFullYear()} KOKODA {t('welcome.allRightsReserved')}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </footer>
