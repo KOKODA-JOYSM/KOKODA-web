@@ -1,60 +1,123 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# KOKODA - Lost & Found Web Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Inertia.js](https://img.shields.io/badge/Inertia.js-9553E9?style=for-the-badge&logo=Inertia&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
 
-## About Laravel
+KOKODA is a modern university proof-of-concept web application designed to connect people who have lost items with those who have found them. Built with a robust backend using **Laravel 12** and a dynamic frontend powered by **React**, **Inertia.js**, and **Tailwind CSS**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Key Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Lost & Found Marketplace:** Create detailed posts for lost or found items. Posts include images, descriptions, categories, and location data.
+- **Robust Claim System:** An integrated workflow allows users to submit claims for found items or notify owners of lost items. The claim workflow tracks statuses (`pending`, `accepted`, `rejected`, `resolved`).
+- **Location-Based Search:** Utilize radius-based location filtering with coordinate tracking (latitude & longitude) to find items lost or found nearby.
+- **Real-time Chat:** Communicate instantly with other users regarding claims or posts. Powered by Laravel Reverb and Echo for seamless WebSocket interactions, including text, image sending, and read receipts.
+- **Leaderboard & Gamification:** Engage the community by rewarding points for returning items, complete with a leaderboard displaying top users.
+- **User Profiles & History:** Comprehensive profile pages tracking a user's active posts, incoming requests, sent claims, and transaction history.
+- **Comments & Ratings:** Users can leave comments on posts and rate their transaction experience.
+- **Multi-language Support:** Easily switch between English (EN), Indonesian (ID), and Japanese (JA).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🛠️ Technology Stack
 
-## Learning Laravel
+- **Backend:** Laravel 12 (PHP 8.2+), Laravel Sanctum (Authentication)
+- **Frontend:** React 18, Inertia.js, Tailwind CSS
+- **Real-time Engine:** Laravel Reverb, Laravel Echo, Pusher JS
+- **Database:** SQLite (default for local development)
+- **Tooling:** Vite, Composer, NPM
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🎨 Design System & Colors
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+The application uses a warm, welcoming palette defined via Tailwind CSS:
 
-## Laravel Sponsors
+- **Primary:** `#F4C799` (Warm tan/beige)
+- **Secondary:** `#C0976C` (Brownish)
+- **Highlight:** `#FFE7A3` (Light yellow)
+- **Label Found:** `#5D8CAD` (Blue)
+- **Label Lost:** `#D56666` (Red)
+- **Base:** `#FEFEFE` (Off-white)
+- **Tertiary:** `#311A05` (Dark brown - for text)
+- **Fonts:** Quicksand (Headers & Menus), Roboto (Body Text)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🗄️ Database Schema & Models
 
-### Premium Partners
+- `User`: Handles authentication and profiles.
+- `Post`: The core model for lost/found items.
+- `Location`: Manages the geolocation coordinates attached to posts.
+- `Claim`: Tracks the ownership requests and their lifecycles between the `claimant` and the `owner`.
+- `Comment`: Allows users to discuss posts.
+- `Conversation` & `Message`: Handles the real-time chat infrastructure.
+- `Rating`: Manages feedback left after a claim is resolved.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## ⚙️ Setup & Installation Guide
 
-## Contributing
+To get KOKODA running on your local machine, follow these steps:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 1. Clone the repository
+```bash
+git clone <your-repository-url>
+cd KOKODA-web
+```
 
-## Code of Conduct
+### 2. Install PHP and Node.js Dependencies
+```bash
+composer install
+npm install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 3. Environment Configuration
+Duplicate the `.env.example` file and rename it to `.env`:
+```bash
+cp .env.example .env
+```
+Generate the application key:
+```bash
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+### 4. Database Setup (SQLite)
+Create an empty SQLite database (if it doesn't exist) and run the migrations with sample data:
+```bash
+touch database/database.sqlite
+php artisan migrate --seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 5. Storage Link
+Link the storage directory to make uploaded images publicly accessible:
+```bash
+php artisan storage:link
+```
 
-## License
+### 6. Start the Development Servers
+KOKODA utilizes Laravel Reverb for WebSockets and Vite for frontend bundling. You can start all required services concurrently using the setup command provided in `composer.json` or by running:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-"# KOKODA-web" 
+```bash
+composer run dev
+```
+
+Alternatively, you can run them manually in separate terminal tabs:
+```bash
+# Terminal 1: Laravel Backend
+php artisan serve
+
+# Terminal 2: Vite Frontend
+npm run dev
+
+# Terminal 3: Laravel Reverb (WebSockets)
+php artisan reverb:start --debug
+
+# Terminal 4: Queue Listener (For asynchronous tasks)
+php artisan queue:listen
+```
+
+## 🧪 Testing the Application
+
+Once the servers are running, access the application at `http://localhost:8000`.
+
+- **Test Account:** `test@example.com` / `password`
+- **Mainpage:** `http://localhost:8000/home`
+- **Profile/Requests:** `http://localhost:8000/profile`
+
+---
+
