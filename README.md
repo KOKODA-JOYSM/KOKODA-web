@@ -56,7 +56,7 @@ To get KOKODA running on your local machine, follow these steps:
 
 ### 1. Clone the repository
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/KOKODA-JOYSM/KOKODA-web
 cd KOKODA-web
 ```
 
@@ -115,9 +115,8 @@ php artisan queue:listen
 
 Once the servers are running, access the application at `http://localhost:8000`.
 
-- **Test Account:** `test@example.com` / `password`
+- **Test Account:** `admin@gmail.com` / `admin`
 - **Mainpage:** `http://localhost:8000/home`
 - **Profile/Requests:** `http://localhost:8000/profile`
 
 ---
-
