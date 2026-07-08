@@ -28,6 +28,7 @@ export default function Welcome() {
     const howItWorksGlow = useSectionGlow();
     const whyUsGlow = useSectionGlow();
     const statsGlow = useSectionGlow();
+    const reunionsGlow = useSectionGlow();
     const testimonialsGlow = useSectionGlow();
 
     useEffect(() => {
@@ -287,7 +288,7 @@ export default function Welcome() {
                         </div>
                     </div>
 
-                    {/* Stats Section */}
+                    {/* Platform Impact Section */}
                     <div
                         ref={statsGlow.ref}
                         onMouseMove={statsGlow.onMouseMove}
@@ -299,38 +300,186 @@ export default function Welcome() {
                             range={[-60, 60]}
                             className="absolute inset-0 -z-10 h-full w-full object-cover opacity-20"
                         />
-                        <div className="absolute inset-0 -z-10 bg-tertiary/60"></div>
+                        <div className="absolute inset-0 -z-10 bg-tertiary/80 backdrop-blur-sm"></div>
                         <MouseGlow color="255,231,163" size={550} />
 
                         <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
-                            <div className="mx-auto max-w-2xl lg:mx-0">
-                                <h2 className="text-4xl font-extrabold tracking-tight text-base sm:text-5xl font-roboto">{t('welcome.trustedByCommunity')}</h2>
-                                <p className="mt-6 text-lg leading-8 text-primary font-medium">
-                                    {t('welcome.joinThousands')}
+                            <div className="mx-auto max-w-2xl text-center">
+                                <h2 className="text-base font-bold leading-7 text-highlight tracking-widest uppercase">Platform Impact</h2>
+                                <p className="mt-2 text-4xl font-extrabold tracking-tight text-base sm:text-5xl font-roboto">
+                                    Our Impact in Numbers
+                                </p>
+                                <p className="mt-4 text-lg leading-8 text-primary font-medium">
+                                    See how KOKODA is making a difference in the campus community every day.
                                 </p>
                             </div>
-                            <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
-                                <dl className="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-3">
-                                    <div className="flex flex-col-reverse gap-y-2">
-                                        <dt className="text-base leading-7 text-background/80">{t('welcome.itemsReturned')}</dt>
-                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">
-                                            <NumberTicker value={1000} suffix="+" />
-                                        </dd>
-                                    </div>
-                                    <div className="flex flex-col-reverse gap-y-2">
-                                        <dt className="text-base leading-7 text-background/80">{t('welcome.activeUsers')}</dt>
-                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">
-                                            <NumberTicker value={100} suffix="+" />
-                                        </dd>
+                            <div className="mx-auto mt-16 max-w-2xl lg:max-w-none">
+                                <dl className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+                                    {/* Stat 1 */}
+                                    <div className="flex flex-col items-center justify-center gap-y-4 p-8 rounded-3xl bg-background/5 border border-primary/20 backdrop-blur-md">
+                                        <div className="relative w-32 h-32 flex items-center justify-center">
+                                            <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
+                                                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" className="text-primary/20" strokeWidth="8" />
+                                                <motion.circle
+                                                    cx="50"
+                                                    cy="50"
+                                                    r="45"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    className="text-highlight"
+                                                    strokeWidth="8"
+                                                    strokeLinecap="round"
+                                                    initial={{ strokeDasharray: "283", strokeDashoffset: "283" }}
+                                                    whileInView={{ strokeDashoffset: 0 }}
+                                                    transition={{ duration: 2, ease: "easeOut" }}
+                                                    viewport={{ once: true }}
+                                                />
+                                            </svg>
+                                            <div className="absolute flex flex-col items-center">
+                                                <span className="text-3xl font-extrabold text-highlight"><NumberTicker value={1250} suffix="+" /></span>
+                                            </div>
+                                        </div>
+                                        <dt className="text-base font-medium leading-7 text-background/80 text-center">Items Successfully Returned</dt>
                                     </div>
 
-                                    <div className="flex flex-col-reverse gap-y-2">
-                                        <dt className="text-base leading-7 text-background/80">{t('welcome.successRate')}</dt>
-                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">
-                                            <NumberTicker value={94} suffix="%" />
-                                        </dd>
+                                    {/* Stat 2 */}
+                                    <div className="flex flex-col items-center justify-center gap-y-4 p-8 rounded-3xl bg-background/5 border border-primary/20 backdrop-blur-md">
+                                        <div className="relative w-32 h-32 flex items-center justify-center">
+                                            <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
+                                                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" className="text-primary/20" strokeWidth="8" />
+                                                <motion.circle
+                                                    cx="50"
+                                                    cy="50"
+                                                    r="45"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    className="text-highlight"
+                                                    strokeWidth="8"
+                                                    strokeLinecap="round"
+                                                    initial={{ strokeDasharray: "283", strokeDashoffset: "283" }}
+                                                    whileInView={{ strokeDashoffset: "70" }}
+                                                    transition={{ duration: 2, ease: "easeOut" }}
+                                                    viewport={{ once: true }}
+                                                />
+                                            </svg>
+                                            <div className="absolute flex flex-col items-center">
+                                                <span className="text-3xl font-extrabold text-highlight">&lt; 24h</span>
+                                            </div>
+                                        </div>
+                                        <dt className="text-base font-medium leading-7 text-background/80 text-center">Average Response Time</dt>
+                                    </div>
+
+                                    {/* Stat 3 */}
+                                    <div className="flex flex-col items-center justify-center gap-y-4 p-8 rounded-3xl bg-background/5 border border-primary/20 backdrop-blur-md">
+                                        <div className="relative w-32 h-32 flex items-center justify-center">
+                                            <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
+                                                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" className="text-primary/20" strokeWidth="8" />
+                                                <motion.circle
+                                                    cx="50"
+                                                    cy="50"
+                                                    r="45"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    className="text-highlight"
+                                                    strokeWidth="8"
+                                                    strokeLinecap="round"
+                                                    initial={{ strokeDasharray: "283", strokeDashoffset: "283" }}
+                                                    whileInView={{ strokeDashoffset: "17" }}
+                                                    transition={{ duration: 2, ease: "easeOut" }}
+                                                    viewport={{ once: true }}
+                                                />
+                                            </svg>
+                                            <div className="absolute flex flex-col items-center">
+                                                <span className="text-3xl font-extrabold text-highlight"><NumberTicker value={94} suffix="%" /></span>
+                                            </div>
+                                        </div>
+                                        <dt className="text-base font-medium leading-7 text-background/80 text-center">User Satisfaction Rate</dt>
                                     </div>
                                 </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Featured Reunions Section */}
+                    <div
+                        ref={reunionsGlow.ref}
+                        onMouseMove={reunionsGlow.onMouseMove}
+                        className="group relative overflow-hidden bg-background py-24 sm:py-32"
+                    >
+                        <MouseGlow color="244,199,153" />
+                        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+                            <div className="mx-auto max-w-2xl text-center">
+                                <h2 className="text-base font-bold leading-7 text-secondary tracking-widest uppercase">Success Stories</h2>
+                                <p className="mt-2 text-3xl font-extrabold tracking-tight text-tertiary sm:text-4xl font-roboto">
+                                    Items Reunited with Their Owners
+                                </p>
+                                <p className="mt-4 text-lg leading-8 text-gray-text-field font-quicksand font-medium">
+                                    Real stories making a difference on our campus.
+                                </p>
+                            </div>
+                            
+                            <StaggerGroup className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-12 sm:mt-20 lg:max-w-none lg:grid-cols-3">
+                                {[
+                                    {
+                                        img: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                                        title: "MacBook Pro M1",
+                                        location: "Library 2nd Floor",
+                                        time: "Claimed in 2 hours",
+                                        desc: "Left it on the desk while getting coffee. Someone found it and reported it immediately."
+                                    },
+                                    {
+                                        img: "https://images.unsplash.com/photo-1627384113743-6bd5a479fffd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                                        title: "Sony Wireless Earbuds",
+                                        location: "Cafeteria",
+                                        time: "Claimed in 45 mins",
+                                        desc: "Fell out of my pocket during lunch. Reunited before my next class started!"
+                                    },
+                                    {
+                                        img: "https://images.unsplash.com/photo-1606293926075-69a00dbfde81?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                                        title: "Student ID Card",
+                                        location: "Building C Hallway",
+                                        time: "Claimed in 15 mins",
+                                        desc: "A lifesaver! I wouldn't have been able to take my midterms without it."
+                                    }
+                                ].map((story, i) => (
+                                    <StaggerItem key={i}>
+                                        <Tilt3DCard className="h-full rounded-3xl bg-base p-6 shadow-sm ring-1 ring-primary/20 flex flex-col">
+                                            <div className="relative h-48 w-full overflow-hidden rounded-2xl mb-6 shadow-md">
+                                                <img src={story.img} alt={story.title} className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
+                                                <div className="absolute top-4 right-4 bg-highlight text-tertiary text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
+                                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                                    Returned
+                                                </div>
+                                            </div>
+                                            <h3 className="text-xl font-bold text-tertiary font-roboto">{story.title}</h3>
+                                            <div className="mt-2 flex items-center gap-2 text-sm text-gray-text-field">
+                                                <MapPin className="w-4 h-4 text-secondary" />
+                                                <span>{story.location}</span>
+                                            </div>
+                                            <p className="mt-4 text-sm leading-6 text-gray-text-field flex-grow">"{story.desc}"</p>
+                                            <div className="mt-6 pt-6 border-t border-primary/10 flex items-center justify-between">
+                                                <span className="text-xs font-bold text-secondary uppercase tracking-wider">{story.time}</span>
+                                                <div className="flex -space-x-2">
+                                                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center border-2 border-base">
+                                                        <span className="text-xs text-tertiary font-bold">F</span>
+                                                    </div>
+                                                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center border-2 border-base">
+                                                        <span className="text-xs text-base font-bold">O</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Tilt3DCard>
+                                    </StaggerItem>
+                                ))}
+                            </StaggerGroup>
+                            
+                            <div className="mt-16 flex justify-center">
+                                <Link
+                                    href={route('home')}
+                                    className="text-sm font-bold leading-6 text-tertiary transition-colors hover:text-secondary flex items-center gap-2"
+                                >
+                                    See more success stories <span>&rarr;</span>
+                                </Link>
                             </div>
                         </div>
                     </div>
