@@ -421,32 +421,32 @@ export default function Welcome() {
                             <StaggerGroup className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-12 sm:mt-20 lg:max-w-none lg:grid-cols-3">
                                 {[
                                     {
-                                        img: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                                        title: "MacBook Pro M1",
-                                        location: "Library 2nd Floor",
-                                        time: "Claimed in 2 hours",
-                                        desc: "Left it on the desk while getting coffee. Someone found it and reported it immediately."
-                                    },
-                                    {
-                                        img: "https://images.unsplash.com/photo-1627384113743-6bd5a479fffd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                                        title: "Sony Wireless Earbuds",
-                                        location: "Cafeteria",
-                                        time: "Claimed in 45 mins",
-                                        desc: "Fell out of my pocket during lunch. Reunited before my next class started!"
-                                    },
-                                    {
-                                        img: "https://images.unsplash.com/photo-1606293926075-69a00dbfde81?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                                        img: "/images/id_card.jpg",
                                         title: "Student ID Card",
                                         location: "Building C Hallway",
                                         time: "Claimed in 15 mins",
                                         desc: "A lifesaver! I wouldn't have been able to take my midterms without it."
+                                    },
+                                    {
+                                        img: "/images/shoes.jpg",
+                                        title: "Running Shoes",
+                                        location: "Sports Center",
+                                        time: "Claimed in 45 mins",
+                                        desc: "Left them near the bleachers after practice. Someone found them and reported immediately."
+                                    },
+                                    {
+                                        img: "/images/tumbler.jpg",
+                                        title: "Water Tumbler",
+                                        location: "Library 2nd Floor",
+                                        time: "Claimed in 2 hours",
+                                        desc: "Left it on the desk while getting coffee. So glad it was turned in!"
                                     }
                                 ].map((story, i) => (
                                     <StaggerItem key={i}>
-                                        <Tilt3DCard className="h-full rounded-3xl bg-base p-6 shadow-sm ring-1 ring-primary/20 flex flex-col">
+                                        <MagicCard className="flex h-full flex-col rounded-3xl bg-background p-8 shadow-sm ring-1 ring-primary/50">
                                             <div className="relative h-48 w-full overflow-hidden rounded-2xl mb-6 shadow-md">
                                                 <img src={story.img} alt={story.title} className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
-                                                <div className="absolute top-4 right-4 bg-highlight text-tertiary text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
+                                                <div className="absolute top-4 right-4 bg-label-returned text-base text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
                                                     <CheckCircle2 className="w-3.5 h-3.5" />
                                                     Returned
                                                 </div>
@@ -459,16 +459,8 @@ export default function Welcome() {
                                             <p className="mt-4 text-sm leading-6 text-gray-text-field flex-grow">"{story.desc}"</p>
                                             <div className="mt-6 pt-6 border-t border-primary/10 flex items-center justify-between">
                                                 <span className="text-xs font-bold text-secondary uppercase tracking-wider">{story.time}</span>
-                                                <div className="flex -space-x-2">
-                                                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center border-2 border-base">
-                                                        <span className="text-xs text-tertiary font-bold">F</span>
-                                                    </div>
-                                                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center border-2 border-base">
-                                                        <span className="text-xs text-base font-bold">O</span>
-                                                    </div>
-                                                </div>
                                             </div>
-                                        </Tilt3DCard>
+                                        </MagicCard>
                                     </StaggerItem>
                                 ))}
                             </StaggerGroup>

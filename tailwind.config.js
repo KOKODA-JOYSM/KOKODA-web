@@ -26,6 +26,7 @@ export default {
                 'tertiary': '#311A05',
                 'label-found': '#5D8CAD',
                 'label-lost': '#D56666',
+                'label-returned': '#5CBA7D',
                 'gray-text-field': '#777777',
                 'online-color': '#008000',
             },
