@@ -91,10 +91,7 @@ export default function Welcome() {
                             transition={{ duration: 0.6 }}
                             className="text-center lg:text-left flex-1 z-10"
                         >
-                            <AnimatedGradientText className="mb-6">
-                                <Sparkles className="h-4 w-4 text-secondary" />
-                                <span className="ml-2 text-tertiary">{t('welcome.badge')}</span>
-                            </AnimatedGradientText>
+
                             <h1 className="text-5xl font-extrabold tracking-tight text-tertiary sm:text-6xl lg:text-7xl font-roboto">
                                 {t('welcome.title')}<br />
                                 <span className="relative inline-block mt-2">
@@ -313,25 +310,20 @@ export default function Welcome() {
                                 </p>
                             </div>
                             <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
-                                <dl className="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
+                                <dl className="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-3">
                                     <div className="flex flex-col-reverse gap-y-2">
                                         <dt className="text-base leading-7 text-background/80">{t('welcome.itemsReturned')}</dt>
                                         <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">
-                                            <NumberTicker value={10000} suffix="+" />
+                                            <NumberTicker value={1000} suffix="+" />
                                         </dd>
                                     </div>
                                     <div className="flex flex-col-reverse gap-y-2">
                                         <dt className="text-base leading-7 text-background/80">{t('welcome.activeUsers')}</dt>
                                         <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">
-                                            <NumberTicker value={5000} suffix="+" />
+                                            <NumberTicker value={100} suffix="+" />
                                         </dd>
                                     </div>
-                                    <div className="flex flex-col-reverse gap-y-2">
-                                        <dt className="text-base leading-7 text-background/80">{t('welcome.campuses')}</dt>
-                                        <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">
-                                            <NumberTicker value={12} />
-                                        </dd>
-                                    </div>
+
                                     <div className="flex flex-col-reverse gap-y-2">
                                         <dt className="text-base leading-7 text-background/80">{t('welcome.successRate')}</dt>
                                         <dd className="text-4xl font-extrabold tracking-tight text-highlight font-roboto">

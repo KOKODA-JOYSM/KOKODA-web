@@ -9,7 +9,7 @@ export function MouseGlow({ color = '244,199,153', size = 650, className }) {
                 className,
             )}
             style={{
-                background: `radial-gradient(${size}px circle at var(--mx, 50%) var(--my, 50%), rgba(${color}, 0.35), transparent 60%)`,
+                background: `radial-gradient(${size}px circle at var(--mx, 50%) var(--my, 50%), rgba(${color}, 0.05), transparent 60%)`,
             }}
         />
     );
