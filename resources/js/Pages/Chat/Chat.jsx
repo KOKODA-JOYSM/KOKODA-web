@@ -12,7 +12,7 @@ import RateUserModal from '@/Pages/Profile/RateUserModal';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // Maps the app's dictionary locale to a BCP-47 tag for Intl date formatting.
-const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID' };
 
 /**
  * Format timestamp ISO ke jam:menit sesuai locale aktif.

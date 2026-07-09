@@ -4,7 +4,7 @@ import { X, CheckCircle2, XCircle, Clock, MessageSquare } from 'lucide-react';
 import RateUserModal from './RateUserModal';
 import { useTranslation } from '@/hooks/useTranslation';
 
-const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID' };
 
 const getLocation = (post) =>
     (typeof post?.location === 'object' ? post?.location?.place_name : post?.location) || 'Indonesia';

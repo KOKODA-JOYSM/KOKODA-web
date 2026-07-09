@@ -5,7 +5,7 @@ import PostActionButtons from '@/Components/Posts/PostActionButtons';
 import { useTranslation } from '@/hooks/useTranslation';
 import Avatar from '@/Components/Common/Avatar';
 
-const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID' };
 
 export default function PostDetailModal({ post, onClose }) {
     const { t, locale } = useTranslation();

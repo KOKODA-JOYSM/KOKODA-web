@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSeenClaims } from '@/hooks/useSeenClaims';
@@ -65,6 +65,19 @@ export default function Navbar() {
 
     // Pastikan state isOpen ini ADA (ini yang bikin error tadi)
     const [isOpen, setIsOpen] = useState(false);
+    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const profileDropdownRef = useRef(null);
+
+    // Close dropdown when clicked outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+                setIsProfileDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const isActive  = (item) => url?.startsWith(item.href);
     const hideHamburgerOnChat = url?.startsWith('/chat');
@@ -165,54 +178,92 @@ export default function Navbar() {
                     </ul>
                 </nav>
 
-                {/* PROFILE LINK (Bisa diklik & Data Dinamis) */}
-                <div className="flex-shrink-0 pt-3">
-                    <Link
-                        href={user ? '/profile' : '/login'}
-                        className={`relative flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-secondary no-underline border-2 transition-colors duration-200 cursor-pointer w-full box-border hover:border-base ${
-                            url?.startsWith('/profile') ? 'border-base' : 'border-transparent'
+                {/* PROFILE LINK & DROPDOWN */}
+                <div className="flex-shrink-0 pt-3 mb-16 relative" ref={profileDropdownRef}>
+                    <div
+                        className={`relative flex items-center justify-between p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-secondary border-2 transition-all duration-200 w-full box-border ${
+                            url?.startsWith('/profile') || isProfileDropdownOpen ? 'border-base shadow-sm' : 'border-transparent hover:border-base/70'
                         }`}
-                        id="nav-profile"
-                        aria-label={user ? 'Go to profile' : 'Log in'}
-                        onClick={closeMenu}
                     >
-                        {/* Notification bubble for pending requests */}
-                        {user && pendingClaimsCount > 0 && (
-                            <span
-                                className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-label-lost text-white text-[11px] font-quicksand font-bold shadow-md border-2 border-primary z-10"
-                                style={{ animation: 'bubblePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
-                            >
-                                {pendingClaimsCount > 99 ? '99+' : pendingClaimsCount}
-                            </span>
-                        )}
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full shrink-0 overflow-hidden bg-background">
-                            <img
-                                src={
-                                    user?.profile_icon
-                                        ? '/' + user.profile_icon
-                                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=F4C799&color=311A05`
-                                }
-                                alt="Profile avatar"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                        <div className="flex flex-col gap-0.5 overflow-hidden min-w-0">
-                            {user ? (
-                                <>
-                                    <p className="text-tertiary font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
-                                        {user.name}
-                                    </p>
-                                    <p className="text-tertiary font-quicksand text-xs font-normal m-0 whitespace-nowrap overflow-hidden text-ellipsis opacity-75">
-                                        @ {user.email}
-                                    </p>
-                                </>
-                            ) : (
-                                <p className="text-tertiary font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
-                                    {t('nav.login')}
-                                </p>
+                        <Link
+                            href={user ? '/profile' : '/login'}
+                            className="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0 cursor-pointer no-underline"
+                            id="nav-profile"
+                            aria-label={user ? 'Go to profile' : 'Log in'}
+                            onClick={closeMenu}
+                        >
+                            {/* Notification bubble for pending requests */}
+                            {user && pendingClaimsCount > 0 && (
+                                <span
+                                    className="absolute -top-1.5 -left-1.5 flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-label-lost text-white text-[11px] font-quicksand font-bold shadow-md border-2 border-primary z-10"
+                                    style={{ animation: 'bubblePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
+                                >
+                                    {pendingClaimsCount > 99 ? '99+' : pendingClaimsCount}
+                                </span>
                             )}
+                            <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full shrink-0 overflow-hidden bg-background shadow-inner border border-base/20">
+                                <img
+                                    src={
+                                        user?.profile_icon
+                                            ? '/' + user.profile_icon
+                                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=F4C799&color=311A05`
+                                    }
+                                    alt="Profile avatar"
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-0.5 overflow-hidden min-w-0">
+                                {user ? (
+                                    <>
+                                        <p className="text-tertiary font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
+                                            {user.name}
+                                        </p>
+                                        <p className="text-tertiary font-quicksand text-xs font-medium m-0 whitespace-nowrap overflow-hidden text-ellipsis opacity-70">
+                                            @ {user.email}
+                                        </p>
+                                    </>
+                                ) : (
+                                    <p className="text-tertiary font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
+                                        {t('nav.login')}
+                                    </p>
+                                )}
+                            </div>
+                        </Link>
+                        
+                        {user && (
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setIsProfileDropdownOpen(!isProfileDropdownOpen); }}
+                                className={`ml-2 p-1.5 sm:p-2 rounded-lg text-tertiary transition-all duration-200 ${isProfileDropdownOpen ? 'bg-base/20 text-tertiary' : 'hover:bg-primary/50 text-tertiary/70'}`}
+                                aria-label="Toggle profile menu"
+                            >
+                                <svg className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isProfileDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+                    
+                    {/* Modern Dropdown for Logout */}
+                    {user && (
+                        <div 
+                            className={`absolute top-[calc(100%+8px)] left-0 w-full bg-transparent overflow-hidden transition-all duration-300 origin-top ease-[cubic-bezier(0.34,1.56,0.64,1)] z-[11000] ${
+                                isProfileDropdownOpen ? 'opacity-100 scale-100 pointer-events-auto translate-y-0' : 'opacity-0 scale-95 pointer-events-none -translate-y-2'
+                            }`}
+                        >
+                            <Link
+                                href="/logout"
+                                method="post"
+                                as="button"
+                                className="w-full px-4 py-3 bg-label-lost hover:bg-red-500 text-base rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-200 cursor-pointer"
+                                onClick={() => { setIsProfileDropdownOpen(false); closeMenu(); }}
+                            >
+                                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+                                </svg>
+                                <span>{t('profile.logout')}</span>
+                            </Link>
                         </div>
-                    </Link>
+                    )}
                 </div>
             </aside>
 

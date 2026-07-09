@@ -2,7 +2,7 @@ import { useState } from 'react';
 import PostDetailModal from '@/Components/Home/PostDetailModal';
 import { useTranslation } from '@/hooks/useTranslation';
 
-const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID' };
 
 export default function HistoryTab({ posts = [] }) {
     const { t, locale } = useTranslation();

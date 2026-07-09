@@ -147,13 +147,7 @@ export default function GooglePlacesInput({
 
     // Get short label for a place
     const getShortLabel = (place) => {
-        const addr = place.address || {};
-        const parts = [
-            addr.city || addr.town || addr.village || addr.county,
-            addr.state || addr.region,
-            addr.country,
-        ].filter(Boolean);
-        return parts.join(', ') || place.display_name;
+        return place.name || place.display_name.split(',')[0];
     };
 
     return (

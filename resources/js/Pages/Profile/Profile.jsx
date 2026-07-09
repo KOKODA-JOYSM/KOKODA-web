@@ -108,19 +108,6 @@ export default function Profile({ posts, incomingClaims = [], sentClaims = [], s
                                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                                 </svg>
                             </Link>
-
-                            {/* Tombol Logout */}
-                            <Link
-                                href="/logout"
-                                method="post"
-                                as="button"
-                                className="mt-auto px-4 py-2 bg-label-lost hover:bg-red-500 text-base rounded-xl font-bold text-sm flex items-center gap-2 shadow transition-all duration-200 cursor-pointer"
-                            >
-                                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
-                                </svg>
-                                <span>{t('profile.logout')}</span>
-                            </Link>
                         </div>
                     </div>
 

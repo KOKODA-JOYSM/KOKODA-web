@@ -3,7 +3,7 @@ import { router } from '@inertiajs/react';
 import { X, CheckCircle, MessageSquare, XCircle, Loader2 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
-const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID' };
 
 const getLocation = (post) =>
     (typeof post?.location === 'object' ? post?.location?.place_name : post?.location) || 'Indonesia';
