@@ -3,7 +3,7 @@ import { Send, ChevronLeft, MessageCircle, Loader2, Trash2 } from 'lucide-react'
 import Avatar from '../Common/Avatar';
 import { useTranslation } from '@/hooks/useTranslation';
 
-const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID' };
 
 /**
  * Compute a friendly relative time string (e.g. "2 min ago", "just now").

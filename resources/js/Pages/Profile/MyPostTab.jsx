@@ -4,7 +4,7 @@ import PostDetailModal from '@/Components/Home/PostDetailModal';
 import CreatePostModal from '@/Components/Home/CreatePostModal';
 import { useTranslation } from '@/hooks/useTranslation';
 
-const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID' };
 
 export default function MyPostTab({ posts }) {
     const { t, locale } = useTranslation();

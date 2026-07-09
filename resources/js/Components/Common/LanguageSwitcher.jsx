@@ -4,9 +4,8 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { ChevronDown } from 'lucide-react';
 
 const LANGUAGES = [
-    { value: 'en', label: 'English', flag: 'fi-gb' },
+    { value: 'en', label: 'English', flag: 'fi-us' },
     { value: 'id', label: 'Indonesia', flag: 'fi-id' },
-    { value: 'ja', label: '日本語', flag: 'fi-jp' },
 ];
 
 const VARIANTS = {

@@ -5,7 +5,7 @@ import { MapPin } from 'lucide-react';
 import PostActionButtons from '@/Components/Posts/PostActionButtons';
 import { useTranslation } from '@/hooks/useTranslation';
 
-const LOCALE_TAGS = { en: 'en-US', id: 'id-ID', ja: 'ja-JP' };
+const LOCALE_TAGS = { en: 'en-US', id: 'id-ID' };
 
 export default function Show({ post, auth }) {
     const { t, locale } = useTranslation();
