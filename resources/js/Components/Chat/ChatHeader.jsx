@@ -65,26 +65,27 @@ function StatusLine({ isTyping, isOnline, typingUsers }) {
 
             {/* ── Online state ─────────────────────────────── */}
             <div
-                className="absolute inset-x-0 flex items-center gap-1 transition-all duration-300 ease-in-out"
+                className="absolute inset-x-0 flex items-center gap-1.5 transition-all duration-300 ease-in-out"
                 style={{
                     opacity: !isTyping && isOnline ? 1 : 0,
                     transform: !isTyping && isOnline ? 'translateY(0)' : 'translateY(8px)',
                     pointerEvents: !isTyping && isOnline ? 'auto' : 'none',
                 }}
             >
-                <span className="text-online-color">●</span>
+                <span className="h-2 w-2 rounded-full bg-online-color"></span>
                 <span className="text-[11px] text-tertiary/65 md:text-[12px]">{t('chat.online')}</span>
             </div>
 
             {/* ── Offline state ────────────────────────────── */}
             <div
-                className="absolute inset-x-0 flex items-center transition-all duration-300 ease-in-out"
+                className="absolute inset-x-0 flex items-center gap-1.5 transition-all duration-300 ease-in-out"
                 style={{
                     opacity: !isTyping && !isOnline ? 1 : 0,
                     transform: !isTyping && !isOnline ? 'translateY(0)' : 'translateY(8px)',
                     pointerEvents: !isTyping && !isOnline ? 'auto' : 'none',
                 }}
             >
+                <span className="h-2 w-2 rounded-full bg-tertiary/40"></span>
                 <span className="text-[11px] text-tertiary/40 md:text-[12px]">{t('chat.offline')}</span>
             </div>
         </div>

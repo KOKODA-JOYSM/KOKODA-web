@@ -115,7 +115,7 @@ export default function Navbar() {
                     h-screen
                     pt-4 sm:pt-5 lg:pt-6
                     px-4 sm:px-5 lg:px-5
-                    pb-4 sm:pb-4 lg:pb-16
+                    pb-4 sm:pb-4 lg:pb-6
                     fixed lg:sticky top-0 left-0 z-[10000] lg:z-10
                     transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
                     lg:transform-none lg:translate-x-0
@@ -179,7 +179,7 @@ export default function Navbar() {
                 </nav>
 
                 {/* PROFILE LINK & DROPDOWN */}
-                <div className="flex-shrink-0 pt-3 mb-16 relative" ref={profileDropdownRef}>
+                <div className="flex-shrink-0 pt-3 mt-auto relative" ref={profileDropdownRef}>
                     <div
                         className={`relative flex items-center justify-between p-2.5 sm:p-3 lg:p-3.5 rounded-xl bg-secondary border-2 transition-all duration-200 w-full box-border ${
                             url?.startsWith('/profile') || isProfileDropdownOpen ? 'border-base shadow-sm' : 'border-transparent hover:border-base/70'
@@ -237,7 +237,7 @@ export default function Navbar() {
                                 aria-label="Toggle profile menu"
                             >
                                 <svg className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isProfileDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 15l7-7 7 7" />
                                 </svg>
                             </button>
                         )}
@@ -246,8 +246,8 @@ export default function Navbar() {
                     {/* Modern Dropdown for Logout */}
                     {user && (
                         <div 
-                            className={`absolute top-[calc(100%+8px)] left-0 w-full bg-transparent overflow-hidden transition-all duration-300 origin-top ease-[cubic-bezier(0.34,1.56,0.64,1)] z-[11000] ${
-                                isProfileDropdownOpen ? 'opacity-100 scale-100 pointer-events-auto translate-y-0' : 'opacity-0 scale-95 pointer-events-none -translate-y-2'
+                            className={`absolute bottom-[calc(100%+8px)] left-0 w-full bg-transparent overflow-hidden transition-all duration-300 origin-bottom ease-[cubic-bezier(0.34,1.56,0.64,1)] z-[11000] ${
+                                isProfileDropdownOpen ? 'opacity-100 scale-100 pointer-events-auto translate-y-0' : 'opacity-0 scale-95 pointer-events-none translate-y-2'
                             }`}
                         >
                             <Link
