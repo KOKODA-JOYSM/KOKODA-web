@@ -18,4 +18,9 @@ class Location extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function posts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
 }
