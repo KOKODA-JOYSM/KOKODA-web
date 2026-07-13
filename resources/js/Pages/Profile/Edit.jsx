@@ -186,8 +186,8 @@ export default function Edit({ mustVerifyEmail }) {
                                     id="email"
                                     type="email"
                                     value={data.email}
-                                    onChange={(e) => setData('email', e.target.value)}
-                                    className="w-full bg-base text-tertiary rounded-xl border-none px-4 py-3 text-sm focus:ring-2 focus:ring-tertiary shadow-sm"
+                                    disabled
+                                    className="w-full bg-base/50 text-tertiary/60 cursor-not-allowed rounded-xl border-none px-4 py-3 text-sm shadow-sm"
                                     required
                                 />
                                 {errors.email && <span className="text-red-300 text-xs">{errors.email}</span>}

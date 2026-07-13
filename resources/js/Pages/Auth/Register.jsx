@@ -152,13 +152,13 @@ export default function Register({ previousName = '', previousEmail = '' }) {
 
                         <div className="my-3 h-px w-full bg-secondary/50" />
 
-                        <button
-                            type="button"
+                        <a
+                            href="/auth/google"
                             className="flex w-full items-center justify-center gap-3 rounded-lg border border-secondary/60 bg-base px-4 py-3 font-semibold text-gray-text-field shadow-sm transition hover:bg-background"
                         >
                             <span className="text-xl leading-none text-[#DB4437]">G</span>
                             {t('auth.signInWithGoogle')}
-                        </button>
+                        </a>
 
                         <p className="mt-7 text-center text-base text-tertiary">
                             {t('auth.alreadyHaveAccount')}{' '}
