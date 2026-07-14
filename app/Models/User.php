@@ -31,6 +31,7 @@ class User extends Authenticatable
         'profile_icon',
         'phone_number',
         'location',
+        'description',
         'points',
         'points_updated_at',
         'rating',

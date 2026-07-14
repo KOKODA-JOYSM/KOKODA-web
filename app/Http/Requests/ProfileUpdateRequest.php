@@ -20,6 +20,7 @@ class ProfileUpdateRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
 
             'location' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:500'],
             'profile_icon' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ];
     }

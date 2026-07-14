@@ -31,6 +31,7 @@ class ProfileTest extends TestCase
             ->patch('/profile', [
                 'name' => 'Test User',
                 'email' => 'test@example.com', // This should be ignored
+                'description' => 'Hi, I am a test user who loves returning lost items.',
             ]);
 
         $response
@@ -42,6 +43,7 @@ class ProfileTest extends TestCase
         $this->assertSame('Test User', $user->name);
         // Email should remain unchanged since we disabled email updates
         $this->assertSame($originalEmail, $user->email);
+        $this->assertSame('Hi, I am a test user who loves returning lost items.', $user->description);
     }
 
     public function test_user_can_delete_their_account(): void

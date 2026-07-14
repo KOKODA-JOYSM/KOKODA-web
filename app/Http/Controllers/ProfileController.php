@@ -40,6 +40,7 @@ class ProfileController extends Controller
                 'username' => $user->username,
                 'email' => $user->email,
                 'location' => $user->location,
+                'description' => $user->description,
                 'rating' => $user->rating,
                 'points' => $user->points ?? 0,
                 'profile_icon' => $user->profile_icon,
