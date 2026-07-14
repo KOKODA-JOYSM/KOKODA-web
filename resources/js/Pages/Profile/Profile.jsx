@@ -93,6 +93,13 @@ export default function Profile({ posts, incomingClaims = [], sentClaims = [], s
                                         <span>{userPoints} {t('profile.points')}</span>
                                     </div>
                                 </div>
+
+                                {/* Description / Bio */}
+                                {user.description && (
+                                    <p className="mt-3 text-sm opacity-80 whitespace-pre-line break-words max-w-xl">
+                                        {user.description}
+                                    </p>
+                                )}
                             </div>
                         </div>
 

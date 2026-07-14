@@ -87,6 +87,13 @@ export default function Show({ profileUser, posts = [] }) {
                                         <span>{userPoints} {t('profile.points')}</span>
                                     </div>
                                 </div>
+
+                                {/* Description / Bio */}
+                                {profileUser.description && (
+                                    <p className="mt-3 text-sm opacity-80 whitespace-pre-line break-words max-w-xl">
+                                        {profileUser.description}
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>

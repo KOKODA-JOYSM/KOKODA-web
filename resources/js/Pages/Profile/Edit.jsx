@@ -16,6 +16,7 @@ export default function Edit({ mustVerifyEmail }) {
         name: user.name || '',
         email: user.email || '',
         location: user.location || '',
+        description: user.description || '',
         profile_icon: null,
     });
 
@@ -204,6 +205,24 @@ export default function Edit({ mustVerifyEmail }) {
                                 onChange={(locationName) => setData('location', locationName)}
                             />
                             {errors.location && <span className="text-red-300 text-xs">{errors.location}</span>}
+                        </div>
+
+                        {/* Input Description */}
+                        <div className="flex flex-col gap-2">
+                            <label htmlFor="description" className="font-semibold text-base">
+                                {t('profile.description')}
+                            </label>
+                            <textarea
+                                id="description"
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
+                                maxLength={500}
+                                rows={4}
+                                placeholder={t('profile.descriptionPlaceholder')}
+                                className="w-full bg-base text-tertiary rounded-xl border-none px-4 py-3 text-sm focus:ring-2 focus:ring-tertiary shadow-sm resize-none"
+                            />
+                            <span className="text-xs opacity-70 self-end">{data.description.length}/500</span>
+                            {errors.description && <span className="text-red-300 text-xs">{errors.description}</span>}
                         </div>
                     </div>
 
