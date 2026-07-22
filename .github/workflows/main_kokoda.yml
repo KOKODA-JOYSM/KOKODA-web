@@ -36,9 +36,6 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-dev --optimize-autoloader
 
-      - name: Generate app key
-        run: php artisan key:generate
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
