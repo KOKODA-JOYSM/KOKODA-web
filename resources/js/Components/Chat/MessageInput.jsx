@@ -11,6 +11,7 @@ export default function MessageInput({ value, onChange, onSend, onSendImage, dis
     const handleKeyDown = (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
+            if (disabled) return;
             if (selectedFile) {
                 handleSendImage();
             } else {
@@ -135,8 +136,7 @@ export default function MessageInput({ value, onChange, onSend, onSendImage, dis
                     onChange={(event) => onChange(event.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder={selectedFile ? t('chat.pressEnterToSendImage') : t('chat.typeMessage')}
-                    disabled={disabled}
-                    className="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 font-roboto text-[13px] text-tertiary placeholder:text-tertiary/35 focus:outline-none focus:ring-0 md:text-[14px] disabled:opacity-50"
+                    className="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 font-roboto text-[13px] text-tertiary placeholder:text-tertiary/35 focus:outline-none focus:ring-0 md:text-[14px]"
                 />
 
                 <button

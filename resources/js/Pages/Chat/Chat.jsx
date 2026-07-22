@@ -191,15 +191,15 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
         // Join presence channel untuk online status
         joinPresenceChannel({
             onHere: (users) => {
-                setOnlineUserIds(new Set(users.map((u) => u.id)));
+                setOnlineUserIds(new Set(users.map((u) => String(u.id))));
             },
             onJoining: (user) => {
-                setOnlineUserIds((prev) => new Set([...prev, user.id]));
+                setOnlineUserIds((prev) => new Set([...prev, String(user.id)]));
             },
             onLeaving: (user) => {
                 setOnlineUserIds((prev) => {
                     const next = new Set(prev);
-                    next.delete(user.id);
+                    next.delete(String(user.id));
                     return next;
                 });
             },
@@ -828,7 +828,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                 ? formatTime(conv.last_message.created_at, localeTag)
                 : '',
             unreadCount: conv.unread_count || 0,
-            isOnline: conv.other_user ? onlineUserIds.has(conv.other_user.id) : false,
+            isOnline: conv.other_user ? onlineUserIds.has(String(conv.other_user.id)) : false,
             otherUser: conv.other_user,
             _raw: conv,
         };
