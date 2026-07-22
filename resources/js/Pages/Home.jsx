@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import PostCard from '@/Components/Home/PostCard';
 import CreatePostModal from '@/Components/Home/CreatePostModal';
@@ -7,6 +7,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Home({ posts }) {
     const { t } = useTranslation();
+    const { auth } = usePage().props;
     const [filterType, setFilterType] = useState('all'); // 'all', 'lost', 'found'
     const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -108,7 +109,7 @@ export default function Home({ posts }) {
 
             {/* Floating Plus Button */}
             <button
-                onClick={() => setShowCreateModal(true)}
+                onClick={() => auth.user ? setShowCreateModal(true) : router.get('/login')}
                 className="fixed bottom-8 right-8 w-[70px] h-[70px] rounded-2xl bg-primary text-background border-none text-5xl font-bold cursor-pointer shadow-md flex items-center justify-center transition-all duration-300 z-1 hover:scale-110 hover:shadow-lg"
             >
                 +
