@@ -12,9 +12,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Delete messages that were encrypted (they start with eyJ which is {"iv":... in base64)
-        // so that they don't clutter the UI since the encryption key has changed.
-        DB::table('messages')->where('body', 'LIKE', 'eyJ%')->delete();
+        // Get all messages
+        $messages = DB::table('messages')->where('body', 'LIKE', 'eyJ%')->get();
+
+        foreach ($messages as $message) {
+            try {
+                \Illuminate\Support\Facades\Crypt::decryptString($message->body);
+            } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                // Only delete if it cannot be decrypted (meaning it's a legacy message with a broken key)
+                DB::table('messages')->where('id', $message->id)->delete();
+            }
+        }
     }
 
     /**
