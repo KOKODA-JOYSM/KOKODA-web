@@ -21,6 +21,25 @@ class Message extends Model
     ];
 
     /**
+     * Gracefully decrypt the message body. If it fails (e.g. legacy plain text),
+     * return the raw value instead of throwing a 500 error.
+     */
+    protected function body(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: function ($value) {
+                if (empty($value)) return $value;
+                try {
+                    return \Illuminate\Support\Facades\Crypt::decryptString($value);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    return $value;
+                }
+            },
+            set: fn ($value) => empty($value) ? $value : \Illuminate\Support\Facades\Crypt::encryptString($value),
+        );
+    }
+
+    /**
      * Conversation tempat pesan ini berada.
      */
     public function conversation(): BelongsTo
