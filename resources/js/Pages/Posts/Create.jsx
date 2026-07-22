@@ -14,7 +14,7 @@ export default function Create() {
     const { t } = useTranslation();
     const [preview, setPreview] = useState(null);
     const [cropperSrc, setCropperSrc] = useState(null);
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, setError } = useForm({
         title: '',
         description: '',
         location_name: '',
@@ -58,22 +58,35 @@ export default function Create() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Create FormData for multipart/form-data
-        const formData = new FormData();
-        formData.append('title', data.title);
-        formData.append('description', data.description);
-        formData.append('location_name', data.location_name);
-        formData.append('latitude', data.latitude);
-        formData.append('longitude', data.longitude);
-        formData.append('type', data.type);
-        if (data.image_url) {
-            formData.append('image_url', data.image_url);
+        const newErrors = {};
+
+        if (!data.title || !data.title.trim()) {
+            newErrors.title = t('post.titleRequired') || 'Judul postingan wajib diisi.';
         }
 
-        // Use Inertia post with FormData
+        if (!data.location_name || !data.location_name.trim()) {
+            newErrors.location_name = t('post.locationRequired') || 'Lokasi wajib diisi.';
+        } else if (!data.latitude || !data.longitude) {
+            newErrors.location_name = t('post.locationSelectRequired') || 'Silakan pilih lokasi dari daftar saran agar lokasi terdeteksi.';
+        }
+
+        if (!data.description || !data.description.trim()) {
+            newErrors.description = t('post.descriptionRequired') || 'Deskripsi postingan wajib diisi.';
+        }
+
+        if (!data.image_url) {
+            newErrors.image_url = t('post.imageRequired') || 'Gambar/Foto barang wajib diunggah.';
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setError(newErrors);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
         post(route('posts.store'), {
-            data: formData,
             forceFormData: true,
+            preserveScroll: true,
             onSuccess: () => {
                 // Clear form on success
                 setData({
@@ -87,6 +100,9 @@ export default function Create() {
                 });
                 setPreview(null);
             },
+            onError: () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         });
     };
 
@@ -122,6 +138,29 @@ export default function Create() {
                 }}>
                     {t('post.reportLostOrFound')}
                 </h1>
+
+                {Object.keys(errors).length > 0 && (
+                    <div style={{
+                        backgroundColor: '#FEE2E2',
+                        border: '1px solid #EF4444',
+                        color: '#311A05',
+                        padding: '16px',
+                        borderRadius: '8px',
+                        marginBottom: '24px',
+                        fontFamily: "'Quicksand', sans-serif",
+                        fontSize: '14px',
+                        fontWeight: '600'
+                    }}>
+                        <div style={{ marginBottom: '8px', fontSize: '15px', fontWeight: '700', color: '#311A05' }}>
+                            ⚠️ {t('post.validationError') || 'Mohon lengkapi semua kolom yang wajib diisi.'}
+                        </div>
+                        <ul style={{ margin: 0, paddingLeft: '20px', fontWeight: '600', fontSize: '13px', color: '#311A05' }}>
+                            {Object.values(errors).map((err, idx) => (
+                                <li key={idx} style={{ color: '#311A05' }}>{err}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit}>
 
@@ -267,7 +306,7 @@ export default function Create() {
                             color: '#311A05',
                             marginBottom: '8px',
                         }}>
-                            {t('post.uploadImage')}
+                            {t('post.uploadImage')} <span style={{ color: '#D56666' }}>*</span>
                         </label>
                         <div style={{
                             border: `2px dashed ${COLOR_PRIMARY}`,

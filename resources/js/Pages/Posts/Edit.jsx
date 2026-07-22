@@ -18,7 +18,7 @@ export default function Edit({ post }) {
     const existingLatitude     = post.location?.latitude   ?? post.latitude   ?? '';
     const existingLongitude    = post.location?.longitude  ?? post.longitude  ?? '';
 
-    const { data, setData, patch, processing, errors } = useForm({
+    const { data, setData, patch, processing, errors, setError } = useForm({
         title: post.title,
         description: post.description,
         location_name: existingLocationName,
@@ -50,10 +50,36 @@ export default function Edit({ post }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        const newErrors = {};
+
+        if (!data.title || !data.title.trim()) {
+            newErrors.title = t('post.titleRequired') || 'Judul postingan wajib diisi.';
+        }
+
+        if (!data.location_name || !data.location_name.trim()) {
+            newErrors.location_name = t('post.locationRequired') || 'Lokasi wajib diisi.';
+        } else if (!data.latitude || !data.longitude) {
+            newErrors.location_name = t('post.locationSelectRequired') || 'Silakan pilih lokasi dari daftar saran agar lokasi terdeteksi.';
+        }
+
+        if (!data.description || !data.description.trim()) {
+            newErrors.description = t('post.descriptionRequired') || 'Deskripsi postingan wajib diisi.';
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setError(newErrors);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
         patch(route('posts.update', post.id), {
             onSuccess: () => {
                 router.visit(`/posts/${post.id}`);
             },
+            onError: () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         });
     };
 
@@ -87,6 +113,29 @@ export default function Edit({ post }) {
                 }}>
                     {t('post.editPost')}
                 </h1>
+
+                {Object.keys(errors).length > 0 && (
+                    <div style={{
+                        backgroundColor: '#FEE2E2',
+                        border: '1px solid #EF4444',
+                        color: '#311A05',
+                        padding: '16px',
+                        borderRadius: '8px',
+                        marginBottom: '24px',
+                        fontFamily: "'Quicksand', sans-serif",
+                        fontSize: '14px',
+                        fontWeight: '600'
+                    }}>
+                        <div style={{ marginBottom: '8px', fontSize: '15px', fontWeight: '700', color: '#311A05' }}>
+                            ⚠️ {t('post.validationError') || 'Mohon lengkapi semua kolom yang wajib diisi.'}
+                        </div>
+                        <ul style={{ margin: 0, paddingLeft: '20px', fontWeight: '600', fontSize: '13px', color: '#311A05' }}>
+                            {Object.values(errors).map((err, idx) => (
+                                <li key={idx} style={{ color: '#311A05' }}>{err}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit}>
 

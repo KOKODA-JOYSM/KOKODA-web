@@ -349,6 +349,12 @@ export const translations = {
         'post.currentImage': 'Current Image',
         'post.memberSince': 'Member since',
         'post.ok': 'OK',
+        'post.validationError': 'Please fill in all required fields.',
+        'post.titleRequired': 'Title is required.',
+        'post.descriptionRequired': 'Description is required.',
+        'post.locationRequired': 'Location is required.',
+        'post.locationSelectRequired': 'Please select a location from the suggestion dropdown so coordinates are detected.',
+        'post.imageRequired': 'Image is required.',
 
         // Search
         'search.result': 'result',
@@ -712,6 +718,12 @@ export const translations = {
         'post.currentImage': 'Gambar Saat Ini',
         'post.memberSince': 'Anggota sejak',
         'post.ok': 'OK',
+        'post.validationError': 'Mohon lengkapi semua kolom yang wajib diisi.',
+        'post.titleRequired': 'Judul postingan wajib diisi.',
+        'post.descriptionRequired': 'Deskripsi postingan wajib diisi.',
+        'post.locationRequired': 'Lokasi wajib diisi.',
+        'post.locationSelectRequired': 'Silakan pilih lokasi dari daftar saran agar lokasi terdeteksi.',
+        'post.imageRequired': 'Gambar/Foto barang wajib diunggah.',
 
         // Search
         'search.result': 'hasil',

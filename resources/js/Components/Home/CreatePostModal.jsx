@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { router } from '@inertiajs/react';
 import { X } from 'lucide-react';
 import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
@@ -11,6 +11,7 @@ export default function CreatePostModal({ onClose }) {
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
     const [cropperSrc, setCropperSrc] = useState(null);
+    const modalRef = useRef(null);
 
     const [data, setDataState] = useState({
         title: '',
@@ -24,6 +25,13 @@ export default function CreatePostModal({ onClose }) {
 
     const setData = (key, value) => {
         setDataState(prev => ({ ...prev, [key]: value }));
+        if (errors[key]) {
+            setErrors(prev => {
+                const next = { ...prev };
+                delete next[key];
+                return next;
+            });
+        }
     };
 
     const handleLocationSelect = ({ place_name, latitude, longitude }) => {
@@ -33,6 +41,15 @@ export default function CreatePostModal({ onClose }) {
             latitude,
             longitude,
         }));
+        if (errors.location_name || errors.latitude || errors.longitude) {
+            setErrors(prev => {
+                const next = { ...prev };
+                delete next.location_name;
+                delete next.latitude;
+                delete next.longitude;
+                return next;
+            });
+        }
     };
 
     const handleImageChange = (e) => {
@@ -51,6 +68,13 @@ export default function CreatePostModal({ onClose }) {
         setData('image_url', croppedFile);
         setPreview(previewUrl);
         setCropperSrc(null);
+        if (errors.image_url) {
+            setErrors(prev => {
+                const next = { ...prev };
+                delete next.image_url;
+                return next;
+            });
+        }
     };
 
     const handleCropCancel = () => {
@@ -59,6 +83,35 @@ export default function CreatePostModal({ onClose }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        const newErrors = {};
+
+        if (!data.title || !data.title.trim()) {
+            newErrors.title = t('post.titleRequired') || 'Judul postingan wajib diisi.';
+        }
+
+        if (!data.location_name || !data.location_name.trim()) {
+            newErrors.location_name = t('post.locationRequired') || 'Lokasi wajib diisi.';
+        } else if (data.latitude === null || data.latitude === '' || data.longitude === null || data.longitude === '') {
+            newErrors.location_name = t('post.locationSelectRequired') || 'Silakan pilih lokasi dari daftar saran agar lokasi terdeteksi.';
+        }
+
+        if (!data.description || !data.description.trim()) {
+            newErrors.description = t('post.descriptionRequired') || 'Deskripsi postingan wajib diisi.';
+        }
+
+        if (!data.image_url) {
+            newErrors.image_url = t('post.imageRequired') || 'Gambar/Foto barang wajib diunggah.';
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            if (modalRef.current) {
+                modalRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            return;
+        }
+
         setProcessing(true);
         setErrors({});
 
@@ -84,6 +137,9 @@ export default function CreatePostModal({ onClose }) {
             onError: (errs) => {
                 setProcessing(false);
                 setErrors(errs);
+                if (modalRef.current) {
+                    modalRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                }
             },
             onFinish: () => {
                 setProcessing(false);
@@ -101,6 +157,7 @@ export default function CreatePostModal({ onClose }) {
 
             {/* Modal */}
             <div
+                ref={modalRef}
                 className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-base rounded-2xl w-11/12 max-w-5xl max-h-[90vh] overflow-y-auto z-50 shadow-2xl animate-slideUp px-6 md:px-12"
             >
                 {/* Header */}
@@ -118,6 +175,21 @@ export default function CreatePostModal({ onClose }) {
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="p-3 md:p-5">
+
+                    {/* Top Error Alert Banner */}
+                    {Object.keys(errors).length > 0 && (
+                        <div className="mb-6 p-4 bg-red-50 border-2 border-red-400 rounded-xl font-quicksand text-sm md:text-base font-bold flex items-start gap-3 shadow-sm animate-fadeIn" style={{ color: '#311A05' }}>
+                            <span className="text-2xl leading-none flex-shrink-0">⚠️</span>
+                            <div>
+                                <div style={{ color: '#311A05', fontWeight: '700' }}>{t('post.validationError') || 'Mohon lengkapi semua kolom yang wajib diisi.'}</div>
+                                <ul className="mt-1.5 mb-0 pl-4 text-xs md:text-sm font-semibold list-disc space-y-0.5" style={{ color: '#311A05' }}>
+                                    {Object.values(errors).map((err, idx) => (
+                                        <li key={idx} style={{ color: '#311A05' }}>{err}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Warning Alert */}
                     <div className="mb-6 md:mb-8 p-4 px-4 md:px-8 bg-highlight rounded-lg border border-primary flex gap-3 items-start">
@@ -162,7 +234,9 @@ export default function CreatePostModal({ onClose }) {
                             placeholder={t('post.itemTitlePlaceholder')}
                             value={data.title}
                             onChange={(e) => setData('title', e.target.value)}
-                            className="w-full px-3 py-2.5 rounded-lg border-2 border-primary text-base md:text-xl font-quicksand box-border transition-colors focus:border-secondary outline-none"
+                            className={`w-full px-3 py-2.5 rounded-lg border-2 text-base md:text-xl font-quicksand box-border transition-colors outline-none ${
+                                errors.title ? 'border-red-500 bg-red-50' : 'border-primary focus:border-secondary'
+                            }`}
                         />
                         {errors.title && <div className="text-label-lost text-sm mt-1">{errors.title}</div>}
                     </div>
@@ -176,7 +250,9 @@ export default function CreatePostModal({ onClose }) {
                             value={data.location_name}
                             onSelect={handleLocationSelect}
                             placeholder={t('post.searchLocationPlaceholder')}
-                            className="w-full py-2.5 pr-3 rounded-lg border-2 border-primary text-base md:text-xl font-quicksand box-border transition-colors focus:border-secondary outline-none"
+                            className={`w-full py-2.5 pr-3 rounded-lg border-2 text-base md:text-xl font-quicksand box-border transition-colors outline-none ${
+                                (errors.location_name || errors.latitude) ? 'border-red-500 bg-red-50' : 'border-primary focus:border-secondary'
+                            }`}
                         />
                         {(errors.location_name || errors.latitude) && (
                             <div className="text-label-lost text-sm mt-1">
@@ -196,7 +272,9 @@ export default function CreatePostModal({ onClose }) {
                             value={data.description}
                             onChange={(e) => setData('description', e.target.value)}
                             rows="4"
-                            className="w-full px-3 py-5 rounded-lg border-2 border-primary text-base md:text-xl font-quicksand box-border transition-colors focus:border-secondary outline-none resize-vertical min-h-[100px]"
+                            className={`w-full px-3 py-5 rounded-lg border-2 text-base md:text-xl font-quicksand box-border transition-colors outline-none resize-vertical min-h-[100px] ${
+                                errors.description ? 'border-red-500 bg-red-50' : 'border-primary focus:border-secondary'
+                            }`}
                         />
                         {errors.description && <div className="text-label-lost text-sm mt-1">{errors.description}</div>}
                     </div>
@@ -204,9 +282,11 @@ export default function CreatePostModal({ onClose }) {
                     {/* Image Upload */}
                     <div className="mb-6 md:mb-8">
                         <label className="block font-quicksand text-2xl md:text-3xl font-semibold text-tertiary mb-3 md:mb-4">
-                            {t('post.image')}
+                            {t('post.image')} <span className="text-label-lost">*</span>
                         </label>
-                        <div className="border-2 border-dashed border-primary rounded-lg py-16 md:py-24 px-4 text-center cursor-pointer transition-all hover:bg-orange-100"
+                        <div className={`border-2 border-dashed rounded-lg py-16 md:py-24 px-4 text-center cursor-pointer transition-all hover:bg-orange-100 ${
+                            errors.image_url ? 'border-red-500 bg-red-50' : 'border-primary'
+                        }`}
                             onDragOver={(e) => {
                                 e.preventDefault();
                                 e.currentTarget.style.backgroundColor = '#FFF5E6';
