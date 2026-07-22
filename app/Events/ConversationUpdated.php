@@ -21,7 +21,7 @@ class ConversationUpdated implements ShouldBroadcast
     /**
      * Broadcast ke private channel masing-masing participant
      * sehingga conversation list mereka ter-update.
-     *
+     * ff
      * @return array<PrivateChannel>
      */
     public function broadcastOn(): array
