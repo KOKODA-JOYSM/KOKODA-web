@@ -140,7 +140,7 @@ class PostController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'type' => 'required|in:lost,found',
-            'image_url' => 'nullable|image|max:2048',
+            'image_url' => 'required|image|max:2048',
         ]);
 
         // Create Location record
