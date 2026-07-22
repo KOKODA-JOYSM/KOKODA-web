@@ -75,6 +75,8 @@ export default function CreatePostModal({ onClose }) {
 
         router.post(route('posts.store'), formData, {
             forceFormData: true,
+            preserveState: true,
+            preserveScroll: true,
             onSuccess: () => {
                 setProcessing(false);
                 onClose();
