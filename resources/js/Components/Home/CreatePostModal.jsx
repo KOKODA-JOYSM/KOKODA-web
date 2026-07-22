@@ -3,12 +3,14 @@ import { router } from '@inertiajs/react';
 import { X } from 'lucide-react';
 import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
 import { useTranslation } from '@/hooks/useTranslation';
+import ImageCropper from '@/Components/Common/ImageCropper';
 
 export default function CreatePostModal({ onClose }) {
     const { t } = useTranslation();
     const [preview, setPreview] = useState(null);
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
+    const [cropperSrc, setCropperSrc] = useState(null);
 
     const [data, setDataState] = useState({
         title: '',
@@ -36,13 +38,23 @@ export default function CreatePostModal({ onClose }) {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setData('image_url', file);
             const reader = new FileReader();
             reader.onload = (ev) => {
-                setPreview(ev.target.result);
+                setCropperSrc(ev.target.result);
             };
             reader.readAsDataURL(file);
         }
+        e.target.value = '';
+    };
+
+    const handleCropComplete = (croppedFile, previewUrl) => {
+        setData('image_url', croppedFile);
+        setPreview(previewUrl);
+        setCropperSrc(null);
+    };
+
+    const handleCropCancel = () => {
+        setCropperSrc(null);
     };
 
     const handleSubmit = (e) => {
@@ -260,6 +272,14 @@ export default function CreatePostModal({ onClose }) {
                     }
                 `}</style>
             </div>
+
+            {cropperSrc && (
+                <ImageCropper
+                    imageSrc={cropperSrc}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                />
+            )}
         </>
     );
 }

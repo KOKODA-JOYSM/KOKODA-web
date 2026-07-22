@@ -4,6 +4,7 @@ import { useForm } from '@inertiajs/react';
 import GooglePlacesInput from '@/Components/Common/GooglePlacesInput';
 import tailwindConfig from '../../../../tailwind.config.js';
 import { useTranslation } from '@/hooks/useTranslation';
+import ImageCropper from '@/Components/Common/ImageCropper';
 
 const { colors } = tailwindConfig.theme.extend;
 const COLOR_PRIMARY = colors.primary;    // '#F4C799'
@@ -12,6 +13,7 @@ const COLOR_SECONDARY = colors.secondary; // '#C0976C'
 export default function Create() {
     const { t } = useTranslation();
     const [preview, setPreview] = useState(null);
+    const [cropperSrc, setCropperSrc] = useState(null);
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
@@ -34,13 +36,23 @@ export default function Create() {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setData('image_url', file);
             const reader = new FileReader();
-            reader.onload = (e) => {
-                setPreview(e.target.result);
+            reader.onload = (ev) => {
+                setCropperSrc(ev.target.result);
             };
             reader.readAsDataURL(file);
         }
+        e.target.value = '';
+    };
+
+    const handleCropComplete = (croppedFile, previewUrl) => {
+        setData('image_url', croppedFile);
+        setPreview(previewUrl);
+        setCropperSrc(null);
+    };
+
+    const handleCropCancel = () => {
+        setCropperSrc(null);
     };
 
     const handleSubmit = (e) => {
@@ -386,6 +398,14 @@ export default function Create() {
                     </div>
                 </form>
             </div>
+
+            {cropperSrc && (
+                <ImageCropper
+                    imageSrc={cropperSrc}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                />
+            )}
         </AppLayout>
     );
 }
