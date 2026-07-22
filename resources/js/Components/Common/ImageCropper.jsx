@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
+import 'react-easy-crop/react-easy-crop.css';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // Helper function to get cropped image
