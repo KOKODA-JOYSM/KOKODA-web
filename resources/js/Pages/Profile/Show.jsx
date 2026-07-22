@@ -18,8 +18,8 @@ export default function Show({ profileUser, posts = [] }) {
     };
     const userLocation = truncateWords(profileUser.location || t('profile.unknown'));
     const userRating = profileUser.rating > 0
-        ? Number(profileUser.rating).toFixed(1) + '/5'
-        : '0.0/5';
+        ? Number(profileUser.rating).toFixed(1) + '/5.0'
+        : '0.0/5.0';
     const userPoints = profileUser.points ?? 0;
     const userAvatar = profileUser.profile_icon
         ? ('/' + profileUser.profile_icon)
@@ -50,7 +50,7 @@ export default function Show({ profileUser, posts = [] }) {
 
                             {/* Detail Teks */}
                             <div className="flex flex-col justify-center text-base text-center sm:text-left">
-                                <h1 className="text-3xl font-bold mb-1 text-base">{profileUser.name}</h1>
+                                <h1 className="text-4xl sm:text-5xl font-bold mb-1 text-base">{profileUser.name}</h1>
                                 {profileUser.username && (
                                     <p className="text-sm font-medium opacity-70 mb-2">@{profileUser.username}</p>
                                 )}
