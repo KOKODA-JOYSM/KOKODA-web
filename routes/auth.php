@@ -12,19 +12,19 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('register', function() { return redirect('/login'); })
-        ->name('register.disabled');
+    Route::get('register', [RegisteredUserController::class, 'create'])
+        ->name('register');
 
-    // Route::post('register', [RegisteredUserController::class, 'store']);
+    Route::post('register', [RegisteredUserController::class, 'store']);
 
-    // Route::get('register/otp', [RegisteredUserController::class, 'showOtp'])
-    //     ->name('register.otp');
+    Route::get('register/otp', [RegisteredUserController::class, 'showOtp'])
+        ->name('register.otp');
 
-    // Route::post('register/otp/resend', [RegisteredUserController::class, 'resendOtp'])
-    //     ->name('register.otp.resend');
+    Route::post('register/otp/resend', [RegisteredUserController::class, 'resendOtp'])
+        ->name('register.otp.resend');
 
-    // Route::post('register/otp/verify', [RegisteredUserController::class, 'verifyOtp'])
-    //     ->name('register.otp.verify');
+    Route::post('register/otp/verify', [RegisteredUserController::class, 'verifyOtp'])
+        ->name('register.otp.verify');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
