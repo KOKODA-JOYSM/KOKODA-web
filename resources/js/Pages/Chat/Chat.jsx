@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { usePage } from '@inertiajs/react';
+import { usePage, router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import ConversationList from '@/Components/Chat/ConversationList';
 import ChatHeader from '@/Components/Chat/ChatHeader';
@@ -736,6 +736,20 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
     const markAsRead = (conversationId) => {
         window.axios
             .post(`/chat/conversations/${conversationId}/read`)
+            .then(() => {
+                // Zero out the local unread badge on this conversation
+                setConversations((prev) =>
+                    prev.map((c) =>
+                        c.id === conversationId
+                            ? { ...c, unread_count: 0 }
+                            : c
+                    )
+                );
+
+                // Refresh the Inertia shared prop so the navbar bubble
+                // updates instantly without a full page reload.
+                router.reload({ only: ['unreadConversationsCount'] });
+            })
             .catch(() => {});
     };
 

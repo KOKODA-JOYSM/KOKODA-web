@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
+// Register the /broadcasting/auth endpoint so that Laravel Echo can
+// authenticate users for private & presence channels (online status).
+// Without this route, presence-channel auth returns 404 on Azure and
+// every user appears permanently offline.
+Broadcast::routes(['middleware' => ['web', 'auth']]);
+
 // Private channel untuk setiap conversation.
 // User hanya bisa subscribe jika dia adalah participant conversation tersebut.
 Broadcast::channel('conversation.{conversationId}', function (User $user, int $conversationId) {
