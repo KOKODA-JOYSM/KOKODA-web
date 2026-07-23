@@ -550,13 +550,13 @@ export default function Welcome() {
                                 <h3 className="text-sm font-bold uppercase tracking-wider text-tertiary">{t('welcome.footerSupport')}</h3>
                                 <ul className="mt-4 space-y-3">
                                     <li>
-                                        <span className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary cursor-pointer">{t('welcome.contactSupport')}</span>
+                                        <Link href={route('contact')} className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary cursor-pointer">{t('welcome.contactSupport')}</Link>
                                     </li>
                                     <li>
-                                        <span className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary cursor-pointer">{t('welcome.privacyPolicy')}</span>
+                                        <Link href={route('privacy')} className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary cursor-pointer">{t('welcome.privacyPolicy')}</Link>
                                     </li>
                                     <li>
-                                        <span className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary cursor-pointer">{t('welcome.termsOfService')}</span>
+                                        <Link href={route('terms')} className="text-sm font-bold leading-5 text-gray-text-field transition-colors hover:text-secondary cursor-pointer">{t('welcome.termsOfService')}</Link>
                                     </li>
                                 </ul>
                             </div>
