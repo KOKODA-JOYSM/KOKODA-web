@@ -71,6 +71,19 @@ Route::get('/search', function () {
     return Inertia::render('Search');
 })->name('search');
 
+// Static Pages
+Route::get('/contact', function () {
+    return Inertia::render('Static/ContactSupport');
+})->name('contact');
+
+Route::get('/privacy-policy', function () {
+    return Inertia::render('Static/PrivacyPolicy');
+})->name('privacy');
+
+Route::get('/terms-of-service', function () {
+    return Inertia::render('Static/TermsOfService');
+})->name('terms');
+
 Route::get('/leaderboard', [LeaderboardController::class, 'show'])->name('leaderboard');
 Route::get('/api/leaderboard', [LeaderboardController::class, 'index']);
 
