@@ -41,8 +41,18 @@ class GoogleAuthController extends Controller
                 Auth::login($user);
                 return redirect()->intended(route('dashboard', absolute: false));
             } else {
-                // Create a new user (DISABLED)
-                return redirect('/login')->withErrors(['email' => 'Pendaftaran akun baru ditutup sementara. Hubungi Admin.']);
+                // Create a new user
+                $newUser = User::create([
+                    'name' => $googleUser->name,
+                    'email' => $googleUser->email,
+                    'username' => Str::slug($googleUser->name) . '_' . Str::random(4),
+                    'google_id' => $googleUser->id,
+                    'password' => null, // Password is not needed for Google login
+                    'email_verified_at' => now(), // Assume Google verified their email
+                ]);
+
+                Auth::login($newUser);
+                return redirect()->intended(route('dashboard', absolute: false));
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Google Login Error: ' . $e->getMessage());
