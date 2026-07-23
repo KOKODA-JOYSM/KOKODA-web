@@ -50,7 +50,7 @@ export default function Show({ profileUser, posts = [] }) {
 
                             {/* Detail Teks */}
                             <div className="flex flex-col justify-center text-base text-center sm:text-left">
-                                <h1 className="text-4xl sm:text-5xl font-bold mb-1 text-base">{profileUser.name}</h1>
+                                <h1 className="text-2xl sm:text-3xl font-bold mb-1 text-base">{profileUser.name}</h1>
                                 {profileUser.username && (
                                     <p className="text-sm font-medium opacity-70 mb-2">@{profileUser.username}</p>
                                 )}
