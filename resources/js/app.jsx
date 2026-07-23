@@ -17,7 +17,7 @@ if (typeof window !== 'undefined' && window.Ziggy) {
 }
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    title: (title) => title,
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.jsx`,
