@@ -13,11 +13,13 @@ export default function PostDetailModal({ post, onClose }) {
     const { auth } = usePage().props;
     const [currentImage, setCurrentImage] = useState(0);
 
-    // Hide hamburger navbar when modal is open
+    // Hide hamburger navbar and lock background scroll when modal is open
     useEffect(() => {
         document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
         return () => {
             document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
         };
     }, []);
 

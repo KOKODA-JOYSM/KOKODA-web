@@ -59,7 +59,7 @@ export default function Profile({ posts, incomingClaims = [], sentClaims = [], s
 
                             {/* Detail Teks */}
                             <div className="flex flex-col justify-center text-base text-center sm:text-left">
-                                <h1 className="text-4xl sm:text-5xl font-bold mb-3 text-base">{user.name}</h1>
+                                <h1 className="text-2xl sm:text-3xl font-bold mb-1 text-base">{user.name}</h1>
 
                                 <div className="flex items-center justify-center sm:justify-start gap-2 mb-1.5 opacity-90">
                                     <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
