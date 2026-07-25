@@ -300,13 +300,11 @@ class PostController extends Controller
         $query = Post::with(['user', 'location'])
             ->where('status', 'active');
 
-        // Text search
+        // Text search — match item name (title) only, not description or location,
+        // so this stays independent from the separate location filter below.
         if ($request->has('q') && $request->q) {
             $searchTerm = $request->q;
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('title', 'like', "%{$searchTerm}%")
-                    ->orWhere('description', 'like', "%{$searchTerm}%");
-            });
+            $query->where('title', 'like', "%{$searchTerm}%");
         }
 
         // Type filter
