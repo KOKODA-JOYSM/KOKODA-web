@@ -215,6 +215,51 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
         });
     }, [authUser?.id]);
 
+    // ─────────────────────────────────────────────────────────────
+    // ONLINE STATUS POLLING FALLBACK
+    // Azure production has no Reverb WebSocket server, so presence
+    // channels never fire. This polls the server-side last_seen_at
+    // heartbeat to determine who is online. When Echo presence IS
+    // working (local dev), both sources merge — the Set union is
+    // harmless and the UI always shows the most up-to-date status.
+    // ─────────────────────────────────────────────────────────────
+    useEffect(() => {
+        if (!authUser) return;
+
+        const pollOnlineStatus = () => {
+            // Collect all other-user IDs from the conversation list
+            const otherUserIds = conversations
+                .map((c) => c.other_user?.id)
+                .filter(Boolean);
+
+            if (otherUserIds.length === 0) return;
+
+            window.axios
+                .get(`/chat/online-status?ids=${otherUserIds.join(',')}&_t=${Date.now()}`)
+                .then((response) => {
+                    const serverOnline = response.data?.online_user_ids;
+                    if (Array.isArray(serverOnline)) {
+                        setOnlineUserIds((prev) => {
+                            const next = new Set(serverOnline.map(String));
+                            // If the sets are identical, keep the old reference to
+                            // avoid unnecessary re-renders
+                            if (next.size === prev.size && [...next].every((id) => prev.has(id))) {
+                                return prev;
+                            }
+                            return next;
+                        });
+                    }
+                })
+                .catch(() => {});
+        };
+
+        // Poll immediately on mount, then every 30 seconds
+        pollOnlineStatus();
+        const intervalId = setInterval(pollOnlineStatus, 30_000);
+
+        return () => clearInterval(intervalId);
+    }, [authUser?.id, conversations]);
+
     // Auto-start conversation jika targetUserId disediakan (dari query param)
     useEffect(() => {
         if (targetUserId && authUser) {

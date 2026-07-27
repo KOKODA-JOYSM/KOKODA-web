@@ -141,6 +141,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/conversations/{conversation}/read', [ChatController::class, 'markAsRead'])->name('chat.read');
     Route::post('/chat/conversations/{conversation}/typing', [ChatController::class, 'typing'])->name('chat.typing');
     Route::get('/chat/users/search', [ChatController::class, 'searchUsers'])->name('chat.users.search');
+    Route::get('/chat/online-status', [ChatController::class, 'onlineStatus'])->name('chat.online-status');
 });
 
 require __DIR__.'/auth.php';

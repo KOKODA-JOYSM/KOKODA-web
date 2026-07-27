@@ -291,6 +291,40 @@ class ChatController extends Controller
         return response()->json($users);
     }
 
+    /**
+     * API: Return user IDs that are currently "online".
+     *
+     * A user is considered online if their `last_seen_at` is within the
+     * last 2 minutes. The UpdateLastSeen middleware touches this field on
+     * every authenticated request (throttled to once/60s per user).
+     *
+     * This endpoint exists because Azure production does not run a Reverb
+     * WebSocket server. The Chat frontend polls this endpoint as a fallback
+     * so that online/offline indicators work without WebSockets.
+     *
+     * Accepts an optional `ids` query parameter (comma-separated user IDs)
+     * to limit the query to only the users the caller cares about.
+     */
+    public function onlineStatus(Request $request): JsonResponse
+    {
+        $threshold = now()->subMinutes(2);
+
+        $query = User::where('last_seen_at', '>=', $threshold);
+
+        // If the frontend sends a list of user IDs, only check those
+        $rawIds = $request->query('ids');
+        if ($rawIds) {
+            $ids = array_filter(array_map('intval', explode(',', $rawIds)));
+            if (!empty($ids)) {
+                $query->whereIn('id', $ids);
+            }
+        }
+
+        $onlineIds = $query->pluck('id')->map(fn ($id) => (string) $id)->values();
+
+        return response()->json(['online_user_ids' => $onlineIds]);
+    }
+
     // ─────────────────────────────────────────────────────────────
     // HELPER METHODS
     // ─────────────────────────────────────────────────────────────
