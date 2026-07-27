@@ -2,14 +2,14 @@ import React from 'react';
 
 function ConversationAvatar({ conversation }) {
     return (
-        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-background ring-2 ring-[#F7D8B0] md:h-14 md:w-14">
+        <div className="relative h-12 w-12 shrink-0 md:h-14 md:w-14">
             <img
                 src={conversation.avatar}
                 alt={conversation.name}
-                className="h-full w-full object-cover"
+                className="h-full w-full rounded-full object-cover bg-background ring-2 ring-[#F7D8B0]"
             />
             {conversation.isOnline && (
-                <span className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full border-2 border-[#F1C38B] bg-online-color" />
+                <span className="absolute bottom-0 right-0 z-10 h-3.5 w-3.5 rounded-full border-2 border-[#F1C38B] bg-online-color" />
             )}
         </div>
     );

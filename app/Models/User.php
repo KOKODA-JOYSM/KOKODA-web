@@ -37,6 +37,7 @@ class User extends Authenticatable
         'rating',
         'otp_code',
         'otp_expires_at',
+        'last_seen_at',
     ];
 
     /**
@@ -60,6 +61,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'otp_expires_at' => 'datetime',
             'points_updated_at' => 'datetime',
+            'last_seen_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
