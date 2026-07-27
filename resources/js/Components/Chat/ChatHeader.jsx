@@ -108,14 +108,14 @@ export default function ChatHeader({ conversation, onShowConversations, typingUs
                     <ChevronLeft className="h-5 w-5" />
                 </button>
 
-                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-base ring-2 ring-[#F7D8B0] md:h-12 md:w-12">
+                <div className="relative h-10 w-10 shrink-0 md:h-12 md:w-12">
                     <img
                         src={conversation.avatar}
                         alt={conversation.name}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full rounded-full object-cover bg-base ring-2 ring-[#F7D8B0]"
                     />
                     {conversation.isOnline && (
-                        <span className="absolute bottom-0.5 right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#FBF4E8] bg-online-color" />
+                        <span className="absolute bottom-0 right-0 z-10 h-3 w-3 rounded-full border-2 border-[#FBF4E8] bg-online-color" />
                     )}
                 </div>
 

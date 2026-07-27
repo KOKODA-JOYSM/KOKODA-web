@@ -41,7 +41,7 @@ export default function Navbar() {
     // pesan/request baru (ConversationUpdated dibroadcast oleh ChatController
     // dan ClaimController), refresh shared props supaya badge chat di sidebar
     // dan bubble incoming request di profile langsung menyala tanpa reload.
-    const { subscribeToUserChannel } = useEcho();
+    const { subscribeToUserChannel, joinPresenceChannel } = useEcho();
     useEffect(() => {
         if (!user?.id) return;
         subscribeToUserChannel(user.id, {
@@ -61,7 +61,9 @@ export default function Navbar() {
                 });
             },
         });
-    }, [user?.id, subscribeToUserChannel]);
+        // Join global presence channel agar status online user aktif dari semua halaman aplikasi
+        joinPresenceChannel();
+    }, [user?.id, subscribeToUserChannel, joinPresenceChannel]);
 
     // Pastikan state isOpen ini ADA (ini yang bikin error tadi)
     const [isOpen, setIsOpen] = useState(false);

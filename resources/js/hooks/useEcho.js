@@ -83,6 +83,15 @@ export function useEcho() {
 
         if (handlers.onHere) {
             channel.here(handlers.onHere);
+            // Jika channel sudah tersubscribe sebelumnya (misal dari Navbar di halaman lain),
+            // event pusher:subscription_succeeded tidak akan memicu callback lagi.
+            // Cek cache member di channel.subscription dan panggil onHere langsung.
+            if (channel.subscription?.members?.members) {
+                const existingMembers = Object.values(channel.subscription.members.members);
+                if (existingMembers.length > 0) {
+                    setTimeout(() => handlers.onHere(existingMembers), 0);
+                }
+            }
         }
 
         if (handlers.onJoining) {

@@ -191,23 +191,28 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
         // Join presence channel untuk online status
         joinPresenceChannel({
             onHere: (users) => {
-                setOnlineUserIds(new Set(users.map((u) => String(u.id))));
+                if (!Array.isArray(users)) return;
+                setOnlineUserIds(new Set(users.map((u) => String(u?.id ?? u)).filter(Boolean)));
             },
             onJoining: (user) => {
-                setOnlineUserIds((prev) => new Set([...prev, String(user.id)]));
+                if (!user) return;
+                const id = user.id ?? user.user_id ?? user;
+                if (id != null) {
+                    setOnlineUserIds((prev) => new Set([...prev, String(id)]));
+                }
             },
             onLeaving: (user) => {
-                setOnlineUserIds((prev) => {
-                    const next = new Set(prev);
-                    next.delete(String(user.id));
-                    return next;
-                });
+                if (!user) return;
+                const id = user.id ?? user.user_id ?? user;
+                if (id != null) {
+                    setOnlineUserIds((prev) => {
+                        const next = new Set(prev);
+                        next.delete(String(id));
+                        return next;
+                    });
+                }
             },
         });
-
-        return () => {
-            leavePresenceChannel();
-        };
     }, [authUser?.id]);
 
     // Auto-start conversation jika targetUserId disediakan (dari query param)
