@@ -14,6 +14,7 @@ export default function Edit({ mustVerifyEmail }) {
     // Menggunakan useForm dari Inertia untuk menangani input & submit data
     const { data, setData, patch, processing, errors } = useForm({
         name: user.name || '',
+        username: user.name || user.username || '',
         email: user.email || '',
         location: user.location || '',
         description: user.description || '',
@@ -76,7 +77,7 @@ export default function Edit({ mustVerifyEmail }) {
         if (user.profile_icon) {
             return '/' + user.profile_icon;
         }
-        return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=F4C799&color=311A05';
+        return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.username || user.name) + '&background=F4C799&color=311A05';
     };
 
     return (
@@ -110,7 +111,7 @@ export default function Edit({ mustVerifyEmail }) {
                                 <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-base bg-white shadow-inner">
                                     <img
                                         src={getAvatarUrl()}
-                                        alt={user.name}
+                                        alt={user.username || user.name}
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
@@ -132,7 +133,7 @@ export default function Edit({ mustVerifyEmail }) {
 
                             {/* Nama & Email */}
                             <div className="text-base flex flex-col justify-center">
-                                <h2 className="text-3xl font-bold mb-2">{user.name}</h2>
+                                <h2 className="text-3xl font-bold mb-2">{user.username || user.name}</h2>
                                 <div className="flex items-center gap-2 opacity-90 text-sm">
                                     <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                                         <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
@@ -164,18 +165,24 @@ export default function Edit({ mustVerifyEmail }) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             {/* Input Username */}
                             <div className="flex flex-col gap-2">
-                                <label htmlFor="name" className="font-semibold text-base">
+                                <label htmlFor="username" className="font-semibold text-base">
                                     {t('profile.username')}
                                 </label>
                                 <input
-                                    id="name"
+                                    id="username"
                                     type="text"
-                                    value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
+                                    value={data.username}
+                                    onChange={(e) => {
+                                        setData(prev => ({
+                                            ...prev,
+                                            username: e.target.value,
+                                            name: e.target.value,
+                                        }));
+                                    }}
                                     className="w-full bg-base text-tertiary rounded-xl border-none px-4 py-3 text-sm focus:ring-2 focus:ring-tertiary shadow-sm"
                                     required
                                 />
-                                {errors.name && <span className="text-red-300 text-xs">{errors.name}</span>}
+                                {(errors.username || errors.name) && <span className="text-red-300 text-xs">{errors.username || errors.name}</span>}
                             </div>
 
                             {/* Input Email Address */}
