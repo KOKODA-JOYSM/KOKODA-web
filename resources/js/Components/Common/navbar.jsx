@@ -208,7 +208,7 @@ export default function Navbar() {
                                     src={
                                         user?.profile_icon
                                             ? '/' + user.profile_icon
-                                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=F4C799&color=311A05`
+                                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.username || user?.name || 'User')}&background=F4C799&color=311A05`
                                     }
                                     alt="Profile avatar"
                                     className="w-full h-full object-cover"
@@ -218,7 +218,7 @@ export default function Navbar() {
                                 {user ? (
                                     <>
                                         <p className="text-tertiary font-quicksand text-sm lg:text-[15px] font-semibold m-0 whitespace-nowrap overflow-hidden text-ellipsis">
-                                            {user.name}
+                                            {user.username || user.name}
                                         </p>
                                         <p className="text-tertiary font-quicksand text-xs font-medium m-0 whitespace-nowrap overflow-hidden text-ellipsis opacity-70">
                                             @ {user.email}

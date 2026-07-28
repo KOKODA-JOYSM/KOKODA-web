@@ -17,7 +17,7 @@ export default function RateUserModal({ claim, onClose }) {
 
     const claimantAvatar = ratee?.profile_icon
         ? ('/' + ratee.profile_icon)
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(ratee?.name || 'User')}&background=F4C799&color=311A05`;
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(ratee?.username || ratee?.name || 'User')}&background=F4C799&color=311A05`;
 
     // Lock body scroll
     useEffect(() => {

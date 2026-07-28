@@ -26,7 +26,7 @@ export function avatarUrl(user) {
 
 /** Generated fallback avatar from the user's name/username initials. */
 function fallbackUrl(user) {
-    const name = user?.name || user?.username || 'User';
+    const name = user?.username || user?.name || 'User';
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=F4C799&color=311A05`;
 }
 
@@ -40,7 +40,7 @@ export default function Avatar({ user, className = '', size = 36, alt }) {
         >
             <img
                 src={src}
-                alt={alt || user?.name || 'User avatar'}
+                alt={alt || user?.username || user?.name || 'User avatar'}
                 className="w-full h-full object-cover"
                 loading="lazy"
                 onError={(e) => {
