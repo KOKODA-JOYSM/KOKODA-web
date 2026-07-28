@@ -112,14 +112,14 @@ export default function PostDetailModal({ post, onClose }) {
                                 >
                                     <Avatar user={post.user} size={32} className="w-8 h-8" />
                                     <span className="font-quicksand font-semibold text-xs text-tertiary truncate group-hover/profile:underline">
-                                        {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || t('profile.unknown')}`}
+                                        {post.user?.name ? `@${post.user.name}` : `@${post.user?.username || t('profile.unknown')}`}
                                     </span>
                                 </Link>
                             ) : (
                                 <div className="flex items-center gap-2 min-w-0 flex-1">
                                     <Avatar user={post.user} size={32} className="w-8 h-8" />
                                     <span className="font-quicksand font-semibold text-xs text-tertiary truncate">
-                                        {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || t('profile.unknown')}`}
+                                        {post.user?.name ? `@${post.user.name}` : `@${post.user?.username || t('profile.unknown')}`}
                                     </span>
                                 </div>
                             )}

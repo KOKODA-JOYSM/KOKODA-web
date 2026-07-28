@@ -23,7 +23,7 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
 
     const claimantAvatar = claimant?.profile_icon
         ? ('/' + claimant.profile_icon)
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(claimant?.username || claimant?.name || 'User')}&background=F4C799&color=311A05`;
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(claimant?.name || claimant?.username || 'User')}&background=F4C799&color=311A05`;
 
     const requestDate = claim.created_at
         ? new Date(claim.created_at).toLocaleDateString(localeTag, {
@@ -99,11 +99,11 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
                     <div className="flex items-center gap-3">
                         <img
                             src={claimantAvatar}
-                            alt={claimant?.name}
+                            alt={claimant?.name || claimant?.username}
                             className="w-9 h-9 rounded-full object-cover border-2 border-secondary/30"
                         />
                         <span className="font-quicksand font-bold text-tertiary text-sm">
-                            @{claimant?.username || claimant?.name || 'unknown'}
+                            @{claimant?.name || claimant?.username || 'unknown'}
                         </span>
                         <span className={`text-xs font-quicksand font-bold px-3 py-1 rounded-full text-base ${
                             post?.type === 'lost' ? 'bg-label-lost' : 'bg-label-found'

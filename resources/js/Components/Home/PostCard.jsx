@@ -148,14 +148,14 @@ export default function PostCard({ post }) {
                             >
                                 <Avatar user={post.user} size={36} className="w-9 h-9" />
                                 <span className="font-quicksand text-sm font-semibold text-tertiary truncate group-hover/profile:underline">
-                                    {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || t('profile.unknown')}`}
+                                    {post.user?.name ? `@${post.user.name}` : `@${post.user?.username || t('profile.unknown')}`}
                                 </span>
                             </Link>
                         ) : (
                             <div className="flex items-center gap-3 min-w-0">
                                 <Avatar user={post.user} size={36} className="w-9 h-9" />
                                 <span className="font-quicksand text-sm font-semibold text-tertiary truncate">
-                                    {post.user?.username ? `@${post.user.username}` : `@${post.user?.name || t('profile.unknown')}`}
+                                    {post.user?.name ? `@${post.user.name}` : `@${post.user?.username || t('profile.unknown')}`}
                                 </span>
                             </div>
                         )}

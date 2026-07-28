@@ -128,9 +128,9 @@ export default function PostCommentsView({
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-baseline gap-2 mb-0.5">
                                     <p className="font-quicksand text-sm font-semibold text-tertiary">
-                                        {comment.user?.username
-                                            ? `@${comment.user.username}`
-                                            : (comment.user?.name || t('profile.unknown'))}
+                                        {comment.user?.name
+                                            ? `@${comment.user.name}`
+                                            : (comment.user?.username ? `@${comment.user.username}` : t('profile.unknown'))}
                                         {isOwn && (
                                             <span className="ml-1.5 text-[10px] font-normal text-primary border border-primary rounded-full px-1.5 py-0.5">
                                                 {t('post.you')}
