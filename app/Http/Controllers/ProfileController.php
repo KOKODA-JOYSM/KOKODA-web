@@ -98,6 +98,12 @@ class ProfileController extends Controller
 
         $user->fill($validated);
 
+        if (isset($validated['username'])) {
+            $user->name = $validated['username'];
+        } elseif (isset($validated['name'])) {
+            $user->username = $validated['name'];
+        }
+
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
