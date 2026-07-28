@@ -73,7 +73,7 @@ function ClaimCard({ claim, mode, onClick, isNew, rateable }) {
 
                     {mode === 'incoming' && claim.claimant && (
                         <p className="text-xs text-tertiary/50 mt-1.5 font-medium">
-                            {t('profile.requestedBy')} @{claim.claimant.username || claim.claimant.name}
+                            {t('profile.requestedBy')} @{claim.claimant.name || claim.claimant.username}
                         </p>
                     )}
                 </div>

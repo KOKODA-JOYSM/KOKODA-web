@@ -43,14 +43,14 @@ export default function Show({ profileUser, posts = [] }) {
                             <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-base shrink-0 bg-white shadow-inner">
                                 <img
                                     src={userAvatar}
-                                    alt={profileUser.username || profileUser.name}
+                                    alt={profileUser.name || profileUser.username}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
 
                             {/* Detail Teks */}
                             <div className="flex flex-col justify-center text-base text-center sm:text-left">
-                                <h1 className="text-2xl sm:text-3xl font-bold mb-1 text-base">{profileUser.username || profileUser.name}</h1>
+                                <h1 className="text-2xl sm:text-3xl font-bold mb-1 text-base">{profileUser.name || profileUser.username}</h1>
                                 {profileUser.username && (
                                     <p className="text-sm font-medium opacity-70 mb-2">@{profileUser.username}</p>
                                 )}

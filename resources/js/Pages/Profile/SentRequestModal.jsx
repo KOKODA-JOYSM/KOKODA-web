@@ -56,7 +56,7 @@ export default function SentRequestModal({ claim, onClose }) {
 
     const ownerAvatar = owner?.profile_icon
         ? ('/' + owner.profile_icon)
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(owner?.username || owner?.name || 'User')}&background=F4C799&color=311A05`;
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(owner?.name || owner?.username || 'User')}&background=F4C799&color=311A05`;
 
     const requestDate = claim.created_at
         ? new Date(claim.created_at).toLocaleDateString(localeTag, {
@@ -109,11 +109,11 @@ export default function SentRequestModal({ claim, onClose }) {
                     <div className="flex items-center gap-3">
                         <img
                             src={ownerAvatar}
-                            alt={owner?.name}
+                            alt={owner?.name || owner?.username}
                             className="w-9 h-9 rounded-full object-cover border-2 border-secondary/30"
                         />
                         <span className="font-quicksand font-bold text-tertiary text-sm">
-                            @{owner?.username || owner?.name || 'unknown'}
+                            @{owner?.name || owner?.username || 'unknown'}
                         </span>
                         <span className={`text-xs font-quicksand font-bold px-3 py-1 rounded-full text-base ${
                             post?.type === 'lost' ? 'bg-label-lost' : 'bg-label-found'

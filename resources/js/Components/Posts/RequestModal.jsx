@@ -116,7 +116,7 @@ export default function RequestModal({ post, onClose, onSuccess }) {
                                         {post.title}
                                     </p>
                                     <p className="font-quicksand text-xs text-gray-500">
-                                        {t('post.postedBy')} @{post.user?.username || post.user?.name || t('profile.unknown')}
+                                        {t('post.postedBy')} @{post.user?.name || post.user?.username || t('profile.unknown')}
                                     </p>
                                 </div>
                             </div>
