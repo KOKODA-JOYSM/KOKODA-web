@@ -56,7 +56,7 @@ export default function SentRequestModal({ claim, onClose }) {
 
     const ownerAvatar = owner?.profile_icon
         ? ('/' + owner.profile_icon)
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(owner?.name || 'User')}&background=F4C799&color=311A05`;
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(owner?.username || owner?.name || 'User')}&background=F4C799&color=311A05`;
 
     const requestDate = claim.created_at
         ? new Date(claim.created_at).toLocaleDateString(localeTag, {

@@ -11,7 +11,7 @@ function getSenderAvatar(message) {
     if (message.senderAvatar) return message.senderAvatar;
     const url = avatarUrl(message.sender);
     if (url) return url;
-    const name = message.senderName || message.sender?.name || 'User';
+    const name = message.senderName || message.sender?.username || message.sender?.name || 'User';
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=F4C799&color=311A05`;
 }
 

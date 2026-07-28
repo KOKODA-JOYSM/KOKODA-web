@@ -23,7 +23,7 @@ export default function IncomingRequestModal({ claim, onClose, onResolve, onReje
 
     const claimantAvatar = claimant?.profile_icon
         ? ('/' + claimant.profile_icon)
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(claimant?.name || 'User')}&background=F4C799&color=311A05`;
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(claimant?.username || claimant?.name || 'User')}&background=F4C799&color=311A05`;
 
     const requestDate = claim.created_at
         ? new Date(claim.created_at).toLocaleDateString(localeTag, {

@@ -60,7 +60,7 @@ export default function Show({ post, auth }) {
                         {/* User Info */}
                         <div className="bg-gray-100 px-4 py-4 rounded-lg mb-6 border-l-4 border-label-lost">
                             <div className="font-semibold text-tertiary mb-1">
-                                {t('post.postedBy')}: @{post.user.name}
+                                {t('post.postedBy')}: @{post.user.username || post.user.name}
                             </div>
                             <div className="text-xs text-gray-600">
                                 {t('post.memberSince')} {new Date(post.user.created_at).toLocaleDateString(localeTag)}

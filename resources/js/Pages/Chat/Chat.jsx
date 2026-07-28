@@ -102,7 +102,7 @@ function getAvatarUrl(user) {
     const url = avatarUrl(user);
     if (url) return url;
     // Fallback: generated avatar from user name
-    const name = user.name || user.username || 'User';
+    const name = user.username || user.name || 'User';
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=F4C799&color=311A05`;
 }
 
@@ -578,7 +578,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                                   body: response.data.message.body,
                                   type: response.data.message.type,
                                   sender_id: authUser.id,
-                                  sender_name: authUser.name,
+                                  sender_name: authUser.username || authUser.name,
                                   created_at: response.data.message.created_at,
                               },
                           }
@@ -676,7 +676,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
                                   type: 'image',
                                   image_url: response.data.message.image_url,
                                   sender_id: authUser.id,
-                                  sender_name: authUser.name,
+                                  sender_name: authUser.username || authUser.name,
                                   created_at: response.data.message.created_at,
                               },
                           }
@@ -853,7 +853,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
             conversation_id: msg.conversation_id,
             user_id: msg.user_id,
             senderId: msg.user_id,
-            senderName: msg.sender?.name || t('profile.unknown'),
+            senderName: msg.sender?.username || msg.sender?.name || t('profile.unknown'),
             senderAvatar: getAvatarUrl(msg.sender),
             body: msg.body,
             text: msg.body,
@@ -885,7 +885,7 @@ export default function ChatPage({ initialConversations = [], targetUserId = nul
 
         return {
             id: conv.id,
-            name: conv.other_user?.name || t('chat.unknownUser'),
+            name: conv.other_user?.username || conv.other_user?.name || t('chat.unknownUser'),
             avatar: getAvatarUrl(conv.other_user),
             lastMessage,
             timestamp: conv.last_message

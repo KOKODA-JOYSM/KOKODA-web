@@ -156,15 +156,15 @@ export default function ConversationList({
                                                     ? user.profile_icon.startsWith('/')
                                                         ? user.profile_icon
                                                         : `/images/profile-icons/${user.profile_icon}`
-                                                    : `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`
+                                                    : `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.username || user.name)}`
                                             }
-                                            alt={user.name}
+                                            alt={user.username || user.name}
                                             className="h-full w-full object-cover"
                                         />
                                     </div>
                                     <div className="min-w-0 flex-1">
                                         <p className="truncate font-quicksand text-[15px] font-semibold text-tertiary">
-                                            {user.name}
+                                            {user.username || user.name}
                                         </p>
                                         {user.username && (
                                             <p className="truncate font-roboto text-[12px] text-tertiary/60">
