@@ -45,15 +45,15 @@ export default function Welcome() {
             <div className="min-h-screen bg-background font-quicksand text-tertiary selection:bg-highlight selection:text-tertiary">
                 {/* Navbar */}
                 <nav className={`fixed top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-base/90 shadow-sm backdrop-blur-md' : 'bg-transparent'}`}>
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
                         <div className="flex h-20 items-center justify-between">
                             <div className="flex items-center">
-                                <img src="/images/logo-kokoda.svg" alt="KOKODA Logo" className="h-10 w-auto" />
+                                <img src="/images/logo-kokoda.svg" alt="KOKODA Logo" className="h-8 w-auto sm:h-10" />
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 sm:gap-4">
                                 <Link
                                     href={route('login')}
-                                    className="text-sm font-bold text-gray-text-field transition-colors hover:text-tertiary"
+                                    className="whitespace-nowrap text-xs font-bold text-gray-text-field transition-colors hover:text-tertiary sm:text-sm"
                                 >
                                     {t('welcome.signIn')}
                                 </Link>
@@ -61,7 +61,7 @@ export default function Welcome() {
                                     href={route('home')}
                                     whileHover={{ y: -3, backgroundColor: '#FFE7A3', boxShadow: '0 10px 20px -6px rgba(49,26,5,0.25)' }}
                                     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                                    className="hidden sm:block rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-tertiary shadow-md"
+                                    className="inline-flex whitespace-nowrap rounded-full bg-primary px-3 py-2 text-xs font-bold text-tertiary shadow-md sm:px-6 sm:py-2.5 sm:text-sm"
                                 >
                                     {t('welcome.getStarted')}
                                 </MotionLink>
@@ -75,7 +75,7 @@ export default function Welcome() {
                     <div
                         ref={heroGlow.ref}
                         onMouseMove={heroGlow.onMouseMove}
-                        className="group relative overflow-hidden pt-32 pb-20 lg:pt-48 lg:pb-32 flex flex-col lg:flex-row items-center justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 gap-12"
+                        className="group relative mx-auto flex max-w-7xl flex-col items-center justify-between gap-10 overflow-hidden px-4 pt-28 pb-20 sm:px-6 md:pt-32 lg:flex-row lg:gap-12 lg:px-8 lg:pt-48 lg:pb-32"
                     >
                         <MouseGlow color="244,199,153" />
                         <DotPattern
@@ -93,9 +93,9 @@ export default function Welcome() {
                             className="text-center lg:text-left flex-1 z-10"
                         >
 
-                            <h1 className="text-5xl font-extrabold tracking-tight text-tertiary sm:text-6xl lg:text-7xl font-roboto">
-                                {t('welcome.title')}<br />
-                                <span className="relative inline-block mt-2">
+                            <h1 className="font-roboto text-[clamp(1.375rem,7vw,4.5rem)] leading-[1.15] font-extrabold tracking-tight text-tertiary">
+                                <span className="whitespace-nowrap lg:whitespace-normal">{t('welcome.title')}</span><br />
+                                <span className="relative mt-2 inline-block whitespace-nowrap lg:whitespace-normal">
                                     <span className="relative z-10">{t('welcome.subtitle')}</span>
                                     <div className="absolute -bottom-2 left-0 h-4 w-full bg-highlight -z-10 rounded-sm"></div>
                                 </span>
