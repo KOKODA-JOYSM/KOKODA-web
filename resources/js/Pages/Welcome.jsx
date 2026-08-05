@@ -41,7 +41,7 @@ export default function Welcome() {
 
     return (
         <>
-            <Head title="Welcome to KOKODA" />
+            <Head title={t('welcome.pageTitle')} />
             <div className="min-h-screen bg-background font-quicksand text-tertiary selection:bg-highlight selection:text-tertiary">
                 {/* Navbar */}
                 <nav className={`fixed top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-base/90 shadow-sm backdrop-blur-md' : 'bg-transparent'}`}>
@@ -127,7 +127,7 @@ export default function Welcome() {
                             <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-tertiary/20 aspect-[4/3]">
                                 <img
                                     src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80"
-                                    alt="Students studying together"
+                                    alt={t('welcome.altStudents')}
                                     className="absolute inset-0 w-full h-full object-cover"
                                 />
                                 <div className="absolute inset-0 bg-secondary/10 mix-blend-multiply"></div>
@@ -171,21 +171,21 @@ export default function Welcome() {
                                         {
                                             Icon: Search,
                                             img: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                                            alt: 'Search concept',
+                                            alt: t('welcome.altSearch'),
                                             title: t('welcome.smartSearch'),
                                             desc: t('welcome.smartSearchDesc'),
                                         },
                                         {
                                             Icon: MapPin,
                                             img: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                                            alt: 'Map concept',
+                                            alt: t('welcome.altMap'),
                                             title: t('welcome.locationBased'),
                                             desc: t('welcome.locationBasedDesc'),
                                         },
                                         {
                                             Icon: Handshake,
                                             img: 'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                                            alt: 'Handshake concept',
+                                            alt: t('welcome.altHandshake'),
                                             title: t('welcome.secureClaiming'),
                                             desc: t('welcome.secureClaimingDesc'),
                                         },
@@ -296,7 +296,7 @@ export default function Welcome() {
                     >
                         <ScrollParallaxImg
                             src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2850&q=80"
-                            alt="University Campus"
+                            alt={t('welcome.altCampus')}
                             range={[-60, 60]}
                             className="absolute inset-0 -z-10 h-full w-full object-cover opacity-20"
                         />
@@ -305,12 +305,12 @@ export default function Welcome() {
 
                         <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
                             <div className="mx-auto max-w-2xl text-center">
-                                <h2 className="text-base font-bold leading-7 text-highlight tracking-widest uppercase">Platform Impact</h2>
+                                <h2 className="text-base font-bold leading-7 text-highlight tracking-widest uppercase">{t('welcome.platformImpact')}</h2>
                                 <p className="mt-2 text-4xl font-extrabold tracking-tight text-base sm:text-5xl font-roboto">
-                                    Our Impact in Numbers
+                                    {t('welcome.impactHeading')}
                                 </p>
                                 <p className="mt-4 text-lg leading-8 text-primary font-medium">
-                                    See how KOKODA is making a difference in the campus community every day.
+                                    {t('welcome.impactDescription')}
                                 </p>
                             </div>
                             <div className="mx-auto mt-16 max-w-2xl lg:max-w-none">
@@ -339,7 +339,7 @@ export default function Welcome() {
                                                 <span className="text-3xl font-extrabold text-highlight"><NumberTicker value={1250} suffix="+" /></span>
                                             </div>
                                         </div>
-                                        <dt className="text-base font-medium leading-7 text-background/80 text-center">Items Successfully Returned</dt>
+                                        <dt className="text-base font-medium leading-7 text-background/80 text-center">{t('welcome.itemsSuccessfullyReturned')}</dt>
                                     </div>
 
                                     {/* Stat 2 */}
@@ -366,7 +366,7 @@ export default function Welcome() {
                                                 <span className="text-3xl font-extrabold text-highlight">&lt; 24h</span>
                                             </div>
                                         </div>
-                                        <dt className="text-base font-medium leading-7 text-background/80 text-center">Average Response Time</dt>
+                                        <dt className="text-base font-medium leading-7 text-background/80 text-center">{t('welcome.averageResponseTime')}</dt>
                                     </div>
 
                                     {/* Stat 3 */}
@@ -393,7 +393,7 @@ export default function Welcome() {
                                                 <span className="text-3xl font-extrabold text-highlight"><NumberTicker value={94} suffix="%" /></span>
                                             </div>
                                         </div>
-                                        <dt className="text-base font-medium leading-7 text-background/80 text-center">User Satisfaction Rate</dt>
+                                        <dt className="text-base font-medium leading-7 text-background/80 text-center">{t('welcome.userSatisfactionRate')}</dt>
                                     </div>
                                 </dl>
                             </div>
@@ -409,12 +409,12 @@ export default function Welcome() {
                         <MouseGlow color="244,199,153" />
                         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
                             <div className="mx-auto max-w-2xl text-center">
-                                <h2 className="text-base font-bold leading-7 text-secondary tracking-widest uppercase">Success Stories</h2>
+                                <h2 className="text-base font-bold leading-7 text-secondary tracking-widest uppercase">{t('welcome.successStories')}</h2>
                                 <p className="mt-2 text-3xl font-extrabold tracking-tight text-tertiary sm:text-4xl font-roboto">
-                                    Items Reunited with Their Owners
+                                    {t('welcome.reunitedHeading')}
                                 </p>
                                 <p className="mt-4 text-lg leading-8 text-gray-text-field font-quicksand font-medium">
-                                    Real stories making a difference on our campus.
+                                    {t('welcome.reunitedSubheading')}
                                 </p>
                             </div>
                             
@@ -422,24 +422,24 @@ export default function Welcome() {
                                 {[
                                     {
                                         img: "/images/id_card.jpg",
-                                        title: "Student ID Card",
-                                        location: "Building C Hallway",
-                                        time: "Claimed in 15 mins",
-                                        desc: "A lifesaver! I wouldn't have been able to take my midterms without it."
+                                        title: t('welcome.story1Title'),
+                                        location: t('welcome.story1Location'),
+                                        time: t('welcome.story1Time'),
+                                        desc: t('welcome.story1Desc')
                                     },
                                     {
                                         img: "/images/shoes.jpg",
-                                        title: "Running Shoes",
-                                        location: "Sports Center",
-                                        time: "Claimed in 45 mins",
-                                        desc: "Left them near the bleachers after practice. Someone found them and reported immediately."
+                                        title: t('welcome.story2Title'),
+                                        location: t('welcome.story2Location'),
+                                        time: t('welcome.story2Time'),
+                                        desc: t('welcome.story2Desc')
                                     },
                                     {
                                         img: "/images/tumbler.jpg",
-                                        title: "Water Tumbler",
-                                        location: "Library 2nd Floor",
-                                        time: "Claimed in 2 hours",
-                                        desc: "Left it on the desk while getting coffee. So glad it was turned in!"
+                                        title: t('welcome.story3Title'),
+                                        location: t('welcome.story3Location'),
+                                        time: t('welcome.story3Time'),
+                                        desc: t('welcome.story3Desc')
                                     }
                                 ].map((story, i) => (
                                     <StaggerItem key={i}>
@@ -448,7 +448,7 @@ export default function Welcome() {
                                                 <img src={story.img} alt={story.title} className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
                                                 <div className="absolute top-4 right-4 bg-label-returned text-base text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
                                                     <CheckCircle2 className="w-3.5 h-3.5" />
-                                                    Returned
+                                                    {t('welcome.returned')}
                                                 </div>
                                             </div>
                                             <h3 className="text-xl font-bold text-tertiary font-roboto">{story.title}</h3>
@@ -470,7 +470,7 @@ export default function Welcome() {
                                     href={route('home')}
                                     className="text-sm font-bold leading-6 text-tertiary transition-colors hover:text-secondary flex items-center gap-2"
                                 >
-                                    See more success stories <span>&rarr;</span>
+                                    {t('welcome.seeMoreStories')} <span>&rarr;</span>
                                 </Link>
                             </div>
                         </div>
