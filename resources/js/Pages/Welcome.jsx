@@ -93,9 +93,10 @@ export default function Welcome() {
                             className="text-center lg:text-left flex-1 z-10"
                         >
 
-                            <h1 className="font-roboto text-[clamp(1.375rem,7vw,4.5rem)] leading-[1.15] font-extrabold tracking-tight text-tertiary">
-                                <span className="whitespace-nowrap lg:whitespace-normal">{t('welcome.title')}</span><br />
-                                <span className="relative mt-2 inline-block whitespace-nowrap lg:whitespace-normal">
+                            <h1 className="font-roboto text-[clamp(1.125rem,6vw,3.75rem)] leading-[1.15] font-extrabold tracking-tight text-tertiary lg:text-[clamp(2rem,3.2vw,2.75rem)]">
+                                <span className="block whitespace-nowrap">{t('welcome.titleLost')}</span>
+                                <span className="block whitespace-nowrap">{t('welcome.titleFound')}</span>
+                                <span className="relative mt-2 inline-block whitespace-nowrap text-[0.75em]">
                                     <span className="relative z-10">{t('welcome.subtitle')}</span>
                                     <div className="absolute -bottom-2 left-0 h-4 w-full bg-highlight -z-10 rounded-sm"></div>
                                 </span>
